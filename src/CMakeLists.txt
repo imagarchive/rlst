@@ -15,22 +15,32 @@
 
 cmake_minimum_required(VERSION 3.30)
 
-set(RLST_HPP)
+set(
+    RLST_HPP 
+    par/geometry.hpp
+    par/par.hpp
+)
+
 set(RLST_IPP)
-set(RLST_CPP main.cpp)
+
+set(
+    RLST_CPP
+    par/geometry.cpp
+    main.cpp
+)
 
 find_package(Boost REQUIRED)
 add_executable(rlst "${RLST_CPP}")
 
 target_link_libraries(rlst PRIVATE Boost::boost)
 
-# target_sources(
-#     rlst
+target_sources(
+    rlst
 
-#     PUBLIC
-#         FILE_SET HEADERS
-#         TYPE HEADERS
-#         FILES "${RLST_HPP}" "${RLST_IPP}"
-# )
+    PUBLIC
+        FILE_SET HEADERS
+        TYPE HEADERS
+        FILES "${RLST_HPP}"
+)
 
 rlst_add_to_doc("${RLST_HPP}")
