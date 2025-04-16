@@ -55,6 +55,93 @@ namespace par
    */
 
   void swap(Point& __lhs, Point& __rhs) noexcept;
+
+  /* SEGMENT */
+
+  /**
+   * A segment
+   */
+
+  class Segment
+  {
+    friend void swap(Segment& __lhs, Segment& __rhs) noexcept;
+  public:
+    /**
+     * Constructs a @ref Segment with its parameters
+     *
+     * @param[in] __start The start @ref Point
+     * @param[in] __end   The end @ref Point
+     */
+
+    constexpr Segment(Point __start, Point __end) noexcept
+      : m_start(__start)
+      , m_end(__end)
+    {}
+  public:
+    /**
+     * Copy constructor of @ref Segment
+     *
+     * @param[in] __other The @ref Segment to copy
+     */
+
+    constexpr Segment(const Segment& __other) = default;
+
+    /**
+     * Move constructor of @ref Segment
+     *
+     * @param[in, out] __other The @ref Segment to move
+     */
+
+    constexpr Segment(Segment&& __other) = default;
+
+    ~Segment() = default; ///< Destructs a @ref Segment
+  public:
+    /**
+     * Copy assignment operator for @ref Segment
+     *
+     * @param[in] __other The @ref Segment to copy
+     * @return A reference to this @ref Segment
+     */
+
+    constexpr Segment& operator=(const Segment& __other) = default;
+
+    /**
+     * Move assignment operator for @ref Segment
+     *
+     * @param[in, out] __other The @ref Segment to move
+     * @return A reference to this @ref Segment
+     */
+
+    constexpr Segment& operator=(Segment&& __other) = default;
+  public:
+    /**
+     * Get the start @ref Point
+     *
+     * @return The start @ref Point
+     */
+
+    constexpr Point start() const noexcept { return m_start; }
+
+    /**
+     * Get the end @ref Point
+     *
+     * @return The end @ref Point
+     */
+
+    constexpr Point end() const noexcept { return m_end; }
+  private:
+    Point m_start; ///< The start point
+    Point m_end;   ///< The end point
+  };
+
+  /**
+   * Swap two @ref Segment "segments"
+   *
+   * @param[in, out] __lhs The left hand side operand
+   * @param[in, out] __rhs The right hand side operand
+   */
+
+  void swap(Segment& __lhs, Segment& __rhs) noexcept;
 }
 
 #endif // RLST_RLST_PAR_HPP

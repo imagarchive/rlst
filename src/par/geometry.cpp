@@ -29,4 +29,12 @@ namespace par
     swap(__lhs.y, __rhs.y);
     swap(__lhs.z, __rhs.z);
   }
+
+  void swap(Segment& __lhs, Segment& __rhs) noexcept
+  {
+    using std::swap;
+
+    swap(__lhs.m_start, __rhs.m_start);
+    swap(__lhs.m_end, __rhs.m_end);
+  }
 }
