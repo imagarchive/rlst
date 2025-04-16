@@ -21,7 +21,7 @@
 
 namespace par
 {
-  void swap(Point& __lhs, Point& __rhs)
+  void swap(Point& __lhs, Point& __rhs) noexcept
   {
     using std::swap;
 

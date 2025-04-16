@@ -54,7 +54,7 @@ namespace par
    * @param[in, out] __rhs The right hand side operand
    */
 
-  void swap(Point& __lhs, Point& __rhs);
+  void swap(Point& __lhs, Point& __rhs) noexcept;
 }
 
 #endif // RLST_RLST_PAR_HPP
