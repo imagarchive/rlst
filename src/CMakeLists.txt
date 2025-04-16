@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.30)
 
 set(
-    RLST_HPP 
+    RLST_HPP
     par/geometry.hpp
     par/par.hpp
 )
