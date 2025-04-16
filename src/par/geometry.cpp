@@ -19,7 +19,7 @@
 #include "par/geometry.hpp"
 #include <utility>
 
-namespace par
+namespace rlst::par
 {
   void swap(Point& __lhs, Point& __rhs) noexcept
   {

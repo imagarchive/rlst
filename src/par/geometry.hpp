@@ -30,7 +30,7 @@
  * utility functions.
  */
 
-namespace par
+namespace rlst::par
 {
   using literal_t = std::int64_t; ///< A literal
 
