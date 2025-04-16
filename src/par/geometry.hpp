@@ -21,6 +21,15 @@
 
 #include <cstdint>
 
+/**
+ * @file
+ * This file contains the definitions of geometric structures and operations
+ *
+ * It includes the definition of a @ref Point structure and a @ref Segment
+ * class, along with their respective constructors, assignment operators, and
+ * utility functions.
+ */
+
 namespace par
 {
   using literal_t = std::int64_t; ///< A literal
