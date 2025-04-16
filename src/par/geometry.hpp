@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_HPP
-#  define RLST_RLST_PAR_HPP
+#ifndef RLST_RLST_PAR_GEOMETRY_HPP
+#  define RLST_RLST_PAR_GEOMETRY_HPP
 
 #include <cstdint>
 
@@ -144,4 +144,4 @@ namespace rlst::par
   void swap(Segment& __lhs, Segment& __rhs) noexcept;
 }
 
-#endif // RLST_RLST_PAR_HPP
+#endif // RLST_RLST_PAR_GEOMETRY_HPP
