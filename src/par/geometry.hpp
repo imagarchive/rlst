@@ -34,7 +34,7 @@ namespace rlst::par
 {
   using literal_t = std::int64_t; ///< A literal
 
-  /* POINT */
+  /* Point */
 
   /**
    * A point
@@ -94,7 +94,7 @@ namespace rlst::par
 
   void swap(Point& __lhs, Point& __rhs) noexcept;
 
-  /* SEGMENT */
+  /* Segment */
 
   /**
    * A segment
