@@ -51,9 +51,9 @@ namespace rlst::par::cell
 
   enum class PortType
   {
-    input,  ///< The port is an input
+    input, ///< The port is an input
     output, ///< The port is an output
-    inout   ///< The port is an input and output
+    inout ///< The port is an input and output
   };
 
   /* Port */
