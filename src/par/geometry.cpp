@@ -23,7 +23,7 @@ namespace rlst::par
 {
   /* Point */
 
-  std::size_t hash_value(const Point& __input) noexcept
+  std::size_t hash_value(const Point& __input)
   {
     std::size_t seed = 0;
 
@@ -45,7 +45,7 @@ namespace rlst::par
 
   /* Segment */
 
-  std::size_t hash_value(const Segment& __input) noexcept
+  std::size_t hash_value(const Segment& __input)
   {
     std::size_t seed = 0;
 

@@ -83,7 +83,7 @@ namespace rlst::par
    * @return The hash value of the @ref Point
    */
 
-  std::size_t hash_value(const Point& __input) noexcept;
+  std::size_t hash_value(const Point& __input);
 
   /**
    * Swap two @ref Point "points"
@@ -103,7 +103,7 @@ namespace rlst::par
   class Segment
   {
     friend constexpr bool operator==(const Segment&, const Segment&) noexcept;
-    friend std::size_t hash_value(const Segment&) noexcept;
+    friend std::size_t hash_value(const Segment&);
     friend void swap(Segment& __lhs, Segment& __rhs) noexcept;
   public:
     /**
@@ -205,7 +205,7 @@ namespace rlst::par
    * @return The hash value of the @ref Segment
    */
 
-  std::size_t hash_value(const Segment& __input) noexcept;
+  std::size_t hash_value(const Segment& __input);
 
   /**
    * Swap two @ref Segment "segments"
