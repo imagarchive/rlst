@@ -48,6 +48,44 @@ namespace rlst::par
   };
 
   /**
+   * Compare two @ref Point "points" for equality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the points are equal, false otherwise
+   */
+
+  constexpr bool operator==(const Point& __lhs, const Point& __rhs) noexcept
+  {
+    return
+      (__lhs.x == __rhs.x) &&
+      (__lhs.y == __rhs.y) &&
+      (__lhs.z == __rhs.z);
+  }
+
+  /**
+   * Compare two @ref Point "points" for inequality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the points are not equal, false otherwise
+   */
+
+  constexpr bool operator!=(const Point& __lhs, const Point& __rhs) noexcept
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Hash function for @ref Point
+   *
+   * @param[in] __input The @ref Point to hash
+   * @return The hash value of the @ref Point
+   */
+
+  std::size_t hash_value(const Point& __input) noexcept;
+
+  /**
    * Swap two @ref Point "points"
    *
    * @param[in, out] __lhs The left hand side operand
@@ -64,6 +102,8 @@ namespace rlst::par
 
   class Segment
   {
+    friend constexpr bool operator==(const Segment&, const Segment&) noexcept;
+    friend std::size_t hash_value(const Segment&) noexcept;
     friend void swap(Segment& __lhs, Segment& __rhs) noexcept;
   public:
     /**
@@ -133,6 +173,39 @@ namespace rlst::par
     Point m_start; ///< The start point
     Point m_end;   ///< The end point
   };
+
+  /**
+   * Compare two @ref Segment "segments" for equality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the segments are equal, false otherwise
+   */
+
+  constexpr bool operator==(const Segment& __lhs, const Segment& __rhs) noexcept
+    { return (__lhs.m_start == __rhs.m_start) && (__lhs.m_end == __rhs.m_end); }
+
+  /**
+   * Compare two @ref Segment "segments" for inequality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the segments are not equal, false otherwise
+   */
+
+  constexpr bool operator!=(const Segment& __lhs, const Segment& __rhs) noexcept
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Hash function for @ref Segment
+   *
+   * @param[in] __input The @ref Segment to hash
+   * @return The hash value of the @ref Segment
+   */
+
+  std::size_t hash_value(const Segment& __input) noexcept;
 
   /**
    * Swap two @ref Segment "segments"

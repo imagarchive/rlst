@@ -17,10 +17,23 @@
 
 
 #include "par/geometry.hpp"
-#include <utility>
+#include <boost/functional/hash.hpp>
 
 namespace rlst::par
 {
+  /* POINT */
+
+  std::size_t hash_value(const Point& __input) noexcept
+  {
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, __input.x);
+    boost::hash_combine(seed, __input.y);
+    boost::hash_combine(seed, __input.z);
+
+    return seed;
+  }
+
   void swap(Point& __lhs, Point& __rhs) noexcept
   {
     using std::swap;
@@ -28,6 +41,18 @@ namespace rlst::par
     swap(__lhs.x, __rhs.x);
     swap(__lhs.y, __rhs.y);
     swap(__lhs.z, __rhs.z);
+  }
+
+  /* SEGMENT */
+
+  std::size_t hash_value(const Segment& __input) noexcept
+  {
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, __input.m_start);
+    boost::hash_combine(seed, __input.m_end);
+
+    return seed;
   }
 
   void swap(Segment& __lhs, Segment& __rhs) noexcept
