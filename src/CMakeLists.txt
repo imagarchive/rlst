@@ -17,6 +17,10 @@ cmake_minimum_required(VERSION 3.30)
 
 set(
     RLST_HPP
+    par/cell/Cell.hpp
+    par/cell/ports.hpp
+    par/cell/types.hpp
+    par/cell.hpp
     par/geometry.hpp
     par/par.hpp
 )
@@ -25,6 +29,9 @@ set(RLST_IPP)
 
 set(
     RLST_CPP
+    par/cell/Cell.cpp
+    par/cell/ports.cpp
+    par/cell/types.cpp
     par/geometry.cpp
     main.cpp
 )
