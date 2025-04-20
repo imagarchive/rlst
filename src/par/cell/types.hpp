@@ -19,7 +19,9 @@
 #ifndef RLST_RLST_PAR_CELL_TYPES_HPP
 #  define RLST_RLST_PAR_CELL_TYPES_HPP
 
+#include "par/cell/ports.hpp"
 #include "par/geometry.hpp"
+
 #include <boost/functional/hash.hpp>
 #include <list>
 
@@ -36,11 +38,6 @@
  * The file also includes utility functions and operators for comparing,
  * hashing, and swapping @ref rlst::par::cell::CellType objects.
  */
-
-namespace rlst::par
-{
-  class Port;
-}
 
 namespace rlst::par::cell
 {
