@@ -53,7 +53,7 @@ namespace rlst::svg::svg
       << " y1='" << __segment.start.y * SIZE_FACTOR << "'"
       << " x2='" << __segment.end.x * SIZE_FACTOR << "'"
       << " y2='" << __segment.end.y * SIZE_FACTOR << "'"
-      << " stroke='" << __color << "'" 
+      << " stroke='" << __color << "'"
       << "/>\n";
   }
 }

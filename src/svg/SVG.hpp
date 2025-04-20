@@ -25,7 +25,7 @@ namespace rlst::svg::svg
     SVG(const char* __file_name);
 
     ~SVG();
-    
+
     /**
      * Draw a @ref rlst::par::cell::Cell object
      *
