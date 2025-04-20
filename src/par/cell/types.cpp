@@ -24,5 +24,8 @@ namespace rlst::par::cell
   {
     using std::swap;
     swap(__lhs.ports, __rhs.ports);
+    swap(__lhs.name, __rhs.name);
+    swap(__lhs.width, __rhs.width);
+    swap(__lhs.height, __rhs.height);
   }
 }

@@ -19,6 +19,7 @@
 #ifndef RLST_RLST_PAR_CELL_TYPES_HPP
 #  define RLST_RLST_PAR_CELL_TYPES_HPP
 
+#include "par/geometry.hpp"
 #include <boost/functional/hash.hpp>
 #include <list>
 
@@ -50,6 +51,9 @@ namespace rlst::par::cell
   struct CellType
   {
     std::list<Port> ports; ///< The ports of the @ref CellType
+    std::string name;      ///< The name of the @ref CellType
+    literal_t width;       ///< The width of the @ref CellType
+    literal_t height;      ///< The height of the @ref CellType
   };
 
   /**
