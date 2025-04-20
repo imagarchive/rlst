@@ -49,8 +49,8 @@ namespace rlst::par
   {
     std::size_t seed = 0;
 
-    boost::hash_combine(seed, __input.start);
-    boost::hash_combine(seed, __input.end);
+    boost::hash_combine(seed, __input.m_start);
+    boost::hash_combine(seed, __input.m_end);
 
     return seed;
   }
@@ -59,7 +59,7 @@ namespace rlst::par
   {
     using std::swap;
 
-    swap(__lhs.start, __rhs.start);
-    swap(__lhs.end, __rhs.end);
+    swap(__lhs.m_start, __rhs.m_start);
+    swap(__lhs.m_end, __rhs.m_end);
   }
 }
