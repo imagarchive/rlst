@@ -23,6 +23,7 @@ set(
     par/cell.hpp
     par/geometry.hpp
     par/par.hpp
+    svg/SVG.hpp
 )
 
 set(RLST_IPP)
@@ -33,6 +34,7 @@ set(
     par/cell/ports.cpp
     par/cell/types.cpp
     par/geometry.cpp
+    svg/SVG.cpp
     main.cpp
 )
 
