@@ -25,9 +25,9 @@
  * @file
  * This file contains the definitions of geometric structures and operations
  *
- * It includes the definition of a @ref Point structure and a @ref Segment
- * class, along with their respective constructors, assignment operators, and
- * utility functions.
+ * It includes the definition of a @ref rlst::par::Point structure and a
+ * @ref rlst::par::Segment class, along with their respective constructors,
+ * assignment operators, and utility functions.
  */
 
 namespace rlst::par
@@ -112,7 +112,7 @@ namespace rlst::par
   };
 
   /**
-   * Compare two @ref Point "points" for equality
+   * Compare two @ref rlst::par::Point "points" for equality
    *
    * @param[in] __lhs The left hand side operand
    * @param[in] __rhs The right hand side operand
@@ -129,7 +129,7 @@ namespace rlst::par
   }
 
   /**
-   * Compare two @ref Point "points" for inequality
+   * Compare two @ref rlst::par::Point "points" for inequality
    *
    * @param[in] __lhs The left hand side operand
    * @param[in] __rhs The right hand side operand
@@ -141,16 +141,16 @@ namespace rlst::par
     { return !(__lhs == __rhs); }
 
   /**
-   * Hash function for @ref Point
+   * Hash function for @ref rlst::par::Point
    *
-   * @param[in] __input The @ref Point to hash
-   * @return The hash value of the @ref Point
+   * @param[in] __input The @ref rlst::par::Point to hash
+   * @return The hash value of the @ref rlst::par::Point
    */
 
   std::size_t hash_value(const Point& __input);
 
   /**
-   * Swap two @ref Point "points"
+   * Swap two @ref rlst::par::Point "points"
    *
    * @param[in, out] __lhs The left hand side operand
    * @param[in, out] __rhs The right hand side operand
@@ -239,7 +239,7 @@ namespace rlst::par
   };
 
   /**
-   * Compare two @ref Segment "segments" for equality
+   * Compare two @ref rlst::par::Segment "segments" for equality
    *
    * @param[in] __lhs The left hand side operand
    * @param[in] __rhs The right hand side operand
@@ -251,7 +251,7 @@ namespace rlst::par
     { return (__lhs.m_start == __rhs.m_start) && (__lhs.m_end == __rhs.m_end); }
 
   /**
-   * Compare two @ref Segment "segments" for inequality
+   * Compare two @ref rlst::par::Segment "segments" for inequality
    *
    * @param[in] __lhs The left hand side operand
    * @param[in] __rhs The right hand side operand
@@ -263,16 +263,16 @@ namespace rlst::par
     { return !(__lhs == __rhs); }
 
   /**
-   * Hash function for @ref Segment
+   * Hash function for @ref rlst::par::Segment
    *
-   * @param[in] __input The @ref Segment to hash
-   * @return The hash value of the @ref Segment
+   * @param[in] __input The @ref rlst::par::Segment to hash
+   * @return The hash value of the @ref rlst::par::Segment
    */
 
   std::size_t hash_value(const Segment& __input);
 
   /**
-   * Swap two @ref Segment "segments"
+   * Swap two @ref rlst::par::Segment "segments"
    *
    * @param[in, out] __lhs The left hand side operand
    * @param[in, out] __rhs The right hand side operand
