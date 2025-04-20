@@ -19,6 +19,7 @@
 #ifndef RLST_RLST_PAR_GEOMETRY_HPP
 #  define RLST_RLST_PAR_GEOMETRY_HPP
 
+#include <cmath>
 #include <cstdint>
 
 /**
@@ -105,6 +106,21 @@ namespace rlst::par
      */
 
     constexpr Point& operator=(Point&& __other) noexcept = default;
+  public:
+    /**
+     * Get the Manhattan length of the segment between this point and another
+     *
+     * @return The Manhattan length of the segment between this point and
+     * another
+     */
+
+    constexpr literal_t manhattan(const Point& __rhs) const noexcept
+    {
+      return
+        std::abs(m_x - __rhs.m_x) +
+        std::abs(m_y - __rhs.m_y) +
+        std::abs(m_z - __rhs.m_z);
+    }
   private:
     literal_t m_x;
     literal_t m_y;
@@ -233,6 +249,15 @@ namespace rlst::par
      */
 
     constexpr Point end() const noexcept { return m_end; }
+  public:
+    /**
+     * Get the Manhattan length of the segment
+     *
+     * @return The Manhattan length of the segment
+     */
+
+    constexpr literal_t manhattan() const noexcept
+      { return m_start.manhattan(m_end); }
   private:
     Point m_start;
     Point m_end;
