@@ -40,11 +40,75 @@ namespace rlst::par
    * A point
    */
 
-  struct Point
+  class Point
   {
-    literal_t x; ///< The x-axis component
-    literal_t y; ///< The y-axis component
-    literal_t z; ///< The z-axis component
+    friend constexpr bool operator==(const Point&, const Point&) noexcept;
+    friend std::size_t hash_value(const Point&);
+    friend void swap(Point& __lhs, Point& __rhs) noexcept;
+  public:
+    /**
+     * Constructs a @ref Point with its parameters
+     *
+     * @param[in] __x The x coordinate
+     * @param[in] __y The y coordinate
+     * @param[in] __z The z coordinate
+     */
+
+    constexpr Point(literal_t __x, literal_t __y, literal_t __z) noexcept
+      : m_x(__x)
+      , m_y(__y)
+      , m_z(__z)
+    {}
+  public:
+    /**
+     * Default constructor of @ref Point
+     */
+
+    constexpr Point() noexcept
+      : m_x()
+      , m_y()
+      , m_z()
+    {}
+
+    ~Point() noexcept = default; ///< Destruct a @ref Point
+
+    /**
+     * Copy constructor of @ref Point
+     *
+     * @param[in] __other The @ref Point to copy
+     */
+
+    constexpr Point(const Point& __other) noexcept = default;
+
+    /**
+     * Move constructor of @ref Point
+     *
+     * @param[in, out] __other The @ref Point to move
+     */
+
+    constexpr Point(Point&& __other) noexcept = default;
+  public:
+    /**
+     * Copy assignment operator for @ref Point
+     *
+     * @param[in] __other The @ref Point to copy
+     * @return A reference to this @ref Point
+     */
+
+    constexpr Point& operator=(const Point& __other) noexcept = default;
+
+    /**
+     * Move assignment operator for @ref Point
+     *
+     * @param[in, out] __other The @ref Point to move
+     * @return A reference to this @ref Point
+     */
+
+    constexpr Point& operator=(Point&& __other) noexcept = default;
+  private:
+    literal_t m_x;
+    literal_t m_y;
+    literal_t m_z;
   };
 
   /**
@@ -59,9 +123,9 @@ namespace rlst::par
   constexpr bool operator==(const Point& __lhs, const Point& __rhs) noexcept
   {
     return
-      (__lhs.x == __rhs.x) &&
-      (__lhs.y == __rhs.y) &&
-      (__lhs.z == __rhs.z);
+      (__lhs.m_x == __rhs.m_x) &&
+      (__lhs.m_y == __rhs.m_y) &&
+      (__lhs.m_z == __rhs.m_z);
   }
 
   /**
