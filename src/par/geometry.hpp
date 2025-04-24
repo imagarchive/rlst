@@ -114,7 +114,7 @@ namespace rlst::par
      * another
      */
 
-    constexpr literal_t manhattan(const Point& __rhs) const noexcept
+    literal_t manhattan(const Point& __rhs) const noexcept
     {
       return
         std::abs(m_x - __rhs.m_x) +
@@ -256,7 +256,7 @@ namespace rlst::par
      * @return The Manhattan length of the segment
      */
 
-    constexpr literal_t manhattan() const noexcept
+    literal_t manhattan() const noexcept
       { return m_start.manhattan(m_end); }
   private:
     Point m_start;

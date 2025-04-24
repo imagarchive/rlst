@@ -34,6 +34,7 @@ set(
     par/cell/ports.cpp
     par/cell/types.cpp
     par/geometry.cpp
+    par/par.cpp
     svg/SVG.cpp
     main.cpp
 )
