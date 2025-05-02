@@ -16,7 +16,7 @@
  */
 
 
-#include "par/par.hpp"
+#include "par/placement.hpp"
 #include <random>
 
 namespace rlst::par
