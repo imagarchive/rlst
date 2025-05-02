@@ -336,17 +336,18 @@ namespace rlst::par
 
     constexpr real_t operator()(
       real_t __overlap_penalty_weight,
+      real_t __overlap_penalty,
       iteration_t __i
     ) const
     {
-      // TODO: implement the overlap penalty functor
-
       return
         std::max(
           0._r,
 
           __overlap_penalty_weight +
-          (0._r - m_overlap_penalty_target(__i)) / m_desired_row_length
+
+          (__overlap_penalty - m_overlap_penalty_target(__i)) /
+          m_desired_row_length
         );
     }
   private:
