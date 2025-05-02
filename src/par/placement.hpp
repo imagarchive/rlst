@@ -21,7 +21,10 @@
 
 #include "par/cell/ports.hpp"
 #include "core.hpp"
+
+#include <iterator>
 #include <numeric>
+#include <type_traits>
 
 /**
  * This namespace describes all utilities related to Place And Route
@@ -29,6 +32,8 @@
 
 namespace rlst::par
 {
+  namespace details {}
+
   /* iteration_t */
 
   using iteration_t = std::uint8_t; ///< The type of the number of iterations
@@ -261,6 +266,230 @@ namespace rlst::par
   };
 
   /* overlap */
+
+  namespace details
+  {
+    // TODO: add `noexcept` qualifiers
+    // TODO: check iterator compatibility
+    // TODO: add contracts
+    // TODO: split
+    // TODO: test
+
+    template <class ColumnIterator, class RowIterator>
+    class overlap_grid_iterator
+    {
+      RLST_ENFORCE_RULE_OF_FOUR(overlap_grid_iterator);
+    public:
+      using column_iterator_type = ColumnIterator;
+      using row_iterator_type = RowIterator;
+
+      using value_type =
+        typename std::iterator_traits<column_iterator_type>::value_type;
+
+      using difference_type =
+        std::common_type_t<
+          typename std::iterator_traits<column_iterator_type>::difference_type,
+          typename std::iterator_traits<row_iterator_type>::difference_type
+        >;
+
+      using pointer =
+        typename std::iterator_traits<column_iterator_type>::pointer;
+
+      using reference =
+        typename std::iterator_traits<column_iterator_type>::reference;
+
+      using iterator_category = std::random_access_iterator_tag;
+    public:
+      template <class C, class R>
+      friend constexpr bool operator==(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
+      friend constexpr difference_type operator-(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
+      friend void swap(
+        overlap_grid_iterator<C, R>&,
+        overlap_grid_iterator<C, R>&
+      );
+    public:
+      constexpr overlap_grid_iterator()
+        : m_column_iterator()
+        , m_row_iterator()
+        , m_column_index(0)
+        , m_row_size(0)
+      {}
+
+      constexpr overlap_grid_iterator(
+        row_iterator_type __row_iterator,
+        difference_type __column_index,
+        difference_type __row_size
+      )
+        : m_column_iterator(__row_iterator->cbegin() + __column_index)
+        , m_row_iterator(__row_iterator)
+        , m_column_index(__column_index)
+        , m_row_size(__row_size)
+      {}
+    public:
+      constexpr reference operator*() const
+        { return *m_row_iterator; }
+
+      constexpr pointer operator->() const
+        { return m_row_iterator.operator->(); }
+
+      constexpr overlap_grid_iterator& operator++()
+      {
+        if (m_column_index == m_row_size) {
+          ++m_row_iterator;
+          m_column_iterator = m_row_iterator->cbegin();
+          m_column_index = 0;
+        } else {
+          ++m_column_iterator;
+        }
+
+        return m_column_iterator;
+      }
+
+      constexpr overlap_grid_iterator operator++(int)
+      {
+        overlap_grid_iterator old = *this;
+        ++(*this);
+        return old;
+      }
+
+      constexpr overlap_grid_iterator operator--()
+      {
+        if (m_column_index == 0) {
+          --m_row_iterator;
+          m_column_iterator = m_row_iterator->cend() - 1;
+          m_column_index = m_row_size - 1;
+        } else {
+          --m_column_iterator;
+        }
+
+        return *this;
+      }
+
+      constexpr overlap_grid_iterator operator--(int)
+      {
+        overlap_grid_iterator old = *this;
+        --(*this);
+        return old;
+      }
+
+      constexpr overlap_grid_iterator& operator+=(difference_type __n)
+      {
+        difference_type rem = __n % static_cast<difference_type>(m_row_size);
+
+        m_row_iterator += __n / static_cast<difference_type>(m_row_size);
+        m_column_iterator += rem;
+        m_column_index = rem;
+      }
+
+      constexpr overlap_grid_iterator& operator-=(difference_type __n)
+        { return *this += -__n; }
+
+      constexpr overlap_grid_iterator operator-(difference_type __n) const
+      {
+        overlap_grid_iterator copy = *this;
+        copy -= __n;
+        return copy;
+      }
+
+      constexpr reference operator[](difference_type __n)
+        { return **this + __n; }
+    private:
+      column_iterator_type m_column_iterator;
+      row_iterator_type m_row_iterator;
+
+      difference_type m_column_index;
+      difference_type m_row_size;
+    };
+
+    template <class C, class R>
+    constexpr bool operator==(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      return
+        (__lhs.m_column_iterator == __rhs.m_column_iterator) &&
+        (__lhs.m_row_iterator == __rhs.m_row_iterator) &&
+        (__lhs.m_row_size == __rhs.m_row_size);
+    }
+
+    template <class C, class R>
+    constexpr bool operator!=(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+      { return !(__lhs == __rhs); }
+
+    template <class C, class R>
+    constexpr bool operator<(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+      { return (__lhs - __rhs) < 0; }
+
+    template <class C, class R>
+    constexpr bool operator>(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+      { return __rhs < __lhs; }
+
+    template <class C, class R>
+    constexpr bool operator<=(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+      { return !(__lhs > __rhs); }
+
+    template <class C, class R>
+    constexpr bool operator>=(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+      { return !(__lhs < __rhs); }
+
+    template <class C, class R>
+    constexpr overlap_grid_iterator<C, R> operator+(
+      overlap_grid_iterator<C, R> __lhs,
+      typename overlap_grid_iterator<C, R>::difference_type __n
+    )
+      { return __lhs += __n; }
+
+    template <class C, class R>
+    constexpr typename overlap_grid_iterator<R, C>::difference_type operator-(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      return
+        (__lhs.m_row_iterator - __rhs.m_row_iterator) +
+        (__lhs.m_column_index - __rhs.m_column_index);
+    }
+
+    template <class C, class R>
+    constexpr void swap(
+      overlap_grid_iterator<C, R>& __lhs,
+      overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      using std::swap;
+
+      swap(__lhs.m_column_iterator, __rhs.m_column_iterator);
+      swap(__lhs.m_row_iterator, __rhs.m_row_iterator);
+      swap(__lhs.m_column_index, __rhs.m_column_index);
+      swap(__lhs.m_row_size, __rhs.m_row_size);
+    }
+  }
 
   /**
    * The overlap penalty target
