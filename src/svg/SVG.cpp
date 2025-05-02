@@ -30,14 +30,14 @@ namespace rlst::svg::svg
       << "<rect"
       << " width='" << __cell.type->width * SIZE_FACTOR << "'"
       << " height='" << __cell.type->height * SIZE_FACTOR << "'"
-      << " x='" << __cell.position.x * SIZE_FACTOR << "'"
-      << " y='" << __cell.position.y * SIZE_FACTOR << "'"
+      << " x='" << __cell.position.x() * SIZE_FACTOR << "'"
+      << " y='" << __cell.position.y() * SIZE_FACTOR << "'"
       << " fill='" << CELL_BACKGROUND_COLOR << "'"
       << "/>\n";
     m_svg_file
       << "<text"
-      << " x='" << (__cell.position.x + 1) * SIZE_FACTOR << "'"
-      << " y='" << (__cell.position.y + __cell.type->height - 1) * SIZE_FACTOR
+      << " x='" << (__cell.position.x() + 1) * SIZE_FACTOR << "'"
+      << " y='" << (__cell.position.y() + __cell.type->height - 1) * SIZE_FACTOR
         << "'"
       << " fill='" << CELL_TEXT_COLOR << "'"
       << ">" << __cell.type->name << "</text>\n";
@@ -49,10 +49,10 @@ namespace rlst::svg::svg
   {
     m_svg_file
       << "<line"
-      << " x1='" << __segment.start.x * SIZE_FACTOR << "'"
-      << " y1='" << __segment.start.y * SIZE_FACTOR << "'"
-      << " x2='" << __segment.end.x * SIZE_FACTOR << "'"
-      << " y2='" << __segment.end.y * SIZE_FACTOR << "'"
+      << " x1='" << __segment.start().x() * SIZE_FACTOR << "'"
+      << " y1='" << __segment.start().y() * SIZE_FACTOR << "'"
+      << " x2='" << __segment.end().x() * SIZE_FACTOR << "'"
+      << " y2='" << __segment.end().y() * SIZE_FACTOR << "'"
       << " stroke='" << __color << "'"
       << "/>\n";
   }

@@ -108,6 +108,30 @@ namespace rlst::par
     constexpr Point& operator=(Point&& __other) noexcept = default;
   public:
     /**
+     * Get the x coordinate
+     *
+     * @return The x coordinate
+     */
+
+    constexpr literal_t x() const noexcept { return m_x; }
+
+    /**
+     * Get the y coordinate
+     *
+     * @return The y coordinate
+     */
+
+    constexpr literal_t y() const noexcept { return m_y; }
+
+    /**
+     * Get the z coordinate
+     *
+     * @return The z coordinate
+     */
+
+    constexpr literal_t z() const noexcept { return m_z; }
+  public:
+    /**
      * Get the Manhattan length of the segment between this point and another
      *
      * @return The Manhattan length of the segment between this point and
