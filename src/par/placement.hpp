@@ -442,6 +442,100 @@ namespace rlst::par
   };
 
   /**
+   * The overlap penalty weight
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class overlap_penalty_weight
+  {
+  public:
+    /**
+     * Constructs an overlap penalty weight with its parameters
+     *
+     * @param[in] __overlap_penalty_target The overlap penalty target
+     * @param[in] __desired_row_length The desired row length
+     */
+
+    constexpr overlap_penalty_weight(
+      overlap_penalty_target __overlap_penalty_target = {},
+      real_t __desired_row_length = 0._r
+    ) noexcept
+      : m_overlap_penalty_target(std::move(__overlap_penalty_target))
+      , m_desired_row_length(__desired_row_length)
+    {}
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other overlap penalty weight
+     */
+
+    constexpr overlap_penalty_weight(
+      const overlap_penalty_weight& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other overlap penalty weight
+     */
+
+    constexpr overlap_penalty_weight(
+      overlap_penalty_weight&& __other
+    ) noexcept = default;
+
+    ~overlap_penalty_weight() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other overlap penalty weight
+     * @return A reference to this overlap penalty weight
+     */
+
+    constexpr overlap_penalty_weight& operator=(
+      const overlap_penalty_weight& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other overlap penalty weight
+     * @return A reference to this overlap penalty weight
+     */
+
+    constexpr overlap_penalty_weight& operator=(
+      overlap_penalty_weight&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * Gets the next overlap penalty weight
+     *
+     * @param[in] __overlap_penalty_weight The current overlap penalty weight
+     * @param[in] __i The current iteration
+     *
+     * @return The next overlap penalty weight
+     */
+
+    constexpr real_t operator()(real_t __overlap_penalty_weight, iteration_t __i)
+    {
+      // TODO: implement the overlap penalty functor
+
+      return
+        std::max(
+          0._r,
+
+          __overlap_penalty_weight +
+          (0._r - m_overlap_penalty_target(__i)) / m_desired_row_length
+        );
+    }
+  private:
+    overlap_penalty_target m_overlap_penalty_target;
+    real_t m_desired_row_length;
+  };
+
+  /**
    * Generate a random number in the range [0, 1]
    *
    * @return A random number in the range [0, 1]
