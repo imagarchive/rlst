@@ -250,7 +250,7 @@ namespace rlst::par
       iteration_t __i,
       real_t __acceptance_rate,
       real_t __acceptance_scale
-    )
+    ) const
     {
       return
         __acceptance_scale *
@@ -340,7 +340,7 @@ namespace rlst::par
      * @return The next temperature
      */
 
-    constexpr real_t operator()(real_t __t) noexcept
+    constexpr real_t operator()(real_t __t) const noexcept
       { return m_alpha * __t; }
   private:
     real_t m_alpha;
@@ -422,7 +422,7 @@ namespace rlst::par
      * @return The next overlap penalty target
      */
 
-    constexpr real_t operator()(iteration_t __i)
+    constexpr real_t operator()(iteration_t __i) const
     {
       return
         (
@@ -518,7 +518,10 @@ namespace rlst::par
      * @return The next overlap penalty weight
      */
 
-    constexpr real_t operator()(real_t __overlap_penalty_weight, iteration_t __i)
+    constexpr real_t operator()(
+      real_t __overlap_penalty_weight,
+      iteration_t __i
+    ) const
     {
       // TODO: implement the overlap penalty functor
 
