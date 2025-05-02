@@ -247,6 +247,12 @@ namespace rlst::par
     {}
   public:
     /**
+     * Default constructor of @ref Segment
+     */
+
+    constexpr Segment() noexcept = default;
+
+    /**
      * Copy constructor of @ref Segment
      *
      * @param[in] __other The @ref Segment to copy
