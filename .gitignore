@@ -1,4 +1,3 @@
-/build/
-
-# Visual Studio Code
 /.vscode/
+/.zed/
+/build/
