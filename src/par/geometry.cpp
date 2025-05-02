@@ -62,4 +62,24 @@ namespace rlst::par
     swap(__lhs.m_start, __rhs.m_start);
     swap(__lhs.m_end, __rhs.m_end);
   }
+
+  /* Size */
+
+  std::size_t hash_value(const Size& __input)
+  {
+    std::size_t seed = 0;
+
+    boost::hash_combine(seed, __input.width);
+    boost::hash_combine(seed, __input.height);
+
+    return seed;
+  }
+
+  void swap(Size& __lhs, Size& __rhs) noexcept
+  {
+    using std::swap;
+
+    swap(__lhs.width, __rhs.width);
+    swap(__lhs.height, __rhs.height);
+  }
 }

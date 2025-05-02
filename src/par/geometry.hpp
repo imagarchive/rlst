@@ -302,6 +302,60 @@ namespace rlst::par
    */
 
   void swap(Segment& __lhs, Segment& __rhs) noexcept;
+
+  /* Size */
+
+  /**
+   * A size
+   */
+
+  struct Size
+  {
+    literal_t width; ///< The width
+    literal_t height; ///< The height
+  };
+
+  /**
+   * Compare two @ref rlst::par::Size "sizes" for equality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the sizes are equal, false otherwise
+   */
+
+  constexpr bool operator==(const Size& __lhs, const Size& __rhs) noexcept
+    { return (__lhs.width == __rhs.width) && (__lhs.height == __rhs.height); }
+
+  /**
+   * Compare two @ref rlst::par::Size "sizes" for inequality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the sizes are not equal, false otherwise
+   */
+
+  constexpr bool operator!=(const Size& __lhs, const Size& __rhs) noexcept
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Hash function for @ref rlst::par::Size
+   *
+   * @param[in] __input The @ref rlst::par::Size to hash
+   * @return The hash value of the @ref rlst::par::Size
+   */
+
+  std::size_t hash_value(const Size& __input);
+
+  /**
+   * Swap two @ref rlst::par::Size "sizes"
+   *
+   * @param[in, out] __lhs The left hand side operand
+   * @param[in, out] __rhs The right hand side operand
+   */
+
+  void swap(Size& __lhs, Size& __rhs) noexcept;
 }
 
 #endif // RLST_RLST_PAR_GEOMETRY_HPP
