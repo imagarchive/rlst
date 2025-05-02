@@ -23,6 +23,6 @@
  * This namespace describes all utilities related to Place And Route
  */
 
-namespace par {}
+namespace rlst::par {}
 
 #endif // RLST_RLST_PAR_HPP
