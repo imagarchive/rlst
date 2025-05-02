@@ -22,9 +22,9 @@ set(
     par/cell/types.hpp
     par/cell.hpp
     par/geometry.hpp
-    par/par.hpp
     par/placement.hpp
     svg/SVG.hpp
+    par.hpp
 )
 
 set(RLST_IPP)
