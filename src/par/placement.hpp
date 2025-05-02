@@ -356,6 +356,45 @@ namespace rlst::par
   };
 
   /**
+   * The overlap penalty cost
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class overlap_penalty_cost
+  {
+    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_cost);
+  public:
+    /**
+     * Constructs an overlap penalty cost with its parameters
+     *
+     * @param[in] __overlap_penalty_weight The overlap penalty weight
+     */
+
+    constexpr overlap_penalty_cost(
+      overlap_penalty_weight __overlap_penalty_weight = {}
+    ) noexcept
+      : m_overlap_penalty_weight(std::move(__overlap_penalty_weight))
+    {}
+  public:
+    constexpr real_t operator()(
+      real_t __overlap_penalty_weight,
+      real_t __overlap_penalty,
+      iteration_t __i
+    ) const
+    {
+      return
+        m_overlap_penalty_weight(
+          __overlap_penalty_weight,
+          __overlap_penalty,
+          __i
+        ) * __overlap_penalty;
+    }
+  private:
+    overlap_penalty_weight m_overlap_penalty_weight;
+  };
+
+  /**
    * The row length control penalty target
    *
    * @see https://doi.org/10.1145/103724.103725
