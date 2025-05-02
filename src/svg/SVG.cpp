@@ -28,8 +28,8 @@ namespace rlst::svg::svg
     // don't exist as of writing this code
     m_svg_file
       << "<rect"
-      << " width='" << __cell.type->width * SIZE_FACTOR << "'"
-      << " height='" << __cell.type->height * SIZE_FACTOR << "'"
+      << " width='" << __cell.type->size.width * SIZE_FACTOR << "'"
+      << " height='" << __cell.type->size.height * SIZE_FACTOR << "'"
       << " x='" << __cell.position.x() * SIZE_FACTOR << "'"
       << " y='" << __cell.position.y() * SIZE_FACTOR << "'"
       << " fill='" << CELL_BACKGROUND_COLOR << "'"
@@ -37,8 +37,11 @@ namespace rlst::svg::svg
     m_svg_file
       << "<text"
       << " x='" << (__cell.position.x() + 1) * SIZE_FACTOR << "'"
-      << " y='" << (__cell.position.y() + __cell.type->height - 1) * SIZE_FACTOR
+      << " y='"
+
+      << (__cell.position.y() + __cell.type->size.height - 1) * SIZE_FACTOR
         << "'"
+
       << " fill='" << CELL_TEXT_COLOR << "'"
       << ">" << __cell.type->name << "</text>\n";
   }
