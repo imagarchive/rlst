@@ -76,6 +76,16 @@ namespace rlst::par
     { return std::exp(-__delta_c / __t); }
 
   /**
+   * Generate a random number in the range [0, 1]
+   *
+   * @return A random number in the range [0, 1]
+   */
+
+  real_t uniform();
+
+  /* acceptance */
+
+  /**
    * The acceptance rate target
    *
    * @see https://doi.org/10.1145/103724.103725
@@ -212,6 +222,8 @@ namespace rlst::par
     acceptance_scale m_acceptance_scale;
   };
 
+  /* temperature */
+
   /**
    * The temperature schedule
    *
@@ -247,6 +259,8 @@ namespace rlst::par
   private:
     real_t m_alpha;
   };
+
+  /* overlap */
 
   /**
    * The overlap penalty target
@@ -393,6 +407,8 @@ namespace rlst::par
   private:
     overlap_penalty_weight m_overlap_penalty_weight;
   };
+
+  /* row length */
 
   /**
    * The row length control penalty target
@@ -544,14 +560,6 @@ namespace rlst::par
   private:
     row_length_weight m_row_length_weight;
   };
-
-  /**
-   * Generate a random number in the range [0, 1]
-   *
-   * @return A random number in the range [0, 1]
-   */
-
-  real_t uniform();
 
   /**
    * Compute the wire length cost of nets
