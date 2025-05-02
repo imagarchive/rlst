@@ -267,6 +267,74 @@ namespace rlst::par
     real_t m_alpha;
   };
 
+  class scaled_cost
+  {
+  public:
+    /**
+     * Constructs a scaled cost with its parameters
+     *
+     * @param[in] __acceptance_scale The acceptance scale
+     */
+
+    constexpr scaled_cost(acceptance_scale __acceptance_scale = {}) noexcept
+      : m_acceptance_scale(std::move(__acceptance_scale))
+    {}
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other scaled cost
+     */
+
+    constexpr scaled_cost(const scaled_cost& __other) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other scaled cost
+     */
+
+    constexpr scaled_cost(scaled_cost&& __other) noexcept = default;
+
+    ~scaled_cost() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other scaled cost
+     * @return A reference to this scaled cost
+     */
+
+    constexpr scaled_cost& operator=(
+      const scaled_cost& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other scaled cost
+     * @return A reference to this scaled cost
+     */
+
+    constexpr scaled_cost& operator=(
+      scaled_cost&& __other
+    ) noexcept = default;
+  public:
+    constexpr real_t operator()(
+      iteration_t __i,
+      real_t __acceptance_rate,
+      real_t __acceptance_scale,
+      real_t __cost
+    ) const
+    {
+      return
+        m_acceptance_scale(__i, __acceptance_rate, __acceptance_scale) *
+        __cost;
+    }
+  private:
+    acceptance_scale m_acceptance_scale;
+  };
+
   /**
    * The temperature schedule
    *
