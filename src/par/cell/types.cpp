@@ -23,9 +23,9 @@ namespace rlst::par::cell
   void swap(CellType& __lhs, CellType& __rhs) noexcept
   {
     using std::swap;
+
     swap(__lhs.ports, __rhs.ports);
     swap(__lhs.name, __rhs.name);
-    swap(__lhs.width, __rhs.width);
-    swap(__lhs.height, __rhs.height);
+    swap(__lhs.size, __rhs.size);
   }
 }
