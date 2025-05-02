@@ -412,6 +412,56 @@ namespace rlst::par
   };
 
   /**
+   * The row length control weight
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class row_length_weight
+  {
+    RLST_ENFORCE_RULE_OF_FOUR(row_length_weight);
+  public:
+    /**
+     * Constructs a row length weight with its parameters
+     *
+     * @param[in] __row_length_penalty_target The row length penalty target
+     */
+
+    constexpr row_length_weight(
+      row_length_penalty_target __row_length_penalty_target = {}
+    ) noexcept
+      : m_row_length_penalty_target(std::move(__row_length_penalty_target))
+    {}
+  public:
+    /**
+     * Get the next row length weight
+     *
+     * @param[in] __i The current iteration
+     * @param[in] __row_length_weight The current row length weight
+     * @param[in] __row_length_penalty The current row length penalty
+     *
+     * @return The next row length weight
+     */
+
+    constexpr real_t operator()(
+      iteration_t __i,
+      real_t __row_length_weight,
+      real_t __row_length_penalty
+    ) const
+    {
+      real_t rlp_target = m_row_length_penalty_target(__i);
+
+      return
+        std::max(
+          0._r,
+          __row_length_weight + (__row_length_penalty - rlp_target) / rlp_target
+        );
+    }
+  private:
+    row_length_penalty_target m_row_length_penalty_target;
+  };
+
+  /**
    * Generate a random number in the range [0, 1]
    *
    * @return A random number in the range [0, 1]
