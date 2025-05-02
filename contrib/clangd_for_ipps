@@ -56,7 +56,7 @@ transpose()
 
 		header="$(realpath --relative-to "${target}" "${f}")" || die
 		ipp="$(realpath "${f%.ipp}.hpp")" || die
-		
+
 		ret+=( "${header}" "${ipp}" )
 	done
 
@@ -88,8 +88,8 @@ CompileFlags:
   Add: [-include, "$2"]
 EOF
 
-		echo
 		shift 2
+		[[ "$#" -eq 0 ]] || echo
 	done
 }
 
@@ -107,7 +107,7 @@ the basic use of this script is to redirect its output to .clangd.
 options:
   -h, --help    Print this message
 
-${NAME}  Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+${NAME} Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
 This program comes with ABSOLUTELY NO WARRANTY; for details type \`show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type \`show c' for details.
@@ -135,7 +135,7 @@ main()
 				die "\`$1\` is not recognized"
 
 				;;
-			
+
 			--)
 				target="$2"
 				break
