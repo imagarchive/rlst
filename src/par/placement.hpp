@@ -20,6 +20,7 @@
 #  define RLST_RLST_PAR_PLACEMENT_HPP
 
 #include "par/cell/ports.hpp"
+#include "core.hpp"
 #include <numeric>
 
 /**
@@ -82,6 +83,7 @@ namespace rlst::par
 
   class acceptance_rate_target
   {
+    RLST_ENFORCE_RULE_OF_FOUR(acceptance_rate_target);
   public:
     /**
      * Constructs an acceptance rate target with its parameters
@@ -95,49 +97,6 @@ namespace rlst::par
       , m_max_iterations(__max_iterations)
     {}
 
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other acceptance rate target
-     */
-
-    constexpr acceptance_rate_target(
-      const acceptance_rate_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other acceptance rate target
-     */
-
-    constexpr acceptance_rate_target(
-      acceptance_rate_target&& __other
-    ) noexcept = default;
-
-    ~acceptance_rate_target() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other acceptance rate target
-     * @return A reference to this acceptance rate target
-     */
-
-    constexpr acceptance_rate_target& operator=(
-      const acceptance_rate_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other acceptance rate target
-     * @return A reference to this acceptance rate target
-     */
-
-    constexpr acceptance_rate_target& operator=(
-      acceptance_rate_target&& __other
-    ) noexcept = default;
   public:
     /**
      * The acceptance rate target
@@ -176,6 +135,7 @@ namespace rlst::par
 
   class acceptance_scale
   {
+    RLST_ENFORCE_RULE_OF_FOUR(acceptance_scale);
   public:
     /**
      * Constructs an acceptance scale with its parameters
@@ -191,50 +151,6 @@ namespace rlst::par
       : m_acceptance_rate_target(std::move(__acceptance_rate_target))
       , m_alpha(__alpha)
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other acceptance scale
-     */
-
-    constexpr acceptance_scale(
-      const acceptance_scale& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other acceptance scale
-     */
-
-    constexpr acceptance_scale(
-      acceptance_scale&& __other
-    ) noexcept = default;
-
-    ~acceptance_scale() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other acceptance scale
-     * @return A reference to this acceptance scale
-     */
-
-    constexpr acceptance_scale& operator=(
-      const acceptance_scale& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other acceptance scale
-     * @return A reference to this acceptance scale
-     */
-
-    constexpr acceptance_scale& operator=(
-      acceptance_scale&& __other
-    ) noexcept = default;
   public:
     /**
      * Get the next acceptance scale
@@ -269,6 +185,7 @@ namespace rlst::par
 
   class scaled_cost
   {
+    RLST_ENFORCE_RULE_OF_FOUR(scaled_cost);
   public:
     /**
      * Constructs a scaled cost with its parameters
@@ -279,46 +196,6 @@ namespace rlst::par
     constexpr scaled_cost(acceptance_scale __acceptance_scale = {}) noexcept
       : m_acceptance_scale(std::move(__acceptance_scale))
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other scaled cost
-     */
-
-    constexpr scaled_cost(const scaled_cost& __other) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other scaled cost
-     */
-
-    constexpr scaled_cost(scaled_cost&& __other) noexcept = default;
-
-    ~scaled_cost() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other scaled cost
-     * @return A reference to this scaled cost
-     */
-
-    constexpr scaled_cost& operator=(
-      const scaled_cost& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other scaled cost
-     * @return A reference to this scaled cost
-     */
-
-    constexpr scaled_cost& operator=(
-      scaled_cost&& __other
-    ) noexcept = default;
   public:
     constexpr real_t operator()(
       iteration_t __i,
@@ -346,6 +223,7 @@ namespace rlst::par
 
   class temperature_schedule
   {
+    RLST_ENFORCE_RULE_OF_FOUR(temperature_schedule);
   public:
     /**
      * Constructs a temperature schedule with its parameter
@@ -356,50 +234,6 @@ namespace rlst::par
     constexpr temperature_schedule(real_t __alpha = .98_r) noexcept
       : m_alpha(__alpha)
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other temperature schedule
-     */
-
-    constexpr temperature_schedule(
-      const temperature_schedule& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other temperature schedule
-     */
-
-    constexpr temperature_schedule(
-      temperature_schedule&& __other
-    ) noexcept = default;
-
-    ~temperature_schedule() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other temperature schedule
-     * @return A reference to this temperature schedule
-     */
-
-    constexpr temperature_schedule& operator=(
-      const temperature_schedule& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other temperature schedule
-     * @return A reference to this temperature schedule
-     */
-
-    constexpr temperature_schedule& operator=(
-      temperature_schedule&& __other
-    ) noexcept = default;
   public:
     /**
      * Get the next temperature
@@ -422,6 +256,7 @@ namespace rlst::par
 
   class overlap_penalty_target
   {
+    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_target);
   public:
     /**
      * Constructs an overlap penalty target with its parameters
@@ -438,50 +273,6 @@ namespace rlst::par
       , m_desired_row_length(__desired_row_length)
       , m_max_iterations(__max_iterations)
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other overlap penalty target
-     */
-
-    constexpr overlap_penalty_target(
-      const overlap_penalty_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other overlap penalty target
-     */
-
-    constexpr overlap_penalty_target(
-      overlap_penalty_target&& __other
-    ) noexcept = default;
-
-    ~overlap_penalty_target() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other overlap penalty target
-     * @return A reference to this overlap penalty target
-     */
-
-    constexpr overlap_penalty_target& operator=(
-      const overlap_penalty_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other overlap penalty target
-     * @return A reference to this overlap penalty target
-     */
-
-    constexpr overlap_penalty_target& operator=(
-      overlap_penalty_target&& __other
-    ) noexcept = default;
   public:
     /**
      * Get the next overlap penalty target
@@ -517,6 +308,7 @@ namespace rlst::par
 
   class overlap_penalty_weight
   {
+    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_weight);
   public:
     /**
      * Constructs an overlap penalty weight with its parameters
@@ -532,50 +324,6 @@ namespace rlst::par
       : m_overlap_penalty_target(std::move(__overlap_penalty_target))
       , m_desired_row_length(__desired_row_length)
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other overlap penalty weight
-     */
-
-    constexpr overlap_penalty_weight(
-      const overlap_penalty_weight& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other overlap penalty weight
-     */
-
-    constexpr overlap_penalty_weight(
-      overlap_penalty_weight&& __other
-    ) noexcept = default;
-
-    ~overlap_penalty_weight() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other overlap penalty weight
-     * @return A reference to this overlap penalty weight
-     */
-
-    constexpr overlap_penalty_weight& operator=(
-      const overlap_penalty_weight& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other overlap penalty weight
-     * @return A reference to this overlap penalty weight
-     */
-
-    constexpr overlap_penalty_weight& operator=(
-      overlap_penalty_weight&& __other
-    ) noexcept = default;
   public:
     /**
      * Gets the next overlap penalty weight
@@ -614,6 +362,7 @@ namespace rlst::par
 
   class row_length_penalty_target
   {
+    RLST_ENFORCE_RULE_OF_FOUR(row_length_penalty_target);
   public:
     /**
      * Constructs a row length penalty target with its parameters
@@ -637,50 +386,6 @@ namespace rlst::par
       , m_max_iterations(__max_iterations)
       , m_xi(__xi)
     {}
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The other row length penalty target
-     */
-
-    constexpr row_length_penalty_target(
-      const row_length_penalty_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The other row length penalty target
-     */
-
-    constexpr row_length_penalty_target(
-      row_length_penalty_target&& __other
-    ) noexcept = default;
-
-    ~row_length_penalty_target() noexcept = default; ///< Destructor
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __other The other row length penalty target
-     * @return A reference to this row length penalty target
-     */
-
-    constexpr row_length_penalty_target& operator=(
-      const row_length_penalty_target& __other
-    ) noexcept = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __other The other row length penalty target
-     * @return A reference to this row length penalty target
-     */
-
-    constexpr row_length_penalty_target& operator=(
-      row_length_penalty_target&& __other
-    ) noexcept = default;
   public:
     /**
      * Get the next row length penalty target

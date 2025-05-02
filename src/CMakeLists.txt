@@ -24,6 +24,7 @@ set(
     par/geometry.hpp
     par/placement.hpp
     svg/SVG.hpp
+    core.hpp
     par.hpp
 )
 

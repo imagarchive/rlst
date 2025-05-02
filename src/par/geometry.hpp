@@ -19,6 +19,8 @@
 #ifndef RLST_RLST_PAR_GEOMETRY_HPP
 #  define RLST_RLST_PAR_GEOMETRY_HPP
 
+#include "core.hpp"
+
 #include <cmath>
 #include <cstdint>
 
@@ -46,6 +48,8 @@ namespace rlst::par
     friend constexpr bool operator==(const Point&, const Point&) noexcept;
     friend std::size_t hash_value(const Point&);
     friend void swap(Point& __lhs, Point& __rhs) noexcept;
+
+    RLST_ENFORCE_RULE_OF_FOUR(Point);
   public:
     /**
      * Constructs a @ref Point with its parameters
@@ -70,42 +74,6 @@ namespace rlst::par
       , m_y()
       , m_z()
     {}
-
-    ~Point() noexcept = default; ///< Destruct a @ref Point
-
-    /**
-     * Copy constructor of @ref Point
-     *
-     * @param[in] __other The @ref Point to copy
-     */
-
-    constexpr Point(const Point& __other) noexcept = default;
-
-    /**
-     * Move constructor of @ref Point
-     *
-     * @param[in, out] __other The @ref Point to move
-     */
-
-    constexpr Point(Point&& __other) noexcept = default;
-  public:
-    /**
-     * Copy assignment operator for @ref Point
-     *
-     * @param[in] __other The @ref Point to copy
-     * @return A reference to this @ref Point
-     */
-
-    constexpr Point& operator=(const Point& __other) noexcept = default;
-
-    /**
-     * Move assignment operator for @ref Point
-     *
-     * @param[in, out] __other The @ref Point to move
-     * @return A reference to this @ref Point
-     */
-
-    constexpr Point& operator=(Point&& __other) noexcept = default;
   public:
     /**
      * Get the x coordinate
@@ -233,6 +201,8 @@ namespace rlst::par
     friend constexpr bool operator==(const Segment&, const Segment&) noexcept;
     friend std::size_t hash_value(const Segment&);
     friend void swap(Segment& __lhs, Segment& __rhs) noexcept;
+
+    RLST_ENFORCE_RULE_OF_FIVE(Segment);
   public:
     /**
      * Constructs a @ref Segment with its parameters
@@ -245,48 +215,6 @@ namespace rlst::par
       : m_start(__start)
       , m_end(__end)
     {}
-  public:
-    /**
-     * Default constructor of @ref Segment
-     */
-
-    constexpr Segment() noexcept = default;
-
-    /**
-     * Copy constructor of @ref Segment
-     *
-     * @param[in] __other The @ref Segment to copy
-     */
-
-    constexpr Segment(const Segment& __other) = default;
-
-    /**
-     * Move constructor of @ref Segment
-     *
-     * @param[in, out] __other The @ref Segment to move
-     */
-
-    constexpr Segment(Segment&& __other) = default;
-
-    ~Segment() = default; ///< Destructs a @ref Segment
-  public:
-    /**
-     * Copy assignment operator for @ref Segment
-     *
-     * @param[in] __other The @ref Segment to copy
-     * @return A reference to this @ref Segment
-     */
-
-    constexpr Segment& operator=(const Segment& __other) = default;
-
-    /**
-     * Move assignment operator for @ref Segment
-     *
-     * @param[in, out] __other The @ref Segment to move
-     * @return A reference to this @ref Segment
-     */
-
-    constexpr Segment& operator=(Segment&& __other) = default;
   public:
     /**
      * Get the start @ref Point
