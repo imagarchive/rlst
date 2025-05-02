@@ -462,6 +462,50 @@ namespace rlst::par
   };
 
   /**
+   * The row length cost
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class row_length_cost
+  {
+    RLST_ENFORCE_RULE_OF_FOUR(row_length_cost);
+  public:
+    /**
+     * Constructs a row length cost with its parameters
+     *
+     * @param[in] __row_length_weight The row length weight
+     */
+
+    constexpr row_length_cost(row_length_weight __row_length_weight = {})
+      : m_row_length_weight(std::move(__row_length_weight))
+    {}
+  public:
+    /**
+     * Get the next row length cost
+     *
+     * @param[in] __i The current iteration
+     * @param[in] __row_length_weight The current row length weight
+     * @param[in] __row_length_penalty The current row length penalty
+     *
+     * @return The next row length cost
+     */
+
+    constexpr real_t operator()(
+      iteration_t __i,
+      real_t __row_length_weight,
+      real_t __row_length_penalty
+    ) const
+    {
+      return
+        m_row_length_weight(__i, __row_length_weight, __row_length_penalty) *
+        __row_length_penalty;
+    }
+  private:
+    row_length_weight m_row_length_weight;
+  };
+
+  /**
    * Generate a random number in the range [0, 1]
    *
    * @return A random number in the range [0, 1]
