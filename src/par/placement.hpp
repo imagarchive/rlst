@@ -56,92 +56,6 @@ namespace rlst::par
   constexpr real_t operator ""_r(long double __input) noexcept
     { return static_cast<real_t>(__input); }
 
-  /* acceptance_parameters */
-
-  /**
-   * The acceptance parameters
-   *
-   * It is used to define the acceptance rate and the acceptance scale
-   */
-
-  struct acceptance_parameters
-  {
-    real_t alpha; ///< The acceptance rate
-    real_t beta; ///< The acceptance scale deviation
-  };
-
-  /**
-   * The default acceptance parameters
-   *
-   * It is used to define the acceptance rate and the acceptance scale
-   */
-
-  constexpr acceptance_parameters default_acceptance_parameters =
-    { 50._r, 40._r };
-
-  /* overlap_parameters */
-
-  /**
-   * The overlap parameters
-   */
-
-  struct overlap_parameters
-  {
-    real_t alpha;
-    real_t beta;
-  };
-
-  constexpr overlap_parameters default_overlap_parameters = { 1.4_r, 1.15_r };
-
-  /* schedule_parameters */
-
-  /**
-   * The temperature schedule parameters
-   *
-   * It is used to define the initial temperature, the cooling rate and the
-   * number of iterations.
-   */
-
-  struct schedule_parameters
-  {
-    real_t t_0; ///< The initial temperature
-    real_t alpha; ///< The cooling rate
-  };
-
-  /**
-   * The default temperature schedule parameters
-   */
-
-  constexpr schedule_parameters default_schedule_parameters = { 500._r, .98_r };
-
-  /* parameters */
-
-  /**
-   * The parameters of the simulated annealing algorithm
-   */
-
-  struct parameters
-  {
-    schedule_parameters schedule; ///< The temperature schedule parameters
-    acceptance_parameters acceptance; ///< The acceptance parameters
-    overlap_parameters overlap; ///< The overlap parameters
-    iteration_t max_iterations; ///< The maximum number of iterations
-  };
-
-  /**
-   * The default parameters of the simulated annealing algorithm
-   */
-
-  constexpr parameters default_parameters =
-    {
-      default_schedule_parameters,
-      default_acceptance_parameters,
-      default_overlap_parameters,
-      120_it
-    };
-
-  /* functions */
-
   /**
    * The probabilistic acceptance function
    *
@@ -163,31 +77,89 @@ namespace rlst::par
   /**
    * The acceptance rate target
    *
-   * @param[in] __i The current iteration
-   * @param[in] __params The parameters of the simulated annealing algorithm
-   *
-   * @return The acceptance rate target
-   *
    * @see https://doi.org/10.1145/103724.103725
    */
 
-  constexpr real_t acceptance_rate_target(
-    iteration_t __i,
-    const parameters& __params = default_parameters
-  )
+  class acceptance_rate_target
   {
-    return
-      __params.acceptance.alpha *
+  public:
+    /**
+     * Constructs an acceptance rate target with its parameters
+     */
 
-      (
-        1 -
+    constexpr acceptance_rate_target(
+      real_t __alpha = 50._r,
+      iteration_t __max_iterations = 120_it
+    ) noexcept
+      : m_alpha(__alpha)
+      , m_max_iterations(__max_iterations)
+    {}
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other acceptance rate target
+     */
+
+    constexpr acceptance_rate_target(
+      const acceptance_rate_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other acceptance rate target
+     */
+
+    constexpr acceptance_rate_target(
+      acceptance_rate_target&& __other
+    ) noexcept = default;
+
+    ~acceptance_rate_target() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other acceptance rate target
+     * @return A reference to this acceptance rate target
+     */
+
+    constexpr acceptance_rate_target& operator=(
+      const acceptance_rate_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other acceptance rate target
+     * @return A reference to this acceptance rate target
+     */
+
+    constexpr acceptance_rate_target& operator=(
+      acceptance_rate_target&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * The acceptance rate target
+     *
+     * @param[in] __i The current iteration
+     * @return The acceptance rate target
+     */
+
+    constexpr real_t operator()(iteration_t __i) const
+    {
+      return
+        m_alpha *
 
         (
-          static_cast<real_t>(__i) /
-          static_cast<real_t>(__params.max_iterations)
-        )
-      );
-  }
+          1 -
+          (static_cast<real_t>(__i) / static_cast<real_t>(m_max_iterations))
+        );
+    }
+  private:
+    real_t m_alpha;
+    iteration_t m_max_iterations;
+  };
 
   /**
    * Get the next acceptance scale
@@ -199,33 +171,101 @@ namespace rlst::par
    * low temperatures (@f$i = i_{max}@f$). To achieve this acceptance
    * rate profile, negative feedback control has been provided.
    *
-   * @param[in] __i The current iteration
-   * @param[in] __acceptance_rate The current acceptance rate
-   * @param[in] __acceptance_scale The current acceptance scale
-   * @param[in] __params The parameters of the simulated annealing algorithm
-   *
-   * @return The new acceptance scale
-   *
    * @see https://doi.org/10.1145/103724.103725
    */
 
-  constexpr real_t acceptance_scale(
-    iteration_t __i,
-    real_t __acceptance_rate,
-    real_t __acceptance_scale,
-    const parameters& __params = default_parameters
-  )
+  class acceptance_scale
   {
-    return
-      __acceptance_scale *
+  public:
+    /**
+     * Constructs an acceptance scale with its parameters
+     *
+     * @param[in] __acceptance_rate_target The acceptance rate target
+     * @param[in] __beta The beta parameter
+     */
 
-      (
-        1 +
+    constexpr acceptance_scale(
+      acceptance_rate_target __acceptance_rate_target = {},
+      real_t __alpha = 50._r
+    ) noexcept
+      : m_acceptance_rate_target(std::move(__acceptance_rate_target))
+      , m_alpha(__alpha)
+    {}
 
-        (__acceptance_rate - acceptance_rate_target(__i, __params)) /
-        __params.acceptance.beta
-      );
-  }
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other acceptance scale
+     */
+
+    constexpr acceptance_scale(
+      const acceptance_scale& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other acceptance scale
+     */
+
+    constexpr acceptance_scale(
+      acceptance_scale&& __other
+    ) noexcept = default;
+
+    ~acceptance_scale() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other acceptance scale
+     * @return A reference to this acceptance scale
+     */
+
+    constexpr acceptance_scale& operator=(
+      const acceptance_scale& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other acceptance scale
+     * @return A reference to this acceptance scale
+     */
+
+    constexpr acceptance_scale& operator=(
+      acceptance_scale&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * Get the next acceptance scale
+     *
+     * @param[in] __i The current iteration
+     * @param[in] __acceptance_rate The current acceptance rate
+     * @param[in] __acceptance_scale The current acceptance scale
+     *
+     * @return The new acceptance scale
+     */
+
+    constexpr real_t operator()(
+      iteration_t __i,
+      real_t __acceptance_rate,
+      real_t __acceptance_scale
+    )
+    {
+      return
+        __acceptance_scale *
+
+        (
+          1 +
+
+          (__acceptance_rate - m_acceptance_rate_target(__i)) /
+          m_alpha
+        );
+    }
+  private:
+    acceptance_rate_target m_acceptance_rate_target;
+    real_t m_alpha;
+  };
 
   /**
    * The temperature schedule
@@ -233,39 +273,173 @@ namespace rlst::par
    * It gives the next temperature as a function of the number of iterations or
    * the previous temperature.
    *
-   * @param[in] __t The current temperature
-   * @param[in] __params The schedule parameters
-   *
-   * @return The next temperature
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class temperature_schedule
+  {
+  public:
+    /**
+     * Constructs a temperature schedule with its parameter
+     *
+     * @param[in] __alpha The alpha parameter
+     */
+
+    constexpr temperature_schedule(real_t __alpha = .98_r) noexcept
+      : m_alpha(__alpha)
+    {}
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other temperature schedule
+     */
+
+    constexpr temperature_schedule(
+      const temperature_schedule& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other temperature schedule
+     */
+
+    constexpr temperature_schedule(
+      temperature_schedule&& __other
+    ) noexcept = default;
+
+    ~temperature_schedule() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other temperature schedule
+     * @return A reference to this temperature schedule
+     */
+
+    constexpr temperature_schedule& operator=(
+      const temperature_schedule& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other temperature schedule
+     * @return A reference to this temperature schedule
+     */
+
+    constexpr temperature_schedule& operator=(
+      temperature_schedule&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * Get the next temperature
+     *
+     * @param[in] __t The current temperature
+     * @return The next temperature
+     */
+
+    constexpr real_t operator()(real_t __t) noexcept
+      { return m_alpha * __t; }
+  private:
+    real_t m_alpha;
+  };
+
+  /**
+   * The overlap penalty target
    *
    * @see https://doi.org/10.1145/103724.103725
    */
 
-  constexpr real_t schedule(
-    real_t __t,
-    const schedule_parameters& __params = default_schedule_parameters
-  ) noexcept
-    { return __params.alpha * __t; }
-
-  // TODO: comment
-
-  constexpr real_t overlap_penalty_target(
-    iteration_t __i,
-    literal_t __desired_wire_length,
-    const parameters& __params = default_parameters
-  )
+  class overlap_penalty_target
   {
-    return
-      (
-        __params.overlap.alpha -
+  public:
+    /**
+     * Constructs an overlap penalty target with its parameters
+     */
 
-        __params.overlap.beta * (
+    constexpr overlap_penalty_target(
+      real_t __alpha = 1.4_r,
+      real_t __beta = 0.15_r,
+      real_t __desired_row_length = 0._r,
+      iteration_t __max_iterations = 120_it
+    ) noexcept
+      : m_alpha(__alpha)
+      , m_beta(__beta)
+      , m_desired_row_length(__desired_row_length)
+      , m_max_iterations(__max_iterations)
+    {}
 
-          static_cast<real_t>(__i) /
-          static_cast<real_t>(__params.max_iterations)
-        )
-      ) * __desired_wire_length;
-  }
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other overlap penalty target
+     */
+
+    constexpr overlap_penalty_target(
+      const overlap_penalty_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other overlap penalty target
+     */
+
+    constexpr overlap_penalty_target(
+      overlap_penalty_target&& __other
+    ) noexcept = default;
+
+    ~overlap_penalty_target() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other overlap penalty target
+     * @return A reference to this overlap penalty target
+     */
+
+    constexpr overlap_penalty_target& operator=(
+      const overlap_penalty_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other overlap penalty target
+     * @return A reference to this overlap penalty target
+     */
+
+    constexpr overlap_penalty_target& operator=(
+      overlap_penalty_target&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * Get the next overlap penalty target
+     *
+     * @param[in] __i The current iteration
+     * @return The next overlap penalty target
+     */
+
+    constexpr real_t operator()(iteration_t __i)
+    {
+      return
+        (
+          m_alpha -
+
+          m_beta * (
+            static_cast<real_t>(__i) /
+            static_cast<real_t>(m_max_iterations)
+          )
+        ) * m_desired_row_length;
+    }
+  private:
+    real_t m_alpha;
+    real_t m_beta;
+    real_t m_desired_row_length;
+    iteration_t m_max_iterations;
+  };
 
   /**
    * Generate a random number in the range [0, 1]
