@@ -28,7 +28,10 @@ set(
     par.hpp
 )
 
-set(RLST_IPP)
+set(
+  RLST_IPP
+  par/placement.ipp
+)
 
 set(
     RLST_CPP
@@ -52,7 +55,7 @@ target_sources(
     PUBLIC
         FILE_SET HEADERS
         TYPE HEADERS
-        FILES "${RLST_HPP}"
+        FILES "${RLST_HPP}" "${RLST_IPP}
 )
 
 rlst_add_to_doc("${RLST_HPP}")

@@ -272,7 +272,6 @@ namespace rlst::par
   namespace details
   {
     // TODO: add `noexcept` qualifiers
-    // TODO: split
     // TODO: test
 
     template <class ColumnIterator, class RowIterator>
@@ -348,64 +347,18 @@ namespace rlst::par
       constexpr pointer operator->() const
         { return m_row_iterator.operator->(); }
 
-      constexpr overlap_grid_iterator& operator++()
-      {
-        if (m_column_index == m_row_size) {
-          ++m_row_iterator;
-          m_column_iterator = m_row_iterator->cbegin();
-          m_column_index = 0;
-        } else {
-          ++m_column_iterator;
-        }
+      constexpr overlap_grid_iterator& operator++();
+      constexpr overlap_grid_iterator operator++(int);
 
-        return m_column_iterator;
-      }
+      constexpr overlap_grid_iterator operator--();
+      constexpr overlap_grid_iterator operator--(int);
 
-      constexpr overlap_grid_iterator operator++(int)
-      {
-        overlap_grid_iterator old = *this;
-        ++(*this);
-        return old;
-      }
-
-      constexpr overlap_grid_iterator operator--()
-      {
-        if (m_column_index == 0) {
-          --m_row_iterator;
-          m_column_iterator = m_row_iterator->cend() - 1;
-          m_column_index = m_row_size - 1;
-        } else {
-          --m_column_iterator;
-        }
-
-        return *this;
-      }
-
-      constexpr overlap_grid_iterator operator--(int)
-      {
-        overlap_grid_iterator old = *this;
-        --(*this);
-        return old;
-      }
-
-      constexpr overlap_grid_iterator& operator+=(difference_type __n)
-      {
-        difference_type rem = __n % static_cast<difference_type>(m_row_size);
-
-        m_row_iterator += __n / static_cast<difference_type>(m_row_size);
-        m_column_iterator += rem;
-        m_column_index = rem;
-      }
+      constexpr overlap_grid_iterator& operator+=(difference_type __n);
 
       constexpr overlap_grid_iterator& operator-=(difference_type __n)
         { return *this += -__n; }
 
-      constexpr overlap_grid_iterator operator-(difference_type __n) const
-      {
-        overlap_grid_iterator copy = *this;
-        copy -= __n;
-        return copy;
-      }
+      constexpr overlap_grid_iterator operator-(difference_type __n) const;
 
       constexpr reference operator[](difference_type __n)
         { return **this + __n; }
@@ -433,16 +386,7 @@ namespace rlst::par
     bool operator!=(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-    {
-      auto c =
-        boost::contract::function()
-          .precondition(
-            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
-          );
-
-      return !(__lhs == __rhs);
-    }
+    );
 
     template <class C, class R>
     bool operator<(
@@ -483,39 +427,13 @@ namespace rlst::par
     typename overlap_grid_iterator<R, C>::difference_type operator-(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-    {
-      typename overlap_grid_iterator<C, R>::difference_type ret;
-
-      auto c =
-        boost::contract::function()
-
-          .precondition(
-            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
-          )
-
-          .postcondition([&] { BOOST_CONTRACT_ASSERT(__lhs == __rhs + ret); });
-
-      ret =
-        (__lhs.m_row_iterator - __rhs.m_row_iterator) +
-        (__lhs.m_column_index - __rhs.m_column_index);
-
-      return ret;
-    }
+    );
 
     template <class C, class R>
     constexpr void swap(
       overlap_grid_iterator<C, R>& __lhs,
       overlap_grid_iterator<C, R>& __rhs
-    )
-    {
-      using std::swap;
-
-      swap(__lhs.m_column_iterator, __rhs.m_column_iterator);
-      swap(__lhs.m_row_iterator, __rhs.m_row_iterator);
-      swap(__lhs.m_column_index, __rhs.m_column_index);
-      swap(__lhs.m_row_size, __rhs.m_row_size);
-    }
+    );
   }
 
   /**
@@ -847,5 +765,7 @@ namespace rlst::par
       );
   }
 }
+
+#include "placement.ipp"
 
 #endif // RLST_RLST_PAR_PLACEMENT_HPP
