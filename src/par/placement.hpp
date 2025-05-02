@@ -607,6 +607,106 @@ namespace rlst::par
   };
 
   /**
+   * The row length control penalty target
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  class row_length_penalty_target
+  {
+  public:
+    /**
+     * Constructs a row length penalty target with its parameters
+     *
+     * @param[in] __alpha The alpha parameter
+     * @param[in] __beta The beta parameter
+     * @param[in] __desired_row_length The desired row length
+     * @param[in] __max_iterations The maximum number of iterations
+     */
+
+    constexpr row_length_penalty_target(
+      real_t __alpha = 5._r,
+      real_t __beta = 4._r,
+      real_t __desired_row_length = 0._r,
+      iteration_t __max_iterations = 120_it,
+      real_t __xi = 0._r
+    ) noexcept
+      : m_alpha(__alpha)
+      , m_beta(__beta)
+      , m_desired_row_length(__desired_row_length)
+      , m_max_iterations(__max_iterations)
+      , m_xi(__xi)
+    {}
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The other row length penalty target
+     */
+
+    constexpr row_length_penalty_target(
+      const row_length_penalty_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The other row length penalty target
+     */
+
+    constexpr row_length_penalty_target(
+      row_length_penalty_target&& __other
+    ) noexcept = default;
+
+    ~row_length_penalty_target() noexcept = default; ///< Destructor
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __other The other row length penalty target
+     * @return A reference to this row length penalty target
+     */
+
+    constexpr row_length_penalty_target& operator=(
+      const row_length_penalty_target& __other
+    ) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __other The other row length penalty target
+     * @return A reference to this row length penalty target
+     */
+
+    constexpr row_length_penalty_target& operator=(
+      row_length_penalty_target&& __other
+    ) noexcept = default;
+  public:
+    /**
+     * Get the next row length penalty target
+     *
+     * @param[in] __i The current iteration
+     * @return The next row length penalty target
+     */
+
+    constexpr real_t operator()(iteration_t __i) const
+    {
+      return
+        m_alpha -
+
+        m_beta * (
+          static_cast<real_t>(__i) / static_cast<real_t>(m_max_iterations)
+        ) * m_xi * m_desired_row_length;
+    }
+  private:
+    real_t m_alpha;
+    real_t m_beta;
+    real_t m_desired_row_length;
+    iteration_t m_max_iterations;
+    real_t m_xi;
+  };
+
+  /**
    * Generate a random number in the range [0, 1]
    *
    * @return A random number in the range [0, 1]
