@@ -116,6 +116,14 @@ namespace rlst::par
     constexpr literal_t x() const noexcept { return m_x; }
 
     /**
+     * Get the x coordinate
+     *
+     * @return The x coordinate
+     */
+
+    constexpr literal_t& x() noexcept { return m_x; }
+
+    /**
      * Get the y coordinate
      *
      * @return The y coordinate
@@ -124,12 +132,28 @@ namespace rlst::par
     constexpr literal_t y() const noexcept { return m_y; }
 
     /**
+     * Get the y coordinate
+     *
+     * @return The y coordinate
+     */
+
+    constexpr literal_t& y() noexcept { return m_y; }
+
+    /**
      * Get the z coordinate
      *
      * @return The z coordinate
      */
 
     constexpr literal_t z() const noexcept { return m_z; }
+
+    /**
+     * Get the z coordinate
+     *
+     * @return The z coordinate
+     */
+
+    constexpr literal_t& z() noexcept { return m_z; }
   public:
     /**
      * Get the Manhattan length of the segment between this point and another
@@ -267,12 +291,28 @@ namespace rlst::par
     constexpr Point start() const noexcept { return m_start; }
 
     /**
+     * Get the start @ref Point
+     *
+     * @return The start @ref Point
+     */
+
+    constexpr Point& start() noexcept { return m_start; }
+
+    /**
      * Get the end @ref Point
      *
      * @return The end @ref Point
      */
 
     constexpr Point end() const noexcept { return m_end; }
+
+    /**
+     * Get the end @ref Point
+     *
+     * @return The end @ref Point
+     */
+
+    constexpr Point& end() noexcept { return m_end; }
   public:
     /**
      * Get the Manhattan length of the segment
