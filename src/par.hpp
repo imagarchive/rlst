@@ -23,6 +23,15 @@
  * This namespace describes all utilities related to Place And Route
  */
 
-namespace rlst::par {}
+#include <utility>
+
+#include "par/cell/ports.hpp"
+
+namespace rlst::par
+{
+  /* net_t */
+  using net_t =
+    std::pair<rlst::par::cell::PlacedPort, rlst::par::cell::PlacedPort>;
+}
 
 #endif // RLST_RLST_PAR_HPP
