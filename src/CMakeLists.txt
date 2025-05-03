@@ -55,7 +55,7 @@ target_sources(
     PUBLIC
         FILE_SET HEADERS
         TYPE HEADERS
-        FILES "${RLST_HPP}" "${RLST_IPP}
+        FILES "${RLST_HPP}" "${RLST_IPP}"
 )
 
 rlst_add_to_doc("${RLST_HPP}")
