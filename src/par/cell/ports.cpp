@@ -16,7 +16,9 @@
  */
 
 
+#include "par/cell/Cell.hpp"
 #include "par/cell/ports.hpp"
+
 #include <boost/functional/hash.hpp>
 
 namespace rlst::par::cell
@@ -59,5 +61,15 @@ namespace rlst::par::cell
 
     swap(__lhs.parent, __rhs.parent);
     swap(__lhs.port, __rhs.port);
+  }
+
+  literal_t absolute_x(const PlacedPort& __placed_port)
+  {
+    return __placed_port.port.position.x() + __placed_port.parent->position.x();
+  }
+
+  literal_t absolute_y(const PlacedPort& __placed_port)
+  {
+    return __placed_port.port.position.y() + __placed_port.parent->position.y();
   }
 }

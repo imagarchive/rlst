@@ -171,6 +171,18 @@ namespace rlst::par::cell
    */
 
   void swap(PlacedPort& __lhs, PlacedPort& __rhs) noexcept;
+
+  /**
+   * Get the absolute x of a @ref PlacedPort object
+   */
+
+  literal_t absolute_x(const PlacedPort& __placed_port);
+
+  /**
+   * Get the absolute y of a @ref PlacedPort object
+   */
+
+  literal_t absolute_y(const PlacedPort& __placed_port);
 }
 
 #endif // RLST_RLST_PAR_CELL_PORTS_HPP
