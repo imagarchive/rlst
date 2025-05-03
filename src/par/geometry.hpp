@@ -36,6 +36,7 @@
 namespace rlst::par
 {
   using literal_t = std::int64_t; ///< A literal
+  using uliteral_t = std::uint64_t; ///< An unsigned literal
 
   /* Point */
 
@@ -311,8 +312,8 @@ namespace rlst::par
 
   struct Size
   {
-    literal_t width; ///< The width
-    literal_t height; ///< The height
+    uliteral_t width; ///< The width
+    uliteral_t height; ///< The height
   };
 
   /**
