@@ -312,6 +312,30 @@ namespace rlst::par
       );
 
       template <class C, class R>
+      friend bool operator<(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
+      friend bool operator>(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
+      friend bool operator<=(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
+      friend bool operator>=(
+        const overlap_grid_iterator<C, R>&,
+        const overlap_grid_iterator<C, R>&
+      );
+
+      template <class C, class R>
       friend typename overlap_grid_iterator<C, R>::difference_type operator-(
         const overlap_grid_iterator<C, R>&,
         const overlap_grid_iterator<C, R>&
