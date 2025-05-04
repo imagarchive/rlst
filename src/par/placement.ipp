@@ -104,7 +104,7 @@ namespace rlst::par
     }
 
     template <class C, class R>
-    typename overlap_grid_iterator<R, C>::difference_type operator-(
+    typename overlap_grid_iterator<C, R>::difference_type operator-(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
     )
