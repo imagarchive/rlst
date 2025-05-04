@@ -26,7 +26,7 @@ namespace rlst::par
     {
       if (m_column_index == m_row_size) {
         ++m_row_iterator;
-        m_column_iterator = m_row_iterator->cbegin();
+        m_column_iterator = m_row_iterator->begin();
         m_column_index = 0;
       } else {
         ++m_column_iterator;
@@ -50,7 +50,7 @@ namespace rlst::par
     {
       if (m_column_index == 0) {
         --m_row_iterator;
-        m_column_iterator = m_row_iterator->cend() - 1;
+        m_column_iterator = m_row_iterator->end() - 1;
         m_column_index = m_row_size - 1;
       } else {
         --m_column_iterator;
