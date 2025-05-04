@@ -16,7 +16,6 @@
  */
 
 
-#include <boost/contract/check.hpp>
 namespace rlst::par
 {
   namespace details
@@ -92,6 +91,23 @@ namespace rlst::par
     }
 
     template <class C, class R>
+    bool operator==(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      boost::contract::check c =
+        boost::contract::function()
+          .precondition(
+            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
+          );
+
+      return
+        (__lhs.m_column_iterator == __rhs.m_column_iterator) &&
+        (__lhs.m_row_iterator == __rhs.m_row_iterator);
+    }
+
+    template <class C, class R>
     bool operator!=(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
@@ -104,6 +120,71 @@ namespace rlst::par
           );
 
       return !(__lhs == __rhs);
+    }
+
+
+    template <class C, class R>
+    bool operator<(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      boost::contract::check c =
+        boost::contract::function()
+
+          .precondition(
+            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
+          );
+
+      return (__lhs - __rhs) < 0;
+    }
+
+    template <class C, class R>
+    bool operator>(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      boost::contract::check c =
+        boost::contract::function()
+
+          .precondition(
+            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
+          );
+
+      return __rhs < __lhs;
+    }
+
+    template <class C, class R>
+    bool operator<=(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      boost::contract::check c =
+        boost::contract::function()
+
+          .precondition(
+            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
+          );
+
+      return !(__lhs > __rhs);
+    }
+
+    template <class C, class R>
+    bool operator>=(
+      const overlap_grid_iterator<C, R>& __lhs,
+      const overlap_grid_iterator<C, R>& __rhs
+    )
+    {
+      boost::contract::check c =
+        boost::contract::function()
+
+          .precondition(
+            [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
+          );
+
+      return !(__lhs < __rhs);
     }
 
     template <class C, class R>

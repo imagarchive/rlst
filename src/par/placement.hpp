@@ -300,7 +300,7 @@ namespace rlst::par
       using iterator_category = std::random_access_iterator_tag;
     public:
       template <class C, class R>
-      friend constexpr bool operator==(
+      friend bool operator==(
         const overlap_grid_iterator<C, R>&,
         const overlap_grid_iterator<C, R>&
       );
@@ -389,16 +389,10 @@ namespace rlst::par
     >;
 
     template <class C, class R>
-    constexpr bool operator==(
+    bool operator==(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-    {
-      return
-        (__lhs.m_column_iterator == __rhs.m_column_iterator) &&
-        (__lhs.m_row_iterator == __rhs.m_row_iterator) &&
-        (__lhs.m_row_size == __rhs.m_row_size);
-    }
+    );
 
     template <class C, class R>
     bool operator!=(
@@ -410,29 +404,25 @@ namespace rlst::par
     bool operator<(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-      { return (__lhs - __rhs) < 0; }
+    );
 
     template <class C, class R>
     bool operator>(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-      { return __rhs < __lhs; }
+    );
 
     template <class C, class R>
     bool operator<=(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-      { return !(__lhs > __rhs); }
+    );
 
     template <class C, class R>
     bool operator>=(
       const overlap_grid_iterator<C, R>& __lhs,
       const overlap_grid_iterator<C, R>& __rhs
-    )
-      { return !(__lhs < __rhs); }
+    );
 
     template <class C, class R>
     constexpr overlap_grid_iterator<C, R> operator+(
