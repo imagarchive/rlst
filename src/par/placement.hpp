@@ -374,8 +374,8 @@ namespace rlst::par
       constexpr overlap_grid_iterator& operator++();
       constexpr overlap_grid_iterator operator++(int);
 
-      constexpr overlap_grid_iterator operator--();
-      constexpr overlap_grid_iterator operator--(int);
+      overlap_grid_iterator operator--();
+      overlap_grid_iterator operator--(int);
 
       constexpr overlap_grid_iterator& operator+=(difference_type __n);
 

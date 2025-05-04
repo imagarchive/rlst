@@ -45,9 +45,12 @@ namespace rlst::par
     }
 
     template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>
-    overlap_grid_iterator<C, R>::operator--()
+    overlap_grid_iterator<C, R> overlap_grid_iterator<C, R>::operator--()
     {
+      boost::contract::check c =
+        boost::contract::function()
+          .postcondition([&] { BOOST_CONTRACT_ASSERT(--(++*this) == *this); });
+
       if (m_column_index == 0) {
         --m_row_iterator;
         m_column_iterator = m_row_iterator->end() - 1;
@@ -60,8 +63,7 @@ namespace rlst::par
     }
 
     template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>
-    overlap_grid_iterator<C, R>::operator--(int)
+    overlap_grid_iterator<C, R> overlap_grid_iterator<C, R>::operator--(int)
     {
       overlap_grid_iterator old = *this;
       --(*this);
