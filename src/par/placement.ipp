@@ -16,6 +16,7 @@
  */
 
 
+#include <boost/contract/check.hpp>
 namespace rlst::par
 {
   namespace details
@@ -94,7 +95,7 @@ namespace rlst::par
       const overlap_grid_iterator<C, R>& __rhs
     )
     {
-      auto c =
+      boost::contract::check c =
         boost::contract::function()
           .precondition(
             [&] { BOOST_CONTRACT_ASSERT(__lhs.m_row_size == __rhs.m_row_size); }
@@ -111,7 +112,7 @@ namespace rlst::par
     {
       typename overlap_grid_iterator<C, R>::difference_type ret;
 
-      auto c =
+      boost::contract::check c =
         boost::contract::function()
 
           .precondition(
