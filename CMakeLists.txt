@@ -69,8 +69,8 @@ if (WITH_TESTS)
 
     function (rlst_add_integration_tests)
         set(options)
-        set(one_value_args SCOPE_NAME)
-        set(multi_value_args TESTS EXTRA_LIBS)
+        set(one_value_args)
+        set(multi_value_args TESTS)
 
         cmake_parse_arguments(
             RLST_ADD_INTEGRATION_TEST
@@ -80,37 +80,29 @@ if (WITH_TESTS)
             ${ARGN}
         )
 
-        if (NOT DEFINED RLST_ADD_INTEGRATION_TEST_SCOPE_NAME)
-            set(RLST_ADD_INTEGRATION_TEST_SCOPE_NAME "${PROJECT_NAME}")
-        endif()
-
         foreach (test ${RLST_ADD_INTEGRATION_TEST_TESTS})
-            set(target "${RLST_ADD_INTEGRATION_TEST_SCOPE_NAME}-${test}")
-
-            add_executable("${target}" "tests/${test}.cpp")
+            add_executable("${test}" "${CMAKE_SOURCE_DIR}/tests/${test}.cpp")
 
             target_link_libraries(
-                "${target}"
+                "${test}"
 
                 PRIVATE
                     GTest::gtest
                     GTest::gtest_main
-                    "${RLST_ADD_INTEGRATION_TEST_EXTRA_LIBS}"
             )
 
             set_target_properties(
-                "${target}"
+                "${test}"
 
                 PROPERTIES
                     RUNTIME_OUTPUT_DIRECTORY
-                        "${CMAKE_CURRENT_BINARY_DIR}/integration-tests/"
+                        "${CMAKE_BINARY_DIR}/integration-tests/"
 
                     RUNTIME_OUTPUT_NAME "${scope}"
             )
 
             gtest_discover_tests(
-                "${target}"
-                TEST_PREFIX "${RLST_ADD_INTEGRATION_TEST_SCOPE_NAME}."
+                "${test}"
                 XML_OUTPUT_DIR "${TEST_RESULT_DIR}"
             )
         endforeach()
@@ -118,8 +110,8 @@ if (WITH_TESTS)
 
     function (rlst_add_unit_tests)
         set(options)
-        set(one_value_args SCOPE_NAME)
-        set(multi_value_args TESTS EXTRA_LIBS)
+        set(one_value_args)
+        set(multi_value_args TESTS)
 
         cmake_parse_arguments(
             RLST_ADD_UNIT_TEST
@@ -129,15 +121,9 @@ if (WITH_TESTS)
             ${ARGN}
         )
 
-        if (NOT DEFINED RLST_ADD_UNIT_TEST_SCOPE_NAME)
-            set(RLST_ADD_UNIT_TEST_SCOPE_NAME "${PROJECT_NAME}")
-        endif()
-
         foreach (test ${RLST_ADD_UNIT_TEST_TESTS})
-            string(REPLACE "/" "-" scope "${test}")
-            set(target "${RLST_ADD_UNIT_TEST_SCOPE_NAME}-${scope}")
-
-            add_executable("${target}" "src/${test}_test.cpp")
+            string(REPLACE "/" "_" target "${test}")
+            add_executable("${target}" "${test}_test.cpp")
 
             target_link_libraries(
                 "${target}"
@@ -145,22 +131,23 @@ if (WITH_TESTS)
                 PRIVATE
                     GTest::gtest
                     GTest::gtest_main
-                    "${RLST_ADD_UNIT_TEST_EXTRA_LIBS}"
+            )
+
+            target_include_directories(
+                "${target}"
+                PRIVATE "${CMAKE_SOURCE_DIR}/src"
             )
 
             set_target_properties(
                 "${target}"
 
                 PROPERTIES
-                    RUNTIME_OUTPUT_DIRECTORY
-                        "${CMAKE_CURRENT_BINARY_DIR}/unit-tests/"
-
+                    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/unit-tests/"
                     RUNTIME_OUTPUT_NAME "${scope}"
             )
 
             gtest_discover_tests(
                 "${target}"
-                TEST_PREFIX "${RLST_ADD_UNIT_TEST_SCOPE_NAME}."
                 XML_OUTPUT_DIR "${TEST_RESULT_DIR}"
             )
         endforeach()
