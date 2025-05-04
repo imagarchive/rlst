@@ -33,7 +33,7 @@ namespace rlst::par
         ++m_column_iterator;
       }
 
-      return m_column_iterator;
+      return *this;
     }
 
     template <class C, class R>
@@ -78,6 +78,8 @@ namespace rlst::par
       m_row_iterator += __n / static_cast<difference_type>(m_row_size);
       m_column_iterator += rem;
       m_column_index = rem;
+
+      return *this;
     }
 
     template <class C, class R>
