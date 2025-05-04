@@ -370,6 +370,24 @@ namespace rlst::par
       difference_type m_row_size;
     };
 
+    template <class RowIterator>
+    overlap_grid_iterator(
+      RowIterator,
+
+      typename overlap_grid_iterator<
+        typename RowIterator::value_type::iterator,
+        RowIterator
+      >::difference_type,
+
+      typename overlap_grid_iterator<
+              typename RowIterator::value_type::iterator,
+              RowIterator
+            >::difference_type
+    ) -> overlap_grid_iterator<
+      typename RowIterator::value_type::iterator,
+      RowIterator
+    >;
+
     template <class C, class R>
     constexpr bool operator==(
       const overlap_grid_iterator<C, R>& __lhs,
