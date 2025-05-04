@@ -335,7 +335,7 @@ namespace rlst::par
         difference_type __column_index,
         difference_type __row_size
       )
-        : m_column_iterator(__row_iterator->cbegin() + __column_index)
+        : m_column_iterator(__row_iterator->begin() + __column_index)
         , m_row_iterator(__row_iterator)
         , m_column_index(__column_index)
         , m_row_size(__row_size)
