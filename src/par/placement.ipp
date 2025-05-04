@@ -121,14 +121,14 @@ namespace rlst::par
           .postcondition([&] { BOOST_CONTRACT_ASSERT(__lhs == __rhs + ret); });
 
       ret =
-        (__lhs.m_row_iterator - __rhs.m_row_iterator) +
+        (__lhs.m_row_iterator - __rhs.m_row_iterator) * __lhs.m_row_size +
         (__lhs.m_column_index - __rhs.m_column_index);
 
       return ret;
     }
 
     template <class C, class R>
-    constexpr void swap(
+    void swap(
       overlap_grid_iterator<C, R>& __lhs,
       overlap_grid_iterator<C, R>& __rhs
     )

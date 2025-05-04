@@ -448,7 +448,7 @@ namespace rlst::par
     );
 
     template <class C, class R>
-    constexpr void swap(
+    void swap(
       overlap_grid_iterator<C, R>& __lhs,
       overlap_grid_iterator<C, R>& __rhs
     );
