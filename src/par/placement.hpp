@@ -366,10 +366,10 @@ namespace rlst::par
       {}
     public:
       constexpr reference operator*() const
-        { return *m_row_iterator; }
+        { return *m_column_iterator; }
 
       constexpr pointer operator->() const
-        { return m_row_iterator.operator->(); }
+        { return m_column_iterator.operator->(); }
 
       constexpr overlap_grid_iterator& operator++();
       constexpr overlap_grid_iterator operator++(int);
