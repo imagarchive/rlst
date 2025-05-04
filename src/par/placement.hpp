@@ -361,7 +361,7 @@ namespace rlst::par
       constexpr overlap_grid_iterator operator-(difference_type __n) const;
 
       constexpr reference operator[](difference_type __n)
-        { return **this + __n; }
+        { return *(*this + __n); }
     private:
       column_iterator_type m_column_iterator;
       row_iterator_type m_row_iterator;
