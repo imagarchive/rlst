@@ -36,6 +36,7 @@ namespace rlst::par::details
         << "column_iterator = " << x << " (" << *x << "), "
         << "row_iterator = " << &*__it.m_row_iterator << ", "
         << "column_index = " << __it.column_index() << ", "
+        << "offset = " << __it.m_offset << ", "
         << "row_size = " << __it.m_row_size
       << " }";
   }
@@ -223,7 +224,7 @@ TEST(overlap_grid_iterator__cmp__test, ge)
   ASSERT_GE(a, b);
 }
 
-class overlap_grid_iterator__select__test : public testing::Test
+class overlap_grid_iterator__select__test : public testing::TestWithParam<int>
 {
 protected:
   overlap_grid_iterator__select__test()
@@ -246,25 +247,52 @@ protected:
   std::vector<std::vector<int>> grid;
 };
 
-TEST_F(overlap_grid_iterator__select__test, forward)
+TEST_P(overlap_grid_iterator__select__test, forward)
 {
-  details::overlap_grid_iterator it(grid.begin(), 0, 4);
+  int offset = GetParam();
 
-  for (int i = 0; i != 16; ++i) {
-    ASSERT_EQ(*it, i);
-    ++it;
+  details::overlap_grid_iterator it(grid.begin(), 0, 4 - offset, offset);
+
+  for (int i = 0; i != 4; ++i) {
+    for (int j = offset; j != 4; ++j) {
+      ASSERT_EQ(*it, j + 4 * i);
+      ++it;
+    }
   }
 }
 
-TEST_F(overlap_grid_iterator__select__test, backward)
+TEST_P(overlap_grid_iterator__select__test, backward)
 {
-  details::overlap_grid_iterator it(grid.begin() + 3, 3, 4);
+  int offset = GetParam();
 
-  for (int i = 15; i >= 0; --i) {
-    ASSERT_EQ(*it, i);
-    --it;
+  // Force starting at the bottom right corner
+
+  details::overlap_grid_iterator it(
+    grid.begin() + 3,
+    3 - offset,
+    4 - offset,
+    offset
+  );
+
+  for (int i = 3; i >= 0; --i) {
+    for (int j = 3; j >= offset; --j) {
+      ASSERT_EQ(*it, j + 4 * i);
+      --it;
+    }
   }
 }
+
+INSTANTIATE_TEST_SUITE_P(
+  no_offset,
+  overlap_grid_iterator__select__test,
+  testing::Values(0)
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  with_offset,
+  overlap_grid_iterator__select__test,
+  testing::Range(1, 4)
+);
 
 class overlap_grid_iterator__increment__test
   : public testing::TestWithParam<int>

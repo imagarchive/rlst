@@ -355,16 +355,19 @@ namespace rlst::par
       constexpr overlap_grid_iterator()
         : m_column_iterator()
         , m_row_iterator()
+        , m_offset(0)
         , m_row_size(0)
       {}
 
       explicit constexpr overlap_grid_iterator(
         RowIterator&& __row_iterator,
         difference_type __column_index,
-        difference_type __row_size
+        difference_type __row_size,
+        difference_type __offset = 0
       )
-        : m_column_iterator(__row_iterator->begin() + __column_index)
+        : m_column_iterator(__row_iterator->begin() + __offset + __column_index)
         , m_row_iterator(std::forward<RowIterator>(__row_iterator))
+        , m_offset(__offset)
         , m_row_size(__row_size)
       {}
     public:
@@ -397,26 +400,27 @@ namespace rlst::par
         { return m_column_iterator - column_begin(); }
 
       constexpr const_column_iterator_type column_begin() const
-        { return m_row_iterator->begin(); }
+        { return m_row_iterator->begin() + m_offset; }
 
       constexpr column_iterator_type column_begin()
-        { return m_row_iterator->begin(); }
+        { return m_row_iterator->begin() + m_offset; }
 
       constexpr const_column_iterator_type column_cbegin() const
-        { return m_row_iterator->cbegin(); }
+        { return m_row_iterator->cbegin() + m_offset; }
 
       constexpr const_column_iterator_type column_end() const
-        { return m_row_iterator->begin() + m_row_size; }
+        { return m_row_iterator->begin() + m_row_size + m_offset; }
 
       constexpr column_iterator_type column_end()
-        { return m_row_iterator->begin() + m_row_size; }
+        { return m_row_iterator->begin() + m_row_size + m_offset; }
 
       constexpr const_column_iterator_type column_cend() const
-        { return m_row_iterator->cbegin() + m_row_size; }
+        { return m_row_iterator->cbegin() + m_row_size + m_offset; }
     private:
       column_iterator_type m_column_iterator;
       row_iterator_type m_row_iterator;
 
+      difference_type m_offset;
       difference_type m_row_size;
     };
 
