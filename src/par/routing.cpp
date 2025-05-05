@@ -356,36 +356,21 @@ namespace rlst::par
       std::vector<Point> best_route;
       for (uint8_t level = 0; level <= first_empty_level; ++level) {
         // make the spaces around the source and destination available
-        levels.remove_reason_cross(
-          static_cast<uliteral_t>(
-            cell::absolute_x(net.first) - __bottom_left.x()),
-          static_cast<uliteral_t>(
-            cell::absolute_y(net.first) - __bottom_left.y()),
-          level
-          );
-        levels.remove_reason_cross(
-          static_cast<uliteral_t>(
-            cell::absolute_x(net.second) - __bottom_left.x()),
-          static_cast<uliteral_t>(
-            cell::absolute_y(net.second) - __bottom_left.y()),
-          level
-          );
+        uliteral_t source_x = static_cast<uliteral_t>(
+            cell::absolute_x(net.first) - __bottom_left.x());
+        uliteral_t source_y = static_cast<uliteral_t>(
+            cell::absolute_y(net.first) - __bottom_left.y());
+        uliteral_t destination_x = static_cast<uliteral_t>(
+            cell::absolute_x(net.second) - __bottom_left.x());
+        uliteral_t destination_y = static_cast<uliteral_t>(
+            cell::absolute_y(net.second) - __bottom_left.y());
+        levels.remove_reason_cross(source_x, source_y, level);
+        levels.remove_reason_cross(destination_x, destination_y, level);
+        // find a route
         std::vector<Point> route = a_star(net, level, levels, __bottom_left);
         // make the spaces around the source and destination unavailable again
-        levels.add_reason_cross(
-          static_cast<uliteral_t>(
-            cell::absolute_x(net.first) - __bottom_left.x()),
-          static_cast<uliteral_t>(
-            cell::absolute_y(net.first) - __bottom_left.y()),
-          level
-          );
-        levels.add_reason_cross(
-          static_cast<uliteral_t>(
-            cell::absolute_x(net.second) - __bottom_left.x()),
-          static_cast<uliteral_t>(
-            cell::absolute_y(net.second) - __bottom_left.y()),
-          level
-          );
+        levels.add_reason_cross(source_x, source_y, level);
+        levels.add_reason_cross(destination_x, destination_y, level);
         // no route found -> continue
         if (route.size() == 0) continue;
         // route found -> compare it to previous best
