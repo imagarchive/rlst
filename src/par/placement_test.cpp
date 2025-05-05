@@ -19,8 +19,6 @@
 #include "par/placement.hpp"
 #include <gtest/gtest.h>
 
-#include <utility>
-
 using namespace rlst::par;
 
 namespace rlst::par::details
@@ -126,7 +124,7 @@ TEST_P(overlap_grid_iterator__multi_pass_guarantee__test, invariant)
 INSTANTIATE_TEST_SUITE_P(
   same_row,
   overlap_grid_iterator__multi_pass_guarantee__test,
-  testing::Range(2, 4)
+  testing::Range(2, 5)
 );
 
 INSTANTIATE_TEST_SUITE_P(
@@ -137,13 +135,18 @@ INSTANTIATE_TEST_SUITE_P(
 
 class overlap_grid_iterator__output__test
   : public testing::TestWithParam<int>
-{};
+{
+protected:
+  overlap_grid_iterator__output__test()
+    : grid(4, std::vector<int>(4, 0))
+  {}
+protected:
+  std::vector<std::vector<int>> grid;
+};
 
 TEST_P(overlap_grid_iterator__output__test, forward)
 {
   int index = GetParam();
-
-  std::vector<std::vector<int>> grid(4, std::vector<int>(4, 0));
   details::overlap_grid_iterator a(grid.begin(), 0, 3);
 
   a[index] = 1;
@@ -154,8 +157,6 @@ TEST_P(overlap_grid_iterator__output__test, forward)
 TEST_P(overlap_grid_iterator__output__test, backward)
 {
   int index = -GetParam();
-
-  std::vector<std::vector<int>> grid(4, std::vector<int>(4, 0));
   details::overlap_grid_iterator a(grid.begin() + 2, 2, 3);
 
   a[index] = 1;
@@ -166,13 +167,13 @@ TEST_P(overlap_grid_iterator__output__test, backward)
 INSTANTIATE_TEST_SUITE_P(
   same_row,
   overlap_grid_iterator__output__test,
-  testing::Range(0, 2)
+  testing::Range(0, 3)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_row,
   overlap_grid_iterator__output__test,
-  testing::Values(3, 8)
+  testing::Range(3, 9)
 );
 
 TEST(overlap_grid_iterator__basics__test, bidirectional)
@@ -312,23 +313,23 @@ TEST_P(overlap_grid_iterator__increment__test, backward)
 INSTANTIATE_TEST_SUITE_P(
   same_row,
   overlap_grid_iterator__increment__test,
-  testing::Range(0, 3)
+  testing::Range(0, 4)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_one,
   overlap_grid_iterator__increment__test,
-  testing::Range(4, 7)
+  testing::Range(4, 8)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_two,
   overlap_grid_iterator__increment__test,
-  testing::Range(8, 11)
+  testing::Range(8, 12)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_three,
   overlap_grid_iterator__increment__test,
-  testing::Range(12, 15)
+  testing::Range(12, 16)
 );

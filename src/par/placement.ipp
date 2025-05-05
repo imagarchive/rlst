@@ -88,8 +88,10 @@ namespace rlst::par
       m_column_index += __n;
 
       if (m_column_index < 0) {
+        ++m_column_index;
         m_row_iterator += m_column_index / m_row_size - 1;
-        m_column_index = m_row_size + m_column_index % m_row_size;
+        m_column_index %= m_row_size;
+        m_column_index += m_row_size - 1;
       } else {
         m_row_iterator += m_column_index / m_row_size;
         m_column_index %= m_row_size;
