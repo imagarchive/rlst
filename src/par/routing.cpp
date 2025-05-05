@@ -173,17 +173,16 @@ namespace rlst::par
 
   std::vector<Point> reconstruct_path(
     const std::unordered_map<Point, Point, boost::hash<Point>>& __from,
+    const Point& __start,
     const Point& __destination
   )
   {
     std::vector<Point> path;
-    path.push_back(__destination);
-    Point current = __destination;
-    while (__from.find(current) != __from.end()) {
-      current = __from.at(current);
+    Point current = __from.at(__destination);
+    while (current != __start) {
       path.push_back(current);
+      current = __from.at(current);
     }
-    std::reverse(path.begin(), path.end());
     return path;
   }
 
@@ -228,7 +227,9 @@ namespace rlst::par
     // find path
     while (!discovered.empty()) {
       Point current = *discovered.begin();
-      if (current == destination) return reconstruct_path(from, current);
+      if (current == destination) {
+        return reconstruct_path(from, start, destination);
+      }
       discovered.erase(discovered.begin());
       // TODO remove repeater incompatible directions from neighbors if a
       // repeater is required
@@ -267,51 +268,14 @@ namespace rlst::par
     return std::vector<Point>();
   }
 
-  enum Orientation { vertical, horizontal };
-
-  /**
-   * Converts a route from Point to Segments
-   */
-  std::vector<Segment> segmentify(const std::vector<Point>& __route)
-  {
-    std::vector<Segment> segments;
-    Segment current_segment;
-    current_segment.start() = __route[0];
-    // set initial direction
-    Orientation direction =
-      (__route[0].x() == __route[1].x()) ? vertical : horizontal;
-    // create a new segment when the direction changes
-    for (
-      size_t step_index = 1;
-      step_index < __route.size() - 1;
-      ++step_index)
-    {
-      Point step = __route[step_index];
-      if (direction == vertical && current_segment.start().x() != step.x()){
-        direction = horizontal;
-        segments.push_back(current_segment);
-        current_segment.start() = current_segment.end();
-      } else if (direction == horizontal
-          && current_segment.start().y() != step.y()) {
-        direction = vertical;
-        segments.push_back(current_segment);
-        current_segment.start() = current_segment.end();
-      }
-      current_segment.end() = step;
-    }
-    // add the final segment
-    segments.push_back(current_segment);
-    return segments;
-  }
-
-  std::vector<Segment> route(
+  std::vector<Point> route(
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size
   )
   {
-    // store the selected routes as segments
-    std::vector<Segment> segment_routes;
+    // store the selected routes
+    std::vector<Point> routes;
     // first level with no routes on it
     uint8_t first_empty_level = 0;
     // store which spaces are available at each level after placing the routes
@@ -418,13 +382,12 @@ namespace rlst::par
           best_route[best_route.size() - 1].y() - __bottom_left.y()),
         static_cast<uliteral_t>(best_route[best_route.size() - 1].z())
         );
-      std::vector<Segment> best_route_segments = segmentify(best_route);
-      segment_routes.insert(
-        segment_routes.end(),
-        best_route_segments.begin(),
-        best_route_segments.end()
+      routes.insert(
+        routes.end(),
+        best_route.begin(),
+        best_route.end()
         );
     }
-    return segment_routes;
+    return routes;
   }
 }

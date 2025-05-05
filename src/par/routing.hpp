@@ -29,7 +29,7 @@ namespace rlst::par
    * @return The segments that represent the routes
    */
 
-  std::vector<Segment> route(
+  std::vector<Point> route(
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size
