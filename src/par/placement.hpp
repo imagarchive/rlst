@@ -22,10 +22,7 @@
 #include "par/cell/ports.hpp"
 #include "core.hpp"
 
-#include <boost/contract/assert.hpp>
-#include <boost/contract/function.hpp>
 #include <boost/contract.hpp>
-
 #include <numeric>
 
 /**
@@ -272,7 +269,6 @@ namespace rlst::par
   namespace details
   {
     // TODO: add `noexcept` qualifiers
-    // TODO: test
 
     template <class ColumnIterator, class RowIterator>
     class overlap_grid_iterator
@@ -346,6 +342,14 @@ namespace rlst::par
         overlap_grid_iterator<C, R>&,
         overlap_grid_iterator<C, R>&
       );
+
+#ifdef RLST_WITH_TESTS
+      template <class C, class R>
+      friend void PrintTo(
+        const overlap_grid_iterator<C, R>& __it,
+        std::ostream* __os
+      );
+#endif
     public:
       constexpr overlap_grid_iterator()
         : m_column_iterator()

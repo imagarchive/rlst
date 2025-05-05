@@ -61,3 +61,8 @@ target_sources(
 )
 
 rlst_add_to_doc("${RLST_HPP}")
+
+rlst_add_unit_tests(
+    TESTS
+        par/placement
+)
