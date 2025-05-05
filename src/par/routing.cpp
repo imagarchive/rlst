@@ -57,8 +57,8 @@ namespace rlst::par
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
-      --vec.at(__y * x_length + __z * x_length * y_length);
-      assert(vec.at(__y * x_length + __z * x_length * y_length) >= 0);
+      --vec.at(__x + __y * x_length + __z * x_length * y_length);
+      assert(vec.at(__x + __y * x_length + __z * x_length * y_length) >= 0);
     }
 
     /**
@@ -72,7 +72,7 @@ namespace rlst::par
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
-      ++vec.at(__y * x_length + __z * x_length * y_length);
+      ++vec.at(__x + __y * x_length + __z * x_length * y_length);
     }
 
     /**
