@@ -359,12 +359,12 @@ namespace rlst::par
       {}
 
       constexpr overlap_grid_iterator(
-        row_iterator_type __row_iterator,
+        RowIterator&& __row_iterator,
         difference_type __column_index,
         difference_type __row_size
       )
         : m_column_iterator(__row_iterator->begin() + __column_index)
-        , m_row_iterator(__row_iterator)
+        , m_row_iterator(std::forward<RowIterator>(__row_iterator))
         , m_column_index(__column_index)
         , m_row_size(__row_size)
       {}
