@@ -408,10 +408,10 @@ namespace rlst::par
         );
       levels.remove_reason(
         static_cast<uliteral_t>(
-          best_route[best_route.size()].x() - __bottom_left.x()),
+          best_route[best_route.size() - 1].x() - __bottom_left.x()),
         static_cast<uliteral_t>(
-          best_route[best_route.size()].y() - __bottom_left.y()),
-        static_cast<uliteral_t>(best_route[best_route.size()].z())
+          best_route[best_route.size() - 1].y() - __bottom_left.y()),
+        static_cast<uliteral_t>(best_route[best_route.size() - 1].z())
         );
       std::vector<Segment> best_route_segments = segmentify(best_route);
       segment_routes.insert(
