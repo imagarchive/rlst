@@ -252,7 +252,7 @@ namespace rlst::par
         uliteral_t new_cost = cost[current] + 1;
         // heuristic is admissible and consistent, so just check whether
         // a path already exists
-        if (cost.find(neighbor) != cost.end()) {
+        if (cost.find(neighbor) == cost.end()) {
           from[neighbor] = current;
           cost[neighbor] = new_cost;
           estimate[neighbor] =
