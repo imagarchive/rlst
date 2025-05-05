@@ -49,16 +49,25 @@ namespace rlst::par
     template <class C, class R>
     overlap_grid_iterator<C, R> overlap_grid_iterator<C, R>::operator--()
     {
+      boost::contract::old_ptr old = BOOST_CONTRACT_OLDOF(*this);
+
       boost::contract::check c =
-        boost::contract::function()
-          .postcondition([&] { BOOST_CONTRACT_ASSERT(--(++*this) == *this); });
+        boost::contract::public_function(this)
+
+          .postcondition(
+            [&] {
+              overlap_grid_iterator copy = *this;
+              BOOST_CONTRACT_ASSERT(++copy == *old);
+            }
+          );
 
       if (m_column_index == 0) {
         --m_row_iterator;
-        m_column_iterator = m_row_iterator->end() - 1;
+        m_column_iterator = m_row_iterator->begin() + m_row_size - 1;
         m_column_index = m_row_size - 1;
       } else {
         --m_column_iterator;
+        --m_column_index;
       }
 
       return *this;
