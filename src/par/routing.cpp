@@ -178,7 +178,7 @@ namespace rlst::par
   {
     std::vector<Point> path;
     path.push_back(__destination);
-    Point current = __from.at(__destination);
+    Point current = __destination;
     while (__from.find(current) != __from.end()) {
       current = __from.at(current);
       path.push_back(current);
