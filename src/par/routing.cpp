@@ -267,7 +267,7 @@ namespace rlst::par
     return std::vector<Point>();
   }
 
-  enum Orientation { vertical, horizontal, none };
+  enum Orientation { vertical, horizontal };
 
   /**
    * Converts a route from Point to Segments
@@ -277,7 +277,10 @@ namespace rlst::par
     std::vector<Segment> segments;
     Segment current_segment;
     current_segment.start() = __route[0];
-    Orientation direction = none;
+    // set initial direction
+    Orientation direction =
+      (__route[0].x() == __route[1].x()) ? vertical : horizontal;
+    // create a new segment when the direction changes
     for (
       size_t step_index = 1;
       step_index < __route.size() - 1;
