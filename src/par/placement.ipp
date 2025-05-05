@@ -20,16 +20,13 @@ namespace rlst::par
 {
   namespace details
   {
-    template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>&
-    overlap_grid_iterator<C, R>::operator++()
+    template <class R>
+    constexpr overlap_grid_iterator<R>&
+    overlap_grid_iterator<R>::operator++()
     {
-      ++m_column_index;
-
-      if (m_column_index == m_row_size) {
+      if (m_column_iterator == (column_end() - 1)) {
         ++m_row_iterator;
-        m_column_iterator = m_row_iterator->begin();
-        m_column_index = 0;
+        m_column_iterator = column_begin();
       } else {
         ++m_column_iterator;
       }
@@ -37,17 +34,17 @@ namespace rlst::par
       return *this;
     }
 
-    template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>
-    overlap_grid_iterator<C, R>::operator++(int)
+    template <class R>
+    constexpr overlap_grid_iterator<R>
+    overlap_grid_iterator<R>::operator++(int)
     {
       overlap_grid_iterator old = *this;
       ++(*this);
       return old;
     }
 
-    template <class C, class R>
-    overlap_grid_iterator<C, R> overlap_grid_iterator<C, R>::operator--()
+    template <class R>
+    overlap_grid_iterator<R> overlap_grid_iterator<R>::operator--()
     {
       boost::contract::old_ptr old = BOOST_CONTRACT_OLDOF(*this);
 
@@ -61,60 +58,58 @@ namespace rlst::par
             }
           );
 
-      if (m_column_index == 0) {
+      if (m_column_iterator == column_begin()) {
         --m_row_iterator;
-        m_column_iterator = m_row_iterator->begin() + m_row_size - 1;
-        m_column_index = m_row_size - 1;
+        m_column_iterator = column_end() - 1;
       } else {
         --m_column_iterator;
-        --m_column_index;
       }
 
       return *this;
     }
 
-    template <class C, class R>
-    overlap_grid_iterator<C, R> overlap_grid_iterator<C, R>::operator--(int)
+    template <class R>
+    overlap_grid_iterator<R> overlap_grid_iterator<R>::operator--(int)
     {
       overlap_grid_iterator old = *this;
       --(*this);
       return old;
     }
 
-    template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>&
-    overlap_grid_iterator<C, R>::operator+=(difference_type __n)
+    template <class R>
+    constexpr overlap_grid_iterator<R>&
+    overlap_grid_iterator<R>::operator+=(difference_type __n)
     {
-      m_column_index += __n;
+      __n += column_index();
 
-      if (m_column_index < 0) {
-        ++m_column_index;
-        m_row_iterator += m_column_index / m_row_size - 1;
-        m_column_index %= m_row_size;
-        m_column_index += m_row_size - 1;
+      if (__n < 0) {
+        ++__n;
+        m_row_iterator += __n / m_row_size - 1;
+        __n %= m_row_size;
+        __n += m_row_size - 1;
       } else {
-        m_row_iterator += m_column_index / m_row_size;
-        m_column_index %= m_row_size;
+        m_row_iterator += __n / m_row_size;
+        __n %= m_row_size;
       }
 
-      m_column_iterator = m_row_iterator->begin() + m_column_index;
+      m_column_iterator = column_begin() + __n;
 
       return *this;
     }
 
-    template <class C, class R>
-    constexpr overlap_grid_iterator<C, R>
-    overlap_grid_iterator<C, R>::operator-(difference_type __n) const
+    template <class R>
+    constexpr overlap_grid_iterator<R>
+    overlap_grid_iterator<R>::operator-(difference_type __n) const
     {
       overlap_grid_iterator copy = *this;
       copy -= __n;
       return copy;
     }
 
-    template <class C, class R>
+    template <class R>
     bool operator==(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -128,10 +123,10 @@ namespace rlst::par
         (__lhs.m_row_iterator == __rhs.m_row_iterator);
     }
 
-    template <class C, class R>
+    template <class R>
     bool operator!=(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -144,10 +139,10 @@ namespace rlst::par
     }
 
 
-    template <class C, class R>
+    template <class R>
     bool operator<(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -160,10 +155,10 @@ namespace rlst::par
       return (__lhs - __rhs) < 0;
     }
 
-    template <class C, class R>
+    template <class R>
     bool operator>(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -176,10 +171,10 @@ namespace rlst::par
       return __rhs < __lhs;
     }
 
-    template <class C, class R>
+    template <class R>
     bool operator<=(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -192,10 +187,10 @@ namespace rlst::par
       return !(__lhs > __rhs);
     }
 
-    template <class C, class R>
+    template <class R>
     bool operator>=(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
       boost::contract::check c =
@@ -208,13 +203,13 @@ namespace rlst::par
       return !(__lhs < __rhs);
     }
 
-    template <class C, class R>
-    typename overlap_grid_iterator<C, R>::difference_type operator-(
-      const overlap_grid_iterator<C, R>& __lhs,
-      const overlap_grid_iterator<C, R>& __rhs
+    template <class R>
+    typename overlap_grid_iterator<R>::difference_type operator-(
+      const overlap_grid_iterator<R>& __lhs,
+      const overlap_grid_iterator<R>& __rhs
     )
     {
-      typename overlap_grid_iterator<C, R>::difference_type ret;
+      typename overlap_grid_iterator<R>::difference_type ret;
 
       boost::contract::check c =
         boost::contract::function()
@@ -227,22 +222,18 @@ namespace rlst::par
 
       ret =
         (__lhs.m_row_iterator - __rhs.m_row_iterator) * __lhs.m_row_size +
-        (__lhs.m_column_index - __rhs.m_column_index);
+        (__lhs.m_column_iterator - __rhs.m_column_iterator);
 
       return ret;
     }
 
-    template <class C, class R>
-    void swap(
-      overlap_grid_iterator<C, R>& __lhs,
-      overlap_grid_iterator<C, R>& __rhs
-    )
+    template <class R>
+    void swap(overlap_grid_iterator<R>& __lhs, overlap_grid_iterator<R>& __rhs)
     {
       using std::swap;
 
       swap(__lhs.m_column_iterator, __rhs.m_column_iterator);
       swap(__lhs.m_row_iterator, __rhs.m_row_iterator);
-      swap(__lhs.m_column_index, __rhs.m_column_index);
       swap(__lhs.m_row_size, __rhs.m_row_size);
     }
   }

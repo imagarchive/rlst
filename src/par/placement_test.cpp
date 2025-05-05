@@ -23,9 +23,9 @@ using namespace rlst::par;
 
 namespace rlst::par::details
 {
-  template <class C, class R>
+  template <class R>
   void PrintTo(
-    const overlap_grid_iterator<C, R>& __it,
+    const overlap_grid_iterator<R>& __it,
     std::ostream* __os
   )
   {
@@ -35,7 +35,7 @@ namespace rlst::par::details
       << "overlap_grid_iterator { "
         << "column_iterator = " << x << " (" << *x << "), "
         << "row_iterator = " << &*__it.m_row_iterator << ", "
-        << "column_index = " << __it.m_column_index << ", "
+        << "column_index = " << __it.column_index() << ", "
         << "row_size = " << __it.m_row_size
       << " }";
   }
@@ -50,11 +50,7 @@ TEST(overlap_grid_iterator__basics__test, is_constructible)
 TEST(overlap_grid_iterator__basics__test, is_default_constructible)
 {
   using vector = std::vector<std::vector<int>>;
-
-  details::overlap_grid_iterator<
-    decltype(std::declval<vector>().begin()),
-    decltype(std::declval<vector>().begin()->begin())
-  >();
+  details::overlap_grid_iterator<decltype(std::declval<vector>().begin())>();
 }
 
 TEST(overlap_grid_iterator__basics__test, incompatible_ne)
