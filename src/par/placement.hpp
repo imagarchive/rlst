@@ -358,7 +358,7 @@ namespace rlst::par
         , m_row_size(0)
       {}
 
-      constexpr overlap_grid_iterator(
+      explicit constexpr overlap_grid_iterator(
         RowIterator&& __row_iterator,
         difference_type __column_index,
         difference_type __row_size
