@@ -341,7 +341,9 @@ namespace rlst::par
           if (y < __size.height) levels.add_reason(x, y, level);
           y -= 2;
           if (y >= 0) levels.add_reason(x, y, level);
+          ++y;
         }
+        ++x;
       }
     }
     // sort nets by increasing size (Manhattan)
