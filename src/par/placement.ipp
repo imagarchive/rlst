@@ -85,11 +85,17 @@ namespace rlst::par
     constexpr overlap_grid_iterator<C, R>&
     overlap_grid_iterator<C, R>::operator+=(difference_type __n)
     {
-      difference_type rem = __n % static_cast<difference_type>(m_row_size);
+      m_column_index += __n;
 
-      m_row_iterator += __n / static_cast<difference_type>(m_row_size);
-      m_column_iterator += rem;
-      m_column_index = rem;
+      if (m_column_index < 0) {
+        m_row_iterator += m_column_index / m_row_size - 1;
+        m_column_index = m_row_size + m_column_index % m_row_size;
+      } else {
+        m_row_iterator += m_column_index / m_row_size;
+        m_column_index %= m_row_size;
+      }
+
+      m_column_iterator = m_row_iterator->begin() + m_column_index;
 
       return *this;
     }
