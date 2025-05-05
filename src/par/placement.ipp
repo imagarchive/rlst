@@ -24,6 +24,8 @@ namespace rlst::par
     constexpr overlap_grid_iterator<C, R>&
     overlap_grid_iterator<C, R>::operator++()
     {
+      ++m_column_index;
+
       if (m_column_index == m_row_size) {
         ++m_row_iterator;
         m_column_iterator = m_row_iterator->begin();
