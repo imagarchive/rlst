@@ -213,7 +213,7 @@ namespace rlst::par
     estimate[start] = manhattan_cost(start, __net.second);
     // discovered points
     auto compare = [&estimate](Point __lhs, Point __rhs) {
-      return estimate[__lhs] > estimate[__rhs];
+      return estimate[__lhs] < estimate[__rhs];
     };
     std::set<Point, decltype(compare)> discovered(compare);
     discovered.insert(start);
