@@ -299,6 +299,7 @@ namespace rlst::par
       }
       current_segment.end() = step;
     }
+    // add the final segment
     segments.push_back(current_segment);
     return segments;
   }
