@@ -354,7 +354,6 @@ namespace rlst::par
     for (const net_t& net : __nets) {
       uliteral_t best_cost = std::numeric_limits<uliteral_t>::max();
       std::vector<Point> best_route;
-      bool stopped_early = false;
       for (uint8_t level = 0; level <= first_empty_level; ++level) {
         // make the spaces around the source and destination available
         levels.remove_reason_cross(
@@ -387,19 +386,21 @@ namespace rlst::par
             cell::absolute_y(net.second) - __bottom_left.y()),
           level
           );
+        // no route found -> continue
+        if (route.size() == 0) continue;
+        // route found -> compare it to previous best
         uliteral_t cost = level * LEVEL_COST + route.size();
         if (cost < best_cost) {
           best_route = std::move(route);
           best_cost = cost;
         }
         if (best_cost < manhattan_cost(net) + LEVEL_COST * (level + 1)) {
-          if (level < first_empty_level) stopped_early = true;
+          if (level == first_empty_level) ++first_empty_level;
           break;
         }
       }
-      if (!stopped_early) ++first_empty_level;
-      if (first_empty_level == MAX_LEVEL) {
-        throw std::length_error("Could not route, not enough levels");
+      if (best_route.size() == 0) {
+        throw std::runtime_error("Could not route");
       }
       // occupy the route
       for (
