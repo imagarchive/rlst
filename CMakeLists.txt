@@ -83,6 +83,8 @@ if (WITH_TESTS)
         foreach (test ${RLST_ADD_INTEGRATION_TEST_TESTS})
             add_executable("${test}" "${CMAKE_SOURCE_DIR}/tests/${test}.cpp")
 
+            target_compile_definitions("${test}" PRIVATE RLST_WITH_TESTS)
+
             target_link_libraries(
                 "${test}"
 
@@ -124,6 +126,8 @@ if (WITH_TESTS)
         foreach (test ${RLST_ADD_UNIT_TEST_TESTS})
             string(REPLACE "/" "_" target "${test}")
             add_executable("${target}" "${test}_test.cpp")
+
+            target_compile_definitions("${target}" PRIVATE RLST_WITH_TESTS)
 
             target_link_libraries(
                 "${target}"
