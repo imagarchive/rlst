@@ -272,14 +272,14 @@ namespace rlst::par
     return std::vector<Point>();
   }
 
-  std::vector<Point> route(
+  std::vector<std::vector<Point>> route(
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size
   )
   {
     // store the selected routes
-    std::vector<Point> routes;
+    std::vector<std::vector<Point>> routes;
     // first level with no routes on it
     uint8_t first_empty_level = 0;
     // store which spaces are available at each level after placing the routes
@@ -386,11 +386,7 @@ namespace rlst::par
           best_route[best_route.size() - 1].y() - __bottom_left.y()),
         static_cast<uliteral_t>(best_route[best_route.size() - 1].z())
         );
-      routes.insert(
-        routes.end(),
-        best_route.begin(),
-        best_route.end()
-        );
+      routes.push_back(best_route);
     }
     return routes;
   }
