@@ -489,30 +489,26 @@ namespace rlst::par
    * @tparam Allocator The allocator type used for the grid
    */
 
-  template <
-    typename T,
-    std::uint8_t bin_size,
-    class Allocator = std::allocator<T>
-  >
+  template <typename T, std::uint8_t bin_size>
   class overlap_grid
   {
-    template <typename U, std::uint8_t b, class A>
+    template <typename U, std::uint8_t b>
     friend bool operator==(
-      const overlap_grid<U, b, A>&,
-      const overlap_grid<U, b, A>&
+      const overlap_grid<U, b>&,
+      const overlap_grid<U, b>&
     );
 
-    template <typename U, std::uint8_t b, class A>
-    friend void swap(overlap_grid<U, b, A>&, overlap_grid<U, b, A>&) noexcept;
+    template <typename U, std::uint8_t b>
+    friend void swap(overlap_grid<U, b>&, overlap_grid<U, b>&) noexcept;
   public:
     /// The type of the data stored in the grid
     using value_type = T;
   private:
     /// The underlying type of a line of the grid
-    using line_type = std::vector<value_type, Allocator>;
+    using line_type = std::vector<value_type>;
 
     /// The underlying type of the grid
-    using grid_type = std::vector<line_type, Allocator>;
+    using grid_type = std::vector<line_type>;
   public:
     /// A reference to an element of the container
     using reference = std::add_lvalue_reference_t<T>;
@@ -553,9 +549,6 @@ namespace rlst::par
     /// The type of the constant reverse iterator
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
   public:
-    /// The allocator type
-    using allocator_type = Allocator;
-  public:
     /// The default constructor
     overlap_grid() = default;
 
@@ -581,17 +574,6 @@ namespace rlst::par
     /**
      * Constructs an overlap grid with its parameters
      *
-     * @param[in] __other The overlap grid to copy from
-     * @param[in, out] __a The allocator to use
-     */
-
-    overlap_grid(overlap_grid __other, Allocator&& __a)
-      : m_grid(std::move(__other.m_grid), std::forward<Allocator>(__a))
-    {}
-
-    /**
-     * Constructs an overlap grid with its parameters
-     *
      * @param[in] __width The width of the grid
      * @param[in] __height The height of the grid
      * @param[in, out] __default The default value to use
@@ -601,19 +583,11 @@ namespace rlst::par
     overlap_grid(
       size_type __width,
       size_type __height,
-      T&& __default = {},
-      Allocator&& __a = {}
+      T&& __default = {}
     )
       : m_grid(
-        __height,
-
-        line_type(
-          __width,
-          std::forward<T>(__default),
-          __a
-        ),
-
-        std::forward<Allocator>(__a)
+        __height + 1,
+        line_type(__width, std::forward<T>(__default))
       )
     {}
   public:
@@ -642,7 +616,7 @@ namespace rlst::par
      */
 
     iterator begin()
-      { return iterator(m_grid.begin(), 0, m_grid.size()); }
+      { return iterator(m_grid.begin(), 0, m_grid.front().size()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -651,7 +625,7 @@ namespace rlst::par
      */
 
     const_iterator begin() const
-      { return const_iterator(m_grid.begin(), 0, m_grid.size()); }
+      { return const_iterator(m_grid.begin(), 0, m_grid.front().size()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -672,9 +646,9 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() + m_grid.size(),
+          m_grid.begin() + row_number(),
           0,
-          m_grid.size()
+          m_grid.front().size()
         );
     }
 
@@ -688,9 +662,9 @@ namespace rlst::par
     {
       return
         const_iterator(
-          m_grid.begin() + m_grid.size(),
+          m_grid.begin() + row_number(),
           0,
-          m_grid.size()
+          m_grid.front().size()
         );
     }
 
@@ -758,13 +732,31 @@ namespace rlst::par
       { return rend(); }
   public:
     /**
+     * Get the number of column in the grid
+     *
+     * @return The number of column in the grid
+     */
+
+    size_type column_number() const
+      { return m_grid.front().size(); }
+
+    /**
+     * Get the number of row in the grid
+     *
+     * @return The number of row in the grid
+     */
+
+    size_type row_number() const noexcept
+      { return m_grid.size() - 1; }
+
+    /**
      * Get the size of the container
      *
      * @return The size of the container
      */
 
-    size_type size() const noexcept
-      { return m_grid.size() * m_grid.front().size(); }
+    size_type size() const
+      { return row_number() * column_number(); }
 
     /**
      * Get the maximum size of the container
@@ -783,15 +775,6 @@ namespace rlst::par
 
     bool empty() const noexcept
       { return m_grid.empty(); }
-  public:
-    /**
-     * Get the allocator of the container
-     *
-     * @return The allocator of the container
-     */
-
-    allocator_type get_allocator() const noexcept
-      { return m_grid.get_allocator(); }
   public:
    /**
     * Swap the contents of this overlap grid with another
@@ -827,10 +810,10 @@ namespace rlst::par
    * otherwise
    */
 
-  template <typename U, std::uint8_t b, class A>
+  template <typename U, std::uint8_t b>
   bool operator==(
-    const overlap_grid<U, b, A>& __lhs,
-    const overlap_grid<U, b, A>& __rhs
+    const overlap_grid<U, b>& __lhs,
+    const overlap_grid<U, b>& __rhs
   )
   {
     return
@@ -856,10 +839,10 @@ namespace rlst::par
    * otherwise
    */
 
-  template <typename U, std::uint8_t b, class A>
+  template <typename U, std::uint8_t b>
   bool operator!=(
-    const overlap_grid<U, b, A>& __lhs,
-    const overlap_grid<U, b, A>& __rhs
+    const overlap_grid<U, b>& __lhs,
+    const overlap_grid<U, b>& __rhs
   )
     { return !(__lhs == __rhs); }
 
@@ -878,10 +861,10 @@ namespace rlst::par
    * @param[in, out] __rhs The second \ref overlap_grid object
    */
 
-  template <typename U, std::uint8_t b, class A>
+  template <typename U, std::uint8_t b>
   void swap(
-    overlap_grid<U, b, A>& __lhs,
-    overlap_grid<U, b, A>& __rhs
+    overlap_grid<U, b>& __lhs,
+    overlap_grid<U, b>& __rhs
   ) noexcept;
 
   /**
