@@ -19,6 +19,7 @@
 #ifndef RLST_RLST_PAR_PLACEMENT_HPP
 #  define RLST_RLST_PAR_PLACEMENT_HPP
 
+#include "par/cell/Cell.hpp"
 #include "par/cell/ports.hpp"
 #include "core.hpp"
 
@@ -788,6 +789,125 @@ namespace rlst::par
 
     void swap(overlap_grid& __rhs) noexcept
       { return swap(*this, __rhs); }
+  public:
+    /**
+     * Get the top left and bottom right iterator
+     *
+     * @return The top left and bottom right iterator
+     */
+
+    std::pair<iterator, iterator> rect(const cell::Cell& __cell)
+      { return std::make_pair(top_left(__cell), bottom_right(__cell)); }
+
+    /**
+     * Get the top left and bottom right iterator
+     *
+     * @return The top left and bottom right iterator
+     */
+
+    std::pair<const_iterator, const_iterator>
+    rect(const cell::Cell& __cell) const
+      { return std::make_pair(top_left(__cell), bottom_right(__cell)); }
+
+    /**
+     * Get the number of bins that intersect with the given @ref cell::Cell on
+     * the x axis
+     *
+     * @param[in] __cell The given @ref cell:Cell
+     *
+     * @return The number of bins that intersect with the given @ref cell::Cell
+     * on the x axis
+     */
+
+    std::size_t size_of(const cell::Cell& __cell) const
+    {
+      return
+        __cell.type->size.width +
+        ((__cell.position.x() % bin_size) != 0);
+    }
+
+    /**
+     * Get the top left iterator
+     *
+     * The top left iterator is the one pointing to the first element of the
+     * submatrix corresponding to the bins intersecting with the given
+     * @ref cell::Cell.
+     *
+     * @param[in]  __cell The given @ref cell::Cell
+     * @return The top left iterator
+     */
+
+    iterator top_left(const cell::Cell& __cell)
+    {
+      return
+        iterator(
+          m_grid.begin() + __cell.position.y() / bin_size,
+          0,
+          static_cast<difference_type>(size_of(__cell)),
+          __cell.position.x() / bin_size
+        );
+    }
+
+    /**
+     * Get the top left iterator
+     *
+     * The top left iterator is the one pointing to the first element of the
+     * submatrix corresponding to the bins intersecting with the given
+     * @ref cell::Cell.
+     *
+     * @param[in]  __cell The given @ref cell::Cell
+     * @return The top left iterator
+     */
+
+    const_iterator top_left(const cell::Cell& __cell) const
+      { return top_left(__cell); }
+
+    /**
+     * Get the bottom right iterator
+     *
+     * The bottom right iterator is the one pointing to the past-the-last
+     * element of the submatrix corresponding to the bins intersecting with the
+     * given @ref cell::Cell.
+     *
+     * Thus, the returned iterator is, in fact, not the bottom right iterator
+     * but the one just after it.
+     *
+     * @param[in] __cell The bottom right iterator
+     * @return The bottom right iterator
+     */
+
+    iterator bottom_right(const cell::Cell& __cell)
+    {
+      return
+        iterator(
+          m_grid.begin() +
+            ceil_divide(
+              __cell.position.y() + __cell.type->size.height,
+              bin_size
+            ) + 1,
+
+          0,
+          static_cast<difference_type>(size_of(__cell)),
+          __cell.position.x() / bin_size
+        );
+    }
+
+    /**
+     * Get the bottom right iterator
+     *
+     * The bottom right iterator is the one pointing to the past-the-last
+     * element of the submatrix corresponding to the bins intersecting with the
+     * given @ref cell::Cell.
+     *
+     * Thus, the returned iterator is, in fact, not the bottom right iterator
+     * but the one just after it.
+     *
+     * @param[in] __cell The bottom right iterator
+     * @return The bottom right iterator
+     */
+
+    const_iterator bottom_right(const cell::Cell& __cell) const
+      { return bottom_right(__cell); }
   private:
     grid_type m_grid;
   };
