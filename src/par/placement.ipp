@@ -222,7 +222,7 @@ namespace rlst::par
 
       ret =
         (__lhs.m_row_iterator - __rhs.m_row_iterator) * __lhs.m_row_size +
-        (__lhs.m_column_iterator - __rhs.m_column_iterator);
+        (__lhs.column_index() - __rhs.column_index());
 
       return ret;
     }
