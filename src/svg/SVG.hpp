@@ -34,13 +34,13 @@ namespace rlst::svg::svg
     void draw_cell(const rlst::par::cell::Cell& __cell);
 
     /**
-     * Draw a @ref rlst::par::Segment object
+     * Draw a @ref rlst::par::Point object
      *
-     * @param[in] __segment The segment to draw
+     * @param[in] __point The point to draw
      * @param[in] __color The color to use
      */
-    void draw_segment(
-      const rlst::par::Segment& __segment,
+    void draw_point(
+      const rlst::par::Point& __point,
       const std::string_view& __color
     );
 

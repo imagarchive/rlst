@@ -2,6 +2,7 @@
 
 static constexpr char CELL_TEXT_COLOR[] = "black";
 static constexpr char CELL_BACKGROUND_COLOR[] = "red";
+static constexpr char PORT_BACKGROUND_COLOR[] = "blue";
 static constexpr int SIZE_FACTOR = 10;
 static constexpr int CANVAS_WIDTH = 1024 * SIZE_FACTOR;
 static constexpr int CANVAS_HEIGHT = 1024 * SIZE_FACTOR;
@@ -44,19 +45,27 @@ namespace rlst::svg::svg
 
       << " fill='" << CELL_TEXT_COLOR << "'"
       << ">" << __cell.type->name << "</text>\n";
+    for (par::cell::Port port : __cell.type->ports) {
+      par::Point port_point;
+      port_point.x() = __cell.position.x() + port.position.x();
+      port_point.y() = __cell.position.y() + port.position.y();
+      draw_point(port_point, PORT_BACKGROUND_COLOR);
+    }
   }
 
-  void SVG::draw_segment(
-    const rlst::par::Segment& __segment,
+  void SVG::draw_point(
+    const rlst::par::Point& __point,
     const std::string_view& __color)
   {
     m_svg_file
-      << "<line"
-      << " x1='" << __segment.start().x() * SIZE_FACTOR << "'"
-      << " y1='" << __segment.start().y() * SIZE_FACTOR << "'"
-      << " x2='" << __segment.end().x() * SIZE_FACTOR << "'"
-      << " y2='" << __segment.end().y() * SIZE_FACTOR << "'"
-      << " stroke='" << __color << "'"
+      << "<rect"
+      << " width='" << SIZE_FACTOR << "'"
+      << " height='" << SIZE_FACTOR << "'"
+      << " x='" << __point.x() * SIZE_FACTOR
+        << "'"
+      << " y='" << __point.y() * SIZE_FACTOR
+        << "'"
+      << " fill='" << __color << "'"
       << "/>\n";
   }
 }
