@@ -478,6 +478,413 @@ namespace rlst::par
   }
 
   /**
+   * The overlap grid
+   *
+   * This data structure aims to provide an easy way to compute the overlap
+   * score.
+   *
+   *
+   * @tparam T The type of the data stored in the grid
+   * @tparam bin_size The bin size of the grid
+   * @tparam Allocator The allocator type used for the grid
+   */
+
+  template <
+    typename T,
+    std::uint8_t bin_size,
+    class Allocator = std::allocator<T>
+  >
+  class overlap_grid
+  {
+    template <typename U, std::uint8_t b, class A>
+    friend bool operator==(
+      const overlap_grid<U, b, A>&,
+      const overlap_grid<U, b, A>&
+    );
+
+    template <typename U, std::uint8_t b, class A>
+    friend void swap(overlap_grid<U, b, A>&, overlap_grid<U, b, A>&) noexcept;
+  public:
+    /// The type of the data stored in the grid
+    using value_type = T;
+  private:
+    /// The underlying type of a line of the grid
+    using line_type = std::vector<value_type, Allocator>;
+
+    /// The underlying type of the grid
+    using grid_type = std::vector<line_type, Allocator>;
+  public:
+    /// A reference to an element of the container
+    using reference = std::add_lvalue_reference_t<T>;
+
+    /// A constant reference to an element of the container
+    using const_reference = std::add_const_t<std::add_lvalue_reference_t<T>>;
+
+    /// The type of the iterator
+    using iterator =
+      details::overlap_grid_iterator<typename grid_type::iterator>;
+
+    /// The type of the const iterator
+    using const_iterator =
+      details::overlap_grid_iterator<typename grid_type::const_iterator>;
+
+    /// The `difference_type` of the underlying iterator types
+    using difference_type = typename iterator::difference_type;
+
+    static_assert(
+      std::is_same_v<
+        typename iterator::difference_type,
+        typename const_iterator::difference_type
+      >,
+
+      "The difference types of the iterators must be the same"
+    );
+
+    /// The type used to represent the size of the container
+    using size_type =
+      std::common_type_t<
+        typename grid_type::size_type,
+        typename grid_type::value_type::size_type
+      >;
+  public:
+    /// The type of the reverse iterator
+    using reverse_iterator = std::reverse_iterator<iterator>;
+
+    /// The type of the constant reverse iterator
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+  public:
+    /// The allocator type
+    using allocator_type = Allocator;
+  public:
+    /// The default constructor
+    overlap_grid() = default;
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The overlap grid to copy from
+     */
+
+    overlap_grid(const overlap_grid& __other) = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The overlap grid to move from
+     */
+
+    overlap_grid(overlap_grid&& __other) = default;
+
+    /// The destructor
+    ~overlap_grid() = default;
+  public:
+    /**
+     * Constructs an overlap grid with its parameters
+     *
+     * @param[in] __other The overlap grid to copy from
+     * @param[in, out] __a The allocator to use
+     */
+
+    overlap_grid(overlap_grid __other, Allocator&& __a)
+      : m_grid(std::move(__other.m_grid), std::forward<Allocator>(__a))
+    {}
+
+    /**
+     * Constructs an overlap grid with its parameters
+     *
+     * @param[in] __width The width of the grid
+     * @param[in] __height The height of the grid
+     * @param[in, out] __default The default value to use
+     * @param[in, out] __a The allocator to use
+     */
+
+    overlap_grid(
+      size_type __width,
+      size_type __height,
+      T&& __default = {},
+      Allocator&& __a = {}
+    )
+      : m_grid(
+        __height,
+
+        line_type(
+          __width,
+          std::forward<T>(__default),
+          __a
+        ),
+
+        std::forward<Allocator>(__a)
+      )
+    {}
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __rhs The overlap grid to copy from
+     * @return A reference to the updated overlap grid
+     */
+
+    overlap_grid& operator=(const overlap_grid& __rhs) = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __rhs The overlap grid to move from
+     * @return A reference to the updated overlap grid
+     */
+
+    overlap_grid& operator=(overlap_grid&& __rhs) noexcept = default;
+  public:
+    /**
+     * Get an iterator to the beginning of the grid
+     *
+     * @return An iterator to the beginning of the grid
+     */
+
+    iterator begin()
+      { return iterator(m_grid.begin(), 0, m_grid.size()); }
+
+    /**
+     * Get a constant iterator to the beginning of the grid
+     *
+     * @return A constant iterator to the beginning of the grid
+     */
+
+    const_iterator begin() const
+      { return const_iterator(m_grid.begin(), 0, m_grid.size()); }
+
+    /**
+     * Get a constant iterator to the beginning of the grid
+     *
+     * @return A constant iterator to the beginning of the grid
+     */
+
+    const_iterator cbegin() const
+      { return begin(); }
+
+    /**
+     * Get an iterator to the ending of the grid
+     *
+     * @return An iterator to the ending of the grid
+     */
+
+    iterator end()
+    {
+      return
+        iterator(
+          m_grid.begin() + m_grid.size(),
+          0,
+          m_grid.size()
+        );
+    }
+
+    /**
+     * Get a constant iterator to the ending of the grid
+     *
+     * @return A constant iterator to the ending of the grid
+     */
+
+    const_iterator end() const
+    {
+      return
+        const_iterator(
+          m_grid.begin() + m_grid.size(),
+          0,
+          m_grid.size()
+        );
+    }
+
+    /**
+      * Get a constant iterator to the ending of the grid
+      *
+      * @return A constant iterator to the ending of the grid
+      */
+
+    const_iterator cend() const
+      { return end(); }
+  public:
+    /**
+     * Get a reverse iterator to the ending of the grid
+     *
+     * @return A reverse iterator to the ending of the grid
+     */
+
+    reverse_iterator rbegin()
+      { return reverse_iterator(end()); }
+
+    /**
+     * Get a constant reverse iterator to the ending of the grid
+     *
+     * @return A constant reverse iterator to the ending of the grid
+     */
+
+    const_reverse_iterator rbegin() const
+      { return const_reverse_iterator(end()); }
+
+    /**
+     * Get a constant reverse iterator to the ending of the grid
+     *
+     * @return A constant reverse iterator to the ending of the grid
+     */
+
+    const_reverse_iterator crbegin() const
+      { return rbegin(); }
+
+    /**
+     * Get a reverse iterator to the beginning of the grid
+     *
+     * @return A reverse iterator to the beginning of the grid
+     */
+
+    reverse_iterator rend()
+      { return reverse_iterator(begin()); }
+
+    /**
+     * Get a constant reverse iterator to the beginning of the grid
+     *
+     * @return A constant reverse iterator to the beginning of the grid
+     */
+
+    const_reverse_iterator rend() const
+      { return const_reverse_iterator(begin()); }
+
+    /**
+     * Get a constant reverse iterator to the beginning of the grid
+     *
+     * @return A constant reverse iterator to the beginning of the grid
+     */
+
+    const_reverse_iterator crend() const
+      { return rend(); }
+  public:
+    /**
+     * Get the size of the container
+     *
+     * @return The size of the container
+     */
+
+    size_type size() const noexcept
+      { return m_grid.size() * m_grid.front().size(); }
+
+    /**
+     * Get the maximum size of the container
+     *
+     * @return The maximum size of the container
+     */
+
+    size_type max_size() const
+      { return m_grid.max_size() * m_grid.front().max_size(); }
+
+    /**
+     * Check if the container is empty
+     *
+     * @return `true` if the container is empty, `false` otherwise
+     */
+
+    bool empty() const noexcept
+      { return m_grid.empty(); }
+  public:
+    /**
+     * Get the allocator of the container
+     *
+     * @return The allocator of the container
+     */
+
+    allocator_type get_allocator() const noexcept
+      { return m_grid.get_allocator(); }
+  public:
+   /**
+    * Swap the contents of this overlap grid with another
+    *
+    * This function exchanges the contents of the current overlap grid
+    * with those of the provided overlap grid. The operation is performed
+    * in constant time as it only swaps the internal data structures.
+    *
+    * @param[in, out] __rhs The overlap grid to swap with
+    */
+
+    void swap(overlap_grid& __rhs) noexcept
+      { return swap(*this, __rhs); }
+  private:
+    grid_type m_grid;
+  };
+
+  /**
+   * Equality operator for \ref overlap_grid
+   *
+   * Compares two overlap_grid objects for equality. Two \ref overlap_grid
+   * objects are considered equal if their internal grid structures are
+   * identical.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   * @tparam A The allocator type used for the grid
+   *
+   * @param[in] __lhs The left-hand side \ref overlap_grid to compare
+   * @param[in] __rhs The right-hand side \ref overlap_grid to compare
+   *
+   * @return `true` if the two \ref overlap_grid objects are equal, `false`
+   * otherwise
+   */
+
+  template <typename U, std::uint8_t b, class A>
+  bool operator==(
+    const overlap_grid<U, b, A>& __lhs,
+    const overlap_grid<U, b, A>& __rhs
+  )
+  {
+    return
+      (__lhs.size() == __rhs.size()) &&
+      std::equal(__lhs.cbegin(), __lhs.cend(), __rhs.cbegin());
+  }
+
+  /**
+   * Inequality operator for \ref overlap_grid
+   *
+   * Compares two overlap_grid objects for inequality. Two \ref overlap_grid
+   * objects are considered unequal if their internal grid structures are
+   * different.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   * @tparam A The allocator type used for the grid
+   *
+   * @param[in] __lhs The left-hand side \ref overlap_grid to compare
+   * @param[in] __rhs The right-hand side \ref overlap_grid to compare
+   *
+   * @return `true` if the two \ref overlap_grid objects are not equal, `false`
+   * otherwise
+   */
+
+  template <typename U, std::uint8_t b, class A>
+  bool operator!=(
+    const overlap_grid<U, b, A>& __lhs,
+    const overlap_grid<U, b, A>& __rhs
+  )
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Swap two \ref overlap_grid objects
+   *
+   * Exchanges the contents of two \ref overlap_grid objects. This operation is
+   * performed in constant time as it only swaps the internal data structures
+   * of the two objects.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   * @tparam A The allocator type used for the grid
+   *
+   * @param[in, out] __lhs The first \ref overlap_grid object
+   * @param[in, out] __rhs The second \ref overlap_grid object
+   */
+
+  template <typename U, std::uint8_t b, class A>
+  void swap(
+    overlap_grid<U, b, A>& __lhs,
+    overlap_grid<U, b, A>& __rhs
+  ) noexcept;
+
+  /**
    * The overlap penalty target
    *
    * @see https://doi.org/10.1145/103724.103725

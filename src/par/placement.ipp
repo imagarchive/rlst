@@ -237,4 +237,11 @@ namespace rlst::par
       swap(__lhs.m_row_size, __rhs.m_row_size);
     }
   }
+
+  template <typename U, std::uint8_t b, class A>
+  void swap(overlap_grid<U, b, A>& __lhs, overlap_grid<U, b, A>& __rhs) noexcept
+  {
+    using std::swap;
+    swap(__lhs.m_grid, __rhs.m_grid);
+  }
 }
