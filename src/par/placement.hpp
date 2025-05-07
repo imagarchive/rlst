@@ -230,6 +230,14 @@ namespace rlst::par
   /* temperature */
 
   /**
+   * The default first temperature
+   *
+   * This value is chosen accordingly the TimberWolf 4.2 algorithm.
+   */
+
+  constexpr real_t default_first_temperature = 500._r;
+
+  /**
    * The temperature schedule
    *
    * It gives the next temperature as a function of the number of iterations or
