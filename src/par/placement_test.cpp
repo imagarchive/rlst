@@ -19,6 +19,8 @@
 #include "par/placement.hpp"
 #include <gtest/gtest.h>
 
+#include "cell/types.hpp"
+
 using namespace rlst::par;
 
 namespace rlst::par::details
@@ -356,4 +358,311 @@ INSTANTIATE_TEST_SUITE_P(
   jump_three,
   overlap_grid_iterator__increment__test,
   testing::Range(12, 16)
+);
+
+class overlap_grid__iterator__test : public testing::Test
+{
+protected:
+  overlap_grid__iterator__test()
+    : grid(20, 20, 1)
+  {}
+protected:
+  overlap_grid<int, 8> grid;
+};
+
+TEST_F(overlap_grid__iterator__test, select_forward)
+{
+  for (auto i = grid.begin(); i != grid.end(); ++i) {
+    ASSERT_EQ(*i, 1);
+  }
+}
+
+TEST_F(overlap_grid__iterator__test, select_backward)
+{
+  for (auto i = grid.rbegin(); i != grid.rend(); ++i) {
+    ASSERT_EQ(*i, 1);
+  }
+}
+
+TEST_F(overlap_grid__iterator__test, distance)
+{
+  ASSERT_EQ(grid.end() - grid.begin(), 400);
+}
+
+TEST(overlap_grid__size__test, basic)
+{
+  overlap_grid<int, 8> grid(20, 20);
+  ASSERT_EQ(grid.size(), 400);
+}
+
+TEST(overlap_grid__size__test, empty)
+{
+  overlap_grid<int, 8> grid;
+  EXPECT_DEATH({ grid.size(); }, "");
+}
+
+class overlap_grid__cell__test : public testing::Test
+{
+protected:
+  using grid_type = overlap_grid<int, 8>;
+  using difference_type = grid_type::difference_type;
+protected:
+  overlap_grid__cell__test()
+    : grid(20, 20)
+  {
+    auto it = grid.begin();
+
+    for (int i = 0; i != static_cast<int>(grid.size()); ++i) {
+      *it = i;
+      ++it;
+    }
+  }
+protected:
+  grid_type grid;
+};
+
+cell::Cell cell_from_geometry_params(
+  literal_t __x,
+  literal_t __y,
+  uliteral_t __width,
+  uliteral_t __height
+)
+{
+  return
+    cell::Cell {
+      Point(__x, __y, 0),
+
+      std::make_shared<cell::CellType>(
+        cell::CellType {
+          std::list<cell::Port>(),
+          std::string(),
+          Size {__width, __height}
+        }
+      )
+    };
+}
+
+TEST_F(overlap_grid__cell__test, in_bin)
+{
+  cell::Cell c = cell_from_geometry_params(1, 1, 4, 4);
+  auto rect = grid.rect(c);
+
+  ASSERT_EQ(grid.width_of(c), 1);
+  ASSERT_EQ(grid.height_of(c), 1);
+  ASSERT_EQ(rect.second - rect.first, 1);
+
+  ASSERT_EQ(rect.first[0], grid.begin()[0]);
+}
+
+TEST_F(overlap_grid__cell__test, fit_one_bin)
+{
+  cell::Cell c = cell_from_geometry_params(0, 0, 8, 8);
+  auto rect = grid.rect(c);
+
+  ASSERT_EQ(grid.width_of(c), 1);
+  ASSERT_EQ(grid.height_of(c), 1);
+  ASSERT_EQ(rect.second - rect.first, 1);
+
+  ASSERT_EQ(rect.first[0], grid.begin()[0]);
+}
+
+TEST_F(overlap_grid__cell__test, fit_two_bin)
+{
+  cell::Cell c = cell_from_geometry_params(0, 0, 16, 8);
+  auto rect = grid.rect(c);
+
+  ASSERT_EQ(grid.width_of(c), 2);
+  ASSERT_EQ(grid.height_of(c), 1);
+  ASSERT_EQ(rect.second - rect.first, 2);
+
+  ASSERT_EQ(rect.first[0], grid.begin()[0]);
+  ASSERT_EQ(rect.first[1], grid.begin()[1]);
+}
+
+TEST_F(overlap_grid__cell__test, small_accross_two_bin)
+{
+  cell::Cell c = cell_from_geometry_params(6, 1, 3, 4);
+  auto rect = grid.rect(c);
+
+  ASSERT_EQ(grid.width_of(c), 2);
+  ASSERT_EQ(grid.height_of(c), 1);
+  ASSERT_EQ(rect.second - rect.first, 2);
+
+  ASSERT_EQ(rect.first[0], grid.begin()[0]);
+  ASSERT_EQ(rect.first[1], grid.begin()[1]);
+}
+
+
+TEST_F(overlap_grid__cell__test, big_accross_two_bin)
+{
+  cell::Cell c = cell_from_geometry_params(6, 1, 5, 4);
+  auto rect = grid.rect(c);
+
+  ASSERT_EQ(grid.width_of(c), 2);
+  ASSERT_EQ(grid.height_of(c), 1);
+  ASSERT_EQ(rect.second - rect.first, 2);
+
+  ASSERT_EQ(rect.first[0], grid.begin()[0]);
+  ASSERT_EQ(rect.first[1], grid.begin()[1]);
+}
+
+class overlap_grid__cell_select__test
+  : public overlap_grid__cell__test
+  , public testing::WithParamInterface<std::tuple<int, int>>
+{};
+
+TEST_P(overlap_grid__cell_select__test, forward)
+{
+  auto width = static_cast<uliteral_t>(std::get<0>(GetParam()));
+  auto height = static_cast<uliteral_t>(std::get<1>(GetParam()));
+
+  cell::Cell c = cell_from_geometry_params(0, 0, 8 * width, 8 * height);
+
+  auto cell_it = grid.top_left(c);
+  auto grid_it = grid.begin();
+
+  for (uliteral_t i = 0; i != height; ++i) {
+    for (uliteral_t j = 0; j != width; ++j) {
+      ASSERT_EQ(*cell_it, *grid_it);
+
+      ++grid_it;
+      ++cell_it;
+    }
+
+    grid_it += static_cast<difference_type>(grid.column_number() - width);
+  }
+}
+
+TEST_P(overlap_grid__cell_select__test, backward)
+{
+  auto width = static_cast<uliteral_t>(std::get<0>(GetParam()));
+  auto height = static_cast<uliteral_t>(std::get<1>(GetParam()));
+
+  cell::Cell c = cell_from_geometry_params(0, 0, 8 * width, 8 * height);
+
+  auto cell_it = grid.bottom_right(c) - 1;
+
+  auto grid_it =
+    grid.begin() +
+
+    static_cast<difference_type>(
+      (width - 1) +
+      (height - 1) * grid.column_number()
+    );
+
+  for (uliteral_t i = 0; i != height; ++i) {
+    for (uliteral_t j = 0; j != width; ++j) {
+      ASSERT_EQ(*cell_it, *grid_it);
+
+      --grid_it;
+      --cell_it;
+    }
+
+    grid_it -= static_cast<difference_type>(grid.column_number() - width);
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+  same_row,
+  overlap_grid__cell_select__test,
+
+  testing::Combine(
+    testing::Range(1, 8),
+    testing::Values(1)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  same_column,
+  overlap_grid__cell_select__test,
+
+  testing::Combine(
+    testing::Values(1),
+    testing::Range(1, 8)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  many_rows_and_columns,
+  overlap_grid__cell_select__test,
+
+  testing::Combine(
+    testing::Range(2, 8),
+    testing::Range(2, 8)
+  )
+);
+
+class overlap_grid__modifiers__test
+  : public testing::TestWithParam<std::tuple<int, int>>
+{
+protected:
+  using grid_type = overlap_grid<int, 8>;
+
+  using iterator = grid_type::iterator;
+  using size_type = grid_type::size_type;
+  using value_type = grid_type::value_type;
+protected:
+  overlap_grid__modifiers__test()
+    : grid(20, 20)
+  {}
+protected:
+  template <
+    std::pair<iterator, iterator> (grid_type::*modifier)(const cell::Cell&),
+    value_type val
+  >
+  void check_modifier()
+  {
+    auto width = static_cast<uliteral_t>(std::get<0>(GetParam()));
+    auto height = static_cast<uliteral_t>(std::get<1>(GetParam()));
+
+    cell::Cell c = cell_from_geometry_params(0, 0, 8 * width, 8 * height);
+    auto [begin, end] = grid.rect(c);
+
+    (grid.*modifier)(c);
+
+    ASSERT_EQ(
+      std::count(grid.begin(), grid.end(), 0),
+      grid.size() - static_cast<size_type>(end - begin)
+    );
+
+    ASSERT_EQ(std::count(begin, end, val), end - begin);
+  }
+protected:
+  grid_type grid;
+};
+
+TEST_P(overlap_grid__modifiers__test, insert)
+  { check_modifier<&grid_type::insert, 8>(); }
+
+TEST_P(overlap_grid__modifiers__test, erase)
+  { check_modifier<&grid_type::erase, -8>(); }
+
+INSTANTIATE_TEST_SUITE_P(
+  same_row,
+  overlap_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Range(1, 8),
+    testing::Values(1)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  same_column,
+  overlap_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Values(1),
+    testing::Range(1, 8)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  many_rows_and_columns,
+  overlap_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Range(2, 8),
+    testing::Range(2, 8)
+  )
 );
