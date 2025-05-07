@@ -589,7 +589,7 @@ namespace rlst::par
       T&& __default = {}
     )
       : m_grid(
-        __height + 1,
+        __height + 2,
         line_type(__width, std::forward<T>(__default))
       )
     {}
@@ -619,7 +619,7 @@ namespace rlst::par
      */
 
     iterator begin()
-      { return iterator(m_grid.begin(), 0, m_grid.front().size()); }
+      { return iterator(m_grid.begin() + 1, 0, m_grid.front().size()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -628,7 +628,7 @@ namespace rlst::par
      */
 
     const_iterator begin() const
-      { return const_iterator(m_grid.begin(), 0, m_grid.front().size()); }
+      { return const_iterator(m_grid.begin() + 1, 0, m_grid.front().size()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -649,7 +649,7 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() + row_number(),
+          m_grid.begin() + 1 + row_number(),
           0,
           m_grid.front().size()
         );
@@ -665,7 +665,7 @@ namespace rlst::par
     {
       return
         const_iterator(
-          m_grid.begin() + row_number(),
+          m_grid.begin() + 1 + row_number(),
           0,
           m_grid.front().size()
         );
@@ -750,7 +750,7 @@ namespace rlst::par
      */
 
     size_type row_number() const noexcept
-      { return m_grid.size() - 1; }
+      { return m_grid.size() - 2; }
 
     /**
      * Get the size of the container
@@ -821,11 +821,28 @@ namespace rlst::par
      * on the x axis
      */
 
-    std::size_t size_of(const cell::Cell& __cell) const
+    std::size_t width_of(const cell::Cell& __cell) const
     {
       return
-        __cell.type->size.width +
-        ((__cell.position.x() % bin_size) != 0);
+        ceil_divide(__cell.position.x() + __cell.type->size.width, bin_size) -
+        __cell.position.x() / bin_size;
+    }
+
+    /**
+     * Get the number of bins that intersect with the given @ref cell::Cell on
+     * the y axis
+     *
+     * @param[in] __cell The given @ref cell:Cell
+     *
+     * @return The number of bins that intersect with the given @ref cell::Cell
+     * on the y axis
+     */
+
+    std::size_t height_of(const cell::Cell& __cell) const
+    {
+      return
+        ceil_divide(__cell.position.y() + __cell.type->size.height, bin_size) -
+        __cell.position.y() / bin_size;
     }
 
     /**
@@ -843,9 +860,9 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() + __cell.position.y() / bin_size,
+          m_grid.begin() + 1 + __cell.position.y() / bin_size,
           0,
-          static_cast<difference_type>(size_of(__cell)),
+          static_cast<difference_type>(width_of(__cell)),
           __cell.position.x() / bin_size
         );
     }
@@ -882,14 +899,9 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() +
-            ceil_divide(
-              __cell.position.y() + __cell.type->size.height,
-              bin_size
-            ) + 1,
-
+          m_grid.begin() + 1 + height_of(__cell),
           0,
-          static_cast<difference_type>(size_of(__cell)),
+          static_cast<difference_type>(width_of(__cell)),
           __cell.position.x() / bin_size
         );
     }
