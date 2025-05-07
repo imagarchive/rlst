@@ -19,6 +19,8 @@
 #ifndef RLST_RLST_CORE_HPP
 #  define RLST_RLST_CORE_HPP
 
+#include <iterator>
+
 /**
  * @file
  *
@@ -75,5 +77,47 @@
     constexpr T& operator=(const T&) noexcept = default; \
     constexpr T& operator=(T&&) noexcept = default;      \
     ~T() noexcept = default
+
+namespace rlst
+{
+  /**
+   * Contains core utilities and traits for the RLST library
+   *
+   * This namespace provides foundational components such as type traits and
+   * utility functions that are essential for the library's functionality. It
+   * includes tools for type checking, iterator categorization, and other core
+   * operations.
+   */
+
+  inline namespace core
+  {
+    /**
+     * A trait allowing to check if a type is a random access iterator
+     *
+     * @tparam T The type to test
+     */
+
+    template <class T, typename = void>
+    struct is_random_access_iterator : std::false_type {};
+
+    template <class T>
+    struct is_random_access_iterator<T, void>
+      : std::is_base_of<
+        std::random_access_iterator_tag,
+        typename std::iterator_traits<T>::iterator_category
+      >
+    {};
+
+    /**
+     * Check if a type is a random access iterator
+     *
+     * @tparam T The type to test
+     */
+
+    template <class T>
+    constexpr bool is_random_access_iterator_v =
+      is_random_access_iterator<T>::value;
+  }
+}
 
 #endif // RLST_RLST_CORE_HPP
