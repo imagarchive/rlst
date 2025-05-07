@@ -960,6 +960,25 @@ namespace rlst::par
      */
 
     void replace(cell::Cell& __lhs, cell::Cell& __rhs);
+  public:
+    /**
+     * Get the overlap penalty
+     *
+     * @return The overlap penalty
+     * @see https://doi.org/10.1145/103724.103725
+     */
+
+    value_type penalty() const noexcept
+    {
+      return
+        std::reduce(
+          cbegin(),
+          cend(),
+
+          [] (value_type __acc, value_type __current)
+            { return __acc + std::abs(__current - bin_size); }
+        );
+    }
   private:
     grid_type m_grid;
   };
