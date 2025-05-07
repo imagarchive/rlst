@@ -417,6 +417,9 @@ namespace rlst::par
 
       constexpr const_column_iterator_type column_cend() const
         { return m_row_iterator->cbegin() + m_row_size + m_offset; }
+    public:
+      constexpr difference_type x() const
+        { return m_offset + column_index(); }
     private:
       column_iterator_type m_column_iterator;
       row_iterator_type m_row_iterator;
