@@ -50,7 +50,7 @@ namespace rlst::par
 
   /* real_t */
 
-  using real_t = long double; ///< A real number
+  using real_t = double; ///< A real number
 
   /**
    * User-defined literal for @ref rlst::par::real_t
