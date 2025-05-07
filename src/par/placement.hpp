@@ -926,8 +926,26 @@ namespace rlst::par
     template <bool is_inserting>
     std::pair<iterator, iterator> insert(const cell::Cell& __cell);
   public:
+    /**
+     * Insert a new @ref cell::Cell in the grid
+     *
+     * @param[in] The @ref cell::Cell to insert
+     * @return The _rectangle_ of this @ref cell::Cell
+     *
+     * @see rect()
+     */
+
     std::pair<iterator, iterator> insert(const cell::Cell& __cell)
       { return insert<true>(__cell); }
+
+    /**
+     * Erase a @ref cell::Cell from the grid
+     *
+     * @param[in] The @ref cell::Cell to erase
+     * @return The _rectangle_ of this @ref cell::Cell
+     *
+     * @see rect()
+     */
 
     std::pair<iterator, iterator> erase(const cell::Cell& __cell)
       { return insert<false>(__cell); }
