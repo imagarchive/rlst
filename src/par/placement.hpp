@@ -1400,6 +1400,22 @@ namespace rlst::par
     row_length_weight m_row_length_weight;
   };
 
+  /**
+   * Get the row length penalty
+   *
+   * @tparam The iterator type
+   *
+   * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
+   * @param[in] __end The past-the-last iterator of the @ref cell::Cell "cells"
+   *
+   * @return The row length penalty
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  template <class InputIt>
+  real_t row_length_penalty(InputIt __begin, InputIt __end);
+
   /* wire length */
 
   /**

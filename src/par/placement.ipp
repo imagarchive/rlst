@@ -291,4 +291,78 @@ namespace rlst::par
     using std::swap;
     swap(__lhs.m_grid, __rhs.m_grid);
   }
+
+  namespace details
+  {
+    struct row_length_penalty_binop
+    {
+      constexpr real_t operator()(real_t __lhs, real_t __rhs) const noexcept
+        { return __lhs + __rhs; }
+
+      constexpr real_t operator()(
+        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __lhs,
+        real_t __rhs
+      ) const noexcept
+      {
+        return
+          operator()(
+            static_cast<real_t>(__lhs.second.second - __lhs.second.first),
+            __rhs
+          );
+      }
+
+      constexpr real_t operator()(
+        real_t __lhs,
+        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __rhs
+      ) const noexcept
+        { return operator()(__rhs, __lhs); }
+    };
+  }
+
+  template <class InputIt>
+  real_t row_length_penalty(InputIt __begin, InputIt __end)
+  {
+    std::unordered_map<
+      literal_t,
+      std::pair<literal_t, literal_t>
+    > row_to_min_max;
+
+    if constexpr (is_random_access_iterator_v<InputIt>) {
+      row_to_min_max.reserve(__end - __begin);
+    }
+
+    for (; __begin != __end; ++__begin) {
+      auto i =
+        row_to_min_max.insert(
+          std::make_pair(
+            __begin->position.y(),
+
+            std::make_pair(
+              std::numeric_limits<literal_t>::max(),
+              std::numeric_limits<literal_t>::min()
+            )
+          )
+        ).first;
+
+      i->second =
+        std::make_pair(
+          std::min(i->second.first, __begin->position.x()),
+
+          std::max(
+            i->second.second,
+
+            __begin->position.x() +
+              static_cast<literal_t>(__begin->type->size.width)
+          )
+        );
+    }
+
+  return
+    std::accumulate(
+      row_to_min_max.cbegin(),
+      row_to_min_max.cend(),
+      0._r,
+      details::row_length_penalty_binop {}
+    ) / static_cast<real_t>(row_to_min_max.size());
+  }
 }
