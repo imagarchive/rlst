@@ -238,6 +238,39 @@ namespace rlst::par
     }
   }
 
+  template <class U, std::uint8_t b>
+  template <bool is_inserting>
+  std::pair<
+    typename overlap_grid<U, b>::iterator,
+    typename overlap_grid<U, b>::iterator
+  >
+  overlap_grid<U, b>::insert(const cell::Cell& __cell)
+  {
+    auto ret = rect(__cell);
+
+    for (auto i = ret.first; i != ret.second; ++i) {
+      value_type v =
+        static_cast<value_type>(
+          std::min(
+            __cell.position.x() +
+              static_cast<literal_t>(__cell.type->size.width),
+
+            (i.x() + 1) * b
+          ) -
+
+          std::max(__cell.position.x(), i.x() * b)
+        );
+
+      if constexpr (is_inserting) {
+        *i += v;
+      } else {
+        *i -= v;
+      }
+    }
+
+    return ret;
+  }
+
   template <typename U, std::uint8_t b>
   void swap(overlap_grid<U, b>& __lhs, overlap_grid<U, b>& __rhs) noexcept
   {

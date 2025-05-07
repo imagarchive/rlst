@@ -923,6 +923,15 @@ namespace rlst::par
     const_iterator bottom_right(const cell::Cell& __cell) const
       { return bottom_right(__cell); }
   private:
+    template <bool is_inserting>
+    std::pair<iterator, iterator> insert(const cell::Cell& __cell);
+  public:
+    std::pair<iterator, iterator> insert(const cell::Cell& __cell)
+      { return insert<true>(__cell); }
+
+    std::pair<iterator, iterator> erase(const cell::Cell& __cell)
+      { return insert<false>(__cell); }
+  private:
     grid_type m_grid;
   };
 
