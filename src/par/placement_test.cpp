@@ -17,7 +17,7 @@
 
 
 #include "par/placement.hpp"
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "cell/types.hpp"
 
@@ -666,3 +666,65 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Range(2, 8)
   )
 );
+
+TEST(row_length_penalty__basics__test, empty)
+{
+  std::vector<cell::Cell> cells;
+  real_t penalty = row_length_penalty(cells.cbegin(), cells.cend());
+
+  ASSERT_THAT(penalty, testing::IsNan());
+}
+
+TEST(row_length_penalty__basics__test, one)
+{
+  std::vector<cell::Cell> cells = {
+    cell_from_geometry_params(1_l, 1_l, 10_ul, 10_ul)
+  };
+
+  real_t penalty = row_length_penalty(cells.cbegin(), cells.cend());
+
+  ASSERT_DOUBLE_EQ(penalty, 10._r);
+}
+
+TEST(row_length_penalty__basics__test, same_line)
+{
+  std::vector<cell::Cell> cells = {
+    cell_from_geometry_params(1_l, 1_l, 10_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 12_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 14_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 10_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 8_ul, 10_ul),
+    cell_from_geometry_params(0_l, 1_l, 4_ul, 10_ul)
+  };
+
+  real_t penalty = row_length_penalty(cells.cbegin(), cells.cend());
+
+  ASSERT_DOUBLE_EQ(penalty, 15._r);
+}
+
+TEST(row_length_penalty__basics__test, several_lines)
+{
+  std::vector<cell::Cell> cells = {
+    cell_from_geometry_params(1_l, 1_l, 10_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 12_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 14_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 10_ul, 10_ul),
+    cell_from_geometry_params(1_l, 1_l, 8_ul, 10_ul),
+    cell_from_geometry_params(0_l, 1_l, 4_ul, 10_ul),
+
+    cell_from_geometry_params(3_l, 5_l, 2_ul, 10_ul),
+    cell_from_geometry_params(0_l, 5_l, 1_ul, 10_ul),
+    cell_from_geometry_params(1_l, 5_l, 2_ul, 10_ul),
+    cell_from_geometry_params(1_l, 5_l, 3_ul, 10_ul),
+
+    cell_from_geometry_params(0_l, 3_l, 5_ul, 10_ul),
+    cell_from_geometry_params(2_l, 3_l, 8_ul, 10_ul),
+
+    cell_from_geometry_params(2_l, 10_l, 12_ul, 10_ul),
+    cell_from_geometry_params(0_l, 10_l, 10_ul, 10_ul),
+  };
+
+  real_t penalty = row_length_penalty(cells.cbegin(), cells.cend());
+
+  ASSERT_DOUBLE_EQ(penalty, 11._r);
+}
