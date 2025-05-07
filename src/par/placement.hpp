@@ -951,16 +951,16 @@ namespace rlst::par
      *
      * @tparam InputIt The type of the iterator
      *
-     * @param[in, out] __begin The begin iterator
-     * @param[in, out] __end The past-the-last iterator
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
      */
 
     template <class InputIt>
-    void insert(InputIt&& __begin, InputIt&& __end)
+    void insert(InputIt __begin, InputIt __end)
     {
       std::for_each(
-        std::forward<InputIt>(__begin),
-        std::forward<InputIt>(__end),
+        std::move(__begin),
+        std::move(__end),
         [&] (const cell::Cell& __cell) { insert(__cell); }
       );
     }
@@ -982,16 +982,16 @@ namespace rlst::par
      *
      * @tparam The type of the iterator
      *
-     * @param[in, out] __begin The begin iterator
-     * @param[in, out] __end The past-the-last iterator
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
      */
 
     template <class InputIt>
-    void erase(InputIt&& __begin, InputIt __end)
+    void erase(InputIt __begin, InputIt __end)
     {
       std::for_each(
-        std::forward<InputIt>(__begin),
-        std::forward<InputIt>(__end),
+        std::move(__begin),
+        std::move(__end),
         [&] (const cell::Cell& __cell) { erase(__cell); }
       );
     }
@@ -1400,8 +1400,12 @@ namespace rlst::par
     row_length_weight m_row_length_weight;
   };
 
+  /* wire length */
+
   /**
    * Compute the wire length cost of nets
+   *
+   * @tparam InputIt The iterator type
    *
    * @param[in] __begin The begin iterator of the nets
    * @param[in] __end The end iterator of the nets
@@ -1414,8 +1418,8 @@ namespace rlst::par
   {
     return
       std::reduce(
-        __begin,
-        __end,
+        std::move(__begin),
+        std::move(__end),
         0._r,
 
         [] (
