@@ -316,6 +316,18 @@ namespace rlst::par
         const std::pair<literal_t, std::pair<literal_t, literal_t>>& __rhs
       ) const noexcept
         { return operator()(__rhs, __lhs); }
+
+      constexpr real_t operator()(
+        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __lhs,
+        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __rhs
+      ) const noexcept
+      {
+        return
+          operator()(
+            static_cast<real_t>(__lhs.second.second - __lhs.second.first),
+            __rhs
+          );
+      }
     };
   }
 
@@ -358,7 +370,7 @@ namespace rlst::par
     }
 
   return
-    std::accumulate(
+    std::reduce(
       row_to_min_max.cbegin(),
       row_to_min_max.cend(),
       0._r,
