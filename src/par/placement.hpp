@@ -939,6 +939,25 @@ namespace rlst::par
       { return insert<true>(__cell); }
 
     /**
+     * Insert new @ref cell::Cell "cells" in the grid
+     *
+     * @tparam InputIt The type of the iterator
+     *
+     * @param[in, out] __begin The begin iterator
+     * @param[in, out] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void insert(InputIt&& __begin, InputIt&& __end)
+    {
+      std::for_each(
+        std::forward<InputIt>(__begin),
+        std::forward<InputIt>(__end),
+        [&] (const cell::Cell& __cell) { insert(__cell); }
+      );
+    }
+
+    /**
      * Erase a @ref cell::Cell from the grid
      *
      * @param[in] The @ref cell::Cell to erase
@@ -949,6 +968,25 @@ namespace rlst::par
 
     std::pair<iterator, iterator> erase(const cell::Cell& __cell)
       { return insert<false>(__cell); }
+
+    /**
+     * Erase @ref cell::Cell "cells" from the grid
+     *
+     * @tparam The type of the iterator
+     *
+     * @param[in, out] __begin The begin iterator
+     * @param[in, out] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void erase(InputIt&& __begin, InputIt __end)
+    {
+      std::for_each(
+        std::forward<InputIt>(__begin),
+        std::forward<InputIt>(__end),
+        [&] (const cell::Cell& __cell) { erase(__cell); }
+      );
+    }
 
     /**
      * Replace a @ref cell::Cell by another in the grid
