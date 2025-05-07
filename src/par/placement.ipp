@@ -271,6 +271,20 @@ namespace rlst::par
     return ret;
   }
 
+  template<class U, std::uint8_t b>
+  void overlap_grid<U, b>::replace(cell::Cell& __lhs, cell::Cell& __rhs)
+  {
+    using std::swap;
+
+    erase(__lhs);
+    erase(__rhs);
+
+    swap(__lhs.position, __rhs.position);
+
+    insert(__lhs);
+    insert(__rhs);
+  }
+
   template <typename U, std::uint8_t b>
   void swap(overlap_grid<U, b>& __lhs, overlap_grid<U, b>& __rhs) noexcept
   {

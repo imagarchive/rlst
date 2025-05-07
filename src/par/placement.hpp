@@ -949,6 +949,17 @@ namespace rlst::par
 
     std::pair<iterator, iterator> erase(const cell::Cell& __cell)
       { return insert<false>(__cell); }
+
+    /**
+     * Replace a @ref cell::Cell by another in the grid
+     *
+     * @note Positions of these cells are swapped
+     *
+     * @param[in] __lhs The left-hand side @ref cell::Cell
+     * @param[in] __rhs The right-hand side @ref cell::Cell
+     */
+
+    void replace(cell::Cell& __lhs, cell::Cell& __rhs);
   private:
     grid_type m_grid;
   };
