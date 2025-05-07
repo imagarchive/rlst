@@ -39,6 +39,26 @@ namespace rlst::par
   using uliteral_t = std::uint64_t; ///< An unsigned literal
 
   /**
+   * User-defined literal for @ref literal_t
+   *
+   * @param[in] __input The input value to be converted
+   * @return The converted @ref literal_t value
+   */
+
+  constexpr literal_t operator ""_l(unsigned long long __input) noexcept
+    { return static_cast<literal_t>(__input); }
+
+  /**
+   * User-defined literal for @ref uliteral_t
+   *
+   * @param[in] __input The input value to be converted
+   * @return The converted @ref uliteral_t value
+   */
+
+  constexpr uliteral_t operator ""_ul(unsigned long long __input) noexcept
+    { return static_cast<uliteral_t>(__input); }
+
+  /**
    * A function to calculate the ceiling division of two numbers.
    *
    * This function takes two numbers, \p __a and \p __b, and calculates the
