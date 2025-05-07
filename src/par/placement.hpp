@@ -490,7 +490,6 @@ namespace rlst::par
    *
    * @tparam T The type of the data stored in the grid
    * @tparam bin_size The bin size of the grid
-   * @tparam Allocator The allocator type used for the grid
    */
 
   template <typename T, std::uint8_t bin_size>
@@ -924,7 +923,6 @@ namespace rlst::par
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
-   * @tparam A The allocator type used for the grid
    *
    * @param[in] __lhs The left-hand side \ref overlap_grid to compare
    * @param[in] __rhs The right-hand side \ref overlap_grid to compare
@@ -953,7 +951,6 @@ namespace rlst::par
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
-   * @tparam A The allocator type used for the grid
    *
    * @param[in] __lhs The left-hand side \ref overlap_grid to compare
    * @param[in] __rhs The right-hand side \ref overlap_grid to compare
@@ -978,7 +975,6 @@ namespace rlst::par
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
-   * @tparam A The allocator type used for the grid
    *
    * @param[in, out] __lhs The first \ref overlap_grid object
    * @param[in, out] __rhs The second \ref overlap_grid object
