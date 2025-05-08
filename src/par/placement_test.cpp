@@ -728,3 +728,48 @@ TEST(row_length_penalty__basics__test, several_lines)
 
   ASSERT_DOUBLE_EQ(penalty, 11._r);
 }
+
+TEST(wire_length_cost__basics__test, same_row)
+{
+  std::vector<std::pair<cell::Port, cell::Port>> nets = {
+    std::make_pair(
+      cell::Port { Point(0_l, 0_l, 0_l), cell::PortType::output },
+      cell::Port { Point(10_l, 0_l, 0_l), cell::PortType::input }
+    )
+  };
+
+  ASSERT_EQ(
+    wire_length_cost(nets.cbegin(), nets.cend()),
+    10._r
+  );
+}
+
+TEST(wire_length_cost__basics__test, same_column)
+{
+  std::vector<std::pair<cell::Port, cell::Port>> nets = {
+    std::make_pair(
+      cell::Port { Point(0_l, 0_l, 0_l), cell::PortType::output },
+      cell::Port { Point(0_l, 10_l, 0_l), cell::PortType::input }
+    )
+  };
+
+  ASSERT_EQ(
+    wire_length_cost(nets.cbegin(), nets.cend()),
+    10._r
+  );
+}
+
+TEST(wire_length_cost__basics__test, random)
+{
+  std::vector<std::pair<cell::Port, cell::Port>> nets = {
+    std::make_pair(
+      cell::Port { Point(10_l, 0_l, 0_l), cell::PortType::output },
+      cell::Port { Point(0_l, 10_l, 0_l), cell::PortType::input }
+    )
+  };
+
+  ASSERT_EQ(
+    wire_length_cost(nets.cbegin(), nets.cend()),
+    20._r
+  );
+}
