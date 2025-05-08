@@ -32,6 +32,7 @@ set(
 set(
   RLST_IPP
   par/placement.ipp
+  core.ipp
 )
 
 set(

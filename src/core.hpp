@@ -19,7 +19,7 @@
 #ifndef RLST_RLST_CORE_HPP
 #  define RLST_RLST_CORE_HPP
 
-#include <iterator>
+#include <random>
 
 /**
  * @file
@@ -117,7 +117,21 @@ namespace rlst
     template <class T>
     constexpr bool is_random_access_iterator_v =
       is_random_access_iterator<T>::value;
+
+    /**
+     * Choose a random element from a range
+     *
+     * @param[in] __begin The beginning of the range
+     * @param[in] __end The end of the range
+     *
+     * @return A random element from the range
+     */
+
+    template <class Iterator>
+    Iterator choice(Iterator __begin, Iterator __end);
   }
 }
+
+#include "core.ipp"
 
 #endif // RLST_RLST_CORE_HPP
