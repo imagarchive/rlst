@@ -1418,6 +1418,53 @@ namespace rlst::par
 
   /* wire length */
 
+  namespace details
+  {
+    struct wire_length_cost_binop
+    {
+      constexpr real_t operator()(real_t __lhs, real_t __rhs) const noexcept
+        { return __lhs + __rhs; }
+
+      real_t operator()(
+        const std::pair<cell::Port, cell::Port>& __lhs,
+        real_t __rhs
+      ) const noexcept
+      {
+        return
+          operator()(
+            static_cast<real_t>(
+              __lhs.first.position.manhattan(__lhs.second.position)
+            ),
+
+            __rhs
+          );
+      }
+
+      real_t operator()(
+        real_t __lhs,
+        const std::pair<cell::Port, cell::Port>& __rhs
+      ) const noexcept
+        { return operator()(__rhs, __lhs); }
+
+      real_t operator()(
+        const std::pair<cell::Port, cell::Port>& __lhs,
+        const std::pair<cell::Port, cell::Port>& __rhs
+      ) const noexcept
+      {
+        return
+          operator()(
+            static_cast<real_t>(
+              __lhs.first.position.manhattan(__lhs.second.position)
+            ),
+
+            static_cast<real_t>(
+              __rhs.first.position.manhattan(__rhs.second.position)
+            )
+          );
+      }
+    };
+  }
+
   /**
    * Compute the wire length cost of nets
    *
@@ -1437,16 +1484,7 @@ namespace rlst::par
         std::move(__begin),
         std::move(__end),
         0._r,
-
-        [] (
-          real_t __acc,
-          const std::pair<cell::PlacedPort, cell::PlacedPort>& __net
-        )
-        {
-          return
-            __acc +
-            __net.first.port.position.manhattan(__net.second.port.position);
-        }
+        details::wire_length_cost_binop {}
       );
   }
 }
