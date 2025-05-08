@@ -78,58 +78,55 @@
     constexpr T& operator=(T&&) noexcept = default;      \
     ~T() noexcept = default
 
-namespace rlst
+/**
+ * Contains core utilities and traits for the RLST library
+ *
+ * This namespace provides foundational components such as type traits and
+ * utility functions that are essential for the library's functionality. It
+ * includes tools for type checking, iterator categorization, and other core
+ * operations.
+ */
+
+namespace rlst::core
 {
   /**
-   * Contains core utilities and traits for the RLST library
+   * A trait allowing to check if a type is a random access iterator
    *
-   * This namespace provides foundational components such as type traits and
-   * utility functions that are essential for the library's functionality. It
-   * includes tools for type checking, iterator categorization, and other core
-   * operations.
+   * @tparam T The type to test
    */
 
-  inline namespace core
-  {
-    /**
-     * A trait allowing to check if a type is a random access iterator
-     *
-     * @tparam T The type to test
-     */
+  template <class T, typename = void>
+  struct is_random_access_iterator : std::false_type {};
 
-    template <class T, typename = void>
-    struct is_random_access_iterator : std::false_type {};
+  template <class T>
+  struct is_random_access_iterator<T, void>
+    : std::is_base_of<
+      std::random_access_iterator_tag,
+      typename std::iterator_traits<T>::iterator_category
+    >
+  {};
 
-    template <class T>
-    struct is_random_access_iterator<T, void>
-      : std::is_base_of<
-        std::random_access_iterator_tag,
-        typename std::iterator_traits<T>::iterator_category
-      >
-    {};
+  /**
+   * Check if a type is a random access iterator
+   *
+   * @tparam T The type to test
+   */
 
-    /**
-     * Check if a type is a random access iterator
-     *
-     * @tparam T The type to test
-     */
+  template <class T>
+  constexpr bool is_random_access_iterator_v =
+    is_random_access_iterator<T>::value;
 
-    template <class T>
-    constexpr bool is_random_access_iterator_v =
-      is_random_access_iterator<T>::value;
+  /**
+   * Choose a random element from a range
+   *
+   * @param[in] __begin The beginning of the range
+   * @param[in] __end The end of the range
+   *
+   * @return A random element from the range
+   */
 
-    /**
-     * Choose a random element from a range
-     *
-     * @param[in] __begin The beginning of the range
-     * @param[in] __end The end of the range
-     *
-     * @return A random element from the range
-     */
-
-    template <class Iterator>
-    Iterator choice(Iterator __begin, Iterator __end);
-  }
+  template <class Iterator>
+  Iterator choice(Iterator __begin, Iterator __end);
 }
 
 #include "core.ipp"

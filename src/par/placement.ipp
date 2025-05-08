@@ -339,7 +339,7 @@ namespace rlst::par
       std::pair<literal_t, literal_t>
     > row_to_min_max;
 
-    if constexpr (is_random_access_iterator_v<InputIt>) {
+    if constexpr (core::is_random_access_iterator_v<InputIt>) {
       row_to_min_max.reserve(__end - __begin);
     }
 
