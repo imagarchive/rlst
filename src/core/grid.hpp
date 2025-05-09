@@ -28,6 +28,9 @@
 
 namespace rlst::core
 {
+
+#ifndef RLST_DOXYGEN_SHOULD_SKIP_THIS
+
   namespace details
   {
     // TODO: add `noexcept` qualifiers
@@ -231,6 +234,12 @@ namespace rlst::core
     void swap(grid_iterator<R>& __lhs, grid_iterator<R>& __rhs);
   }
 
+#endif // RLST_DOXYGEN_SHOULD_SKIP_THIS
+
+  /**
+   * A grid
+   */
+
   template <typename T, std::uint8_t bs>
   class grid
   {
@@ -246,6 +255,7 @@ namespace rlst::core
     /// The type of the data stored in the grid
     using value_type = T;
 
+    /// The size of the bins
     static constexpr std::uint8_t bin_size = bs;
   private:
     using line_type = std::vector<value_type>;
@@ -318,7 +328,6 @@ namespace rlst::core
      * @param[in] __width The width of the grid
      * @param[in] __height The height of the grid
      * @param[in, out] __default The default value to use
-     * @param[in, out] __a The allocator to use
      */
 
     grid(
@@ -533,6 +542,7 @@ namespace rlst::core
     /**
      * Get the top left and bottom right iterator
      *
+     * @param[in] __cell The given @ref par::cell::Cell
      * @return The top left and bottom right iterator
      */
 
@@ -542,6 +552,7 @@ namespace rlst::core
     /**
      * Get the top left and bottom right iterator
      *
+     * @param[in] __cell The given @ref par::cell::Cell
      * @return The top left and bottom right iterator
      */
 
@@ -550,13 +561,13 @@ namespace rlst::core
       { return std::make_pair(top_left(__cell), bottom_right(__cell)); }
 
     /**
-     * Get the number of bins that intersect with the given @ref cell::Cell on
-     * the x axis
-     *
-     * @param[in] __cell The given @ref cell:Cell
-     *
-     * @return The number of bins that intersect with the given @ref cell::Cell
+     * Get the number of bins that intersect with the given @ref par::cell::Cell
      * on the x axis
+     *
+     * @param[in] __cell The given @ref par::cell::Cell
+     *
+     * @return The number of bins that intersect with the given
+     * @ref par::cell::Cell on the x axis
      */
 
     std::size_t width_of(const par::cell::Cell& __cell) const
@@ -567,13 +578,13 @@ namespace rlst::core
     }
 
     /**
-     * Get the number of bins that intersect with the given @ref cell::Cell on
-     * the y axis
+     * Get the number of bins that intersect with the given
+     * @ref par::cell::Cell on the y axis
      *
-     * @param[in] __cell The given @ref cell:Cell
+     * @param[in] __cell The given @ref par::cell::Cell
      *
-     * @return The number of bins that intersect with the given @ref cell::Cell
-     * on the y axis
+     * @return The number of bins that intersect with the given
+     * @ref par::cell::Cell on the y axis
      */
 
     std::size_t height_of(const par::cell::Cell& __cell) const
@@ -588,9 +599,9 @@ namespace rlst::core
      *
      * The top left iterator is the one pointing to the first element of the
      * submatrix corresponding to the bins intersecting with the given
-     * @ref cell::Cell.
+     * @ref par::cell::Cell.
      *
-     * @param[in]  __cell The given @ref cell::Cell
+     * @param[in]  __cell The given @ref par::cell::Cell
      * @return The top left iterator
      */
 
@@ -610,9 +621,9 @@ namespace rlst::core
      *
      * The top left iterator is the one pointing to the first element of the
      * submatrix corresponding to the bins intersecting with the given
-     * @ref cell::Cell.
+     * @ref par::cell::Cell.
      *
-     * @param[in]  __cell The given @ref cell::Cell
+     * @param[in]  __cell The given @ref par::cell::Cell
      * @return The top left iterator
      */
 
@@ -624,7 +635,7 @@ namespace rlst::core
      *
      * The bottom right iterator is the one pointing to the past-the-last
      * element of the submatrix corresponding to the bins intersecting with the
-     * given @ref cell::Cell.
+     * given @ref par::cell::Cell.
      *
      * Thus, the returned iterator is, in fact, not the bottom right iterator
      * but the one just after it.
@@ -649,7 +660,7 @@ namespace rlst::core
      *
      * The bottom right iterator is the one pointing to the past-the-last
      * element of the submatrix corresponding to the bins intersecting with the
-     * given @ref cell::Cell.
+     * given @ref par::cell::Cell.
      *
      * Thus, the returned iterator is, in fact, not the bottom right iterator
      * but the one just after it.
@@ -665,17 +676,16 @@ namespace rlst::core
   };
 
   /**
-   * Equality operator for \ref grid
+   * Equality operator for @ref grid
    *
-   * Compares two grid objects for equality. Two \ref grid
-   * objects are considered equal if their internal grid structures are
-   * identical.
+   * Compares two grid objects for equality. Two @ref grid objects are
+   * considered equal if their internal grid structures are identical.
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
    *
-   * @param[in] __lhs The left-hand side \ref grid to compare
-   * @param[in] __rhs The right-hand side \ref grid to compare
+   * @param[in] __lhs The left-hand side @ref grid to compare
+   * @param[in] __rhs The right-hand side @ref grid to compare
    *
    * @return `true` if the two \ref grid objects are equal, `false`
    * otherwise
@@ -690,17 +700,16 @@ namespace rlst::core
   }
 
   /**
-   * Inequality operator for \ref grid
+   * Inequality operator for @ref grid
    *
-   * Compares two grid objects for inequality. Two \ref grid
-   * objects are considered unequal if their internal grid structures are
-   * different.
+   * Compares two grid objects for inequality. Two @ref grid objects are
+   * considered unequal if their internal grid structures are different.
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
    *
-   * @param[in] __lhs The left-hand side \ref grid to compare
-   * @param[in] __rhs The right-hand side \ref grid to compare
+   * @param[in] __lhs The left-hand side @ref grid to compare
+   * @param[in] __rhs The right-hand side @ref grid to compare
    *
    * @return `true` if the two \ref grid objects are not equal, `false`
    * otherwise
@@ -711,17 +720,17 @@ namespace rlst::core
     { return !(__lhs == __rhs); }
 
   /**
-   * Swap two \ref grid objects
+   * Swap two @ref grid objects
    *
-   * Exchanges the contents of two \ref grid objects. This operation is
+   * Exchanges the contents of two @ref grid objects. This operation is
    * performed in constant time as it only swaps the internal data structures
    * of the two objects.
    *
    * @tparam U The type of the data stored in the grid
    * @tparam b The bin size of the grid
    *
-   * @param[in, out] __lhs The first \ref grid object
-   * @param[in, out] __rhs The second \ref grid object
+   * @param[in, out] __lhs The first @ref grid object
+   * @param[in, out] __rhs The second @ref grid object
    */
 
   template <typename U, std::uint8_t b>
