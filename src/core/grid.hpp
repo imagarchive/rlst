@@ -131,14 +131,15 @@ namespace rlst::core
         , m_row_size(0)
       {}
 
+      template <class U>
       explicit constexpr grid_iterator(
-        RowIterator&& __row_iterator,
+        U&& __row_iterator,
         difference_type __column_index,
         difference_type __row_size,
         difference_type __offset = 0
       )
         : m_column_iterator(__row_iterator->begin() + __offset + __column_index)
-        , m_row_iterator(std::forward<RowIterator>(__row_iterator))
+        , m_row_iterator(std::forward<U>(__row_iterator))
         , m_offset(__offset)
         , m_row_size(__row_size)
       {}
@@ -198,6 +199,21 @@ namespace rlst::core
       difference_type m_offset;
       difference_type m_row_size;
     };
+
+    template <class U>
+    grid_iterator(
+      U&&,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type
+    ) -> grid_iterator<U>;
+
+    template <class U>
+    grid_iterator(
+      U&&,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type
+    ) -> grid_iterator<U>;
 
     template <class R>
     bool operator==(
