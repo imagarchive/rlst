@@ -426,13 +426,13 @@ namespace rlst::par
      * @see https://doi.org/10.1145/103724.103725
      */
 
-    value_type penalty() noexcept //< TODO: fix this
+    value_type penalty() const noexcept
     {
       return
         static_cast<value_type>(
           std::reduce(
-            begin(),
-            end(),
+            cbegin(),
+            cend(),
             0,
 
             [] (value_type __lhs, value_type __rhs)

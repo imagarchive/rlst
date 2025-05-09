@@ -38,7 +38,18 @@ namespace rlst::core
       RLST_ENFORCE_RULE_OF_FOUR(grid_iterator);
     public:
       using row_iterator_type = RowIterator;
-      using column_iterator_type = typename RowIterator::value_type::iterator;
+
+      /*
+       * This type is equal to
+       * - `typename std::iterator_traits<RowIterator>::value_type::iterator`, or
+       * - `typename std::iterator_traits<RowIterator>::value_type::const_iterator`.
+       *
+       * According to the constness of the `value_type` behind `RowIterator`,
+       * one is choosen over the other.
+       */
+
+      using column_iterator_type =
+        decltype(std::begin(*std::declval<RowIterator>()));
 
       using const_column_iterator_type =
         typename RowIterator::value_type::const_iterator;
