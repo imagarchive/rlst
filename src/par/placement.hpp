@@ -23,6 +23,8 @@
 #include "core.hpp"
 
 #include "par/cell/ports.hpp"
+
+#include <forward_list>
 #include <numeric>
 
 /**
@@ -86,6 +88,129 @@ namespace rlst::par
    */
 
   real_t uniform();
+
+  /* placement */
+
+  class placement_grid
+    : public core::grid<
+      std::forward_list<std::reference_wrapper<const cell::Cell>>,
+      1
+    >
+  {
+  private:
+    using base_type =
+      core::grid<
+        std::forward_list<std::reference_wrapper<const cell::Cell>>,
+        1
+      >;
+  public:
+    /// The default constructor
+    placement_grid() = default;
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The placement grid to copy from
+     */
+
+    placement_grid(const placement_grid& __other) = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The placement grid to move from
+     */
+
+    placement_grid(placement_grid&& __other) = default;
+
+    /// The destructor
+    ~placement_grid() = default;
+  public:
+    /**
+     * Constructs a placement grid with its parameters
+     *
+     * @param[in] __width The width of the grid
+     * @param[in] __height The height of the grid
+     */
+
+    placement_grid(size_type __width, size_type __height)
+      : base_type(__height, __width,  {})
+    {}
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __rhs The placement grid to copy from
+     * @return A reference to the updated placement grid
+     */
+
+    placement_grid& operator=(const placement_grid& __rhs) = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __rhs The placement grid to move from
+     * @return A reference to the updated placement grid
+     */
+
+    placement_grid& operator=(placement_grid&& __rhs) = default;
+  public:
+    /**
+     * Insert a new @ref cell::Cell in the grid
+     *
+     * @param[in] __cell The @ref cell::Cell to insert
+     * @return The _rectangle_ of this @ref cell::Cell
+     */
+
+    std::pair<iterator, iterator> insert(const cell::Cell& __cell);
+
+    /**
+     * Insert new @ref cell::Cell "cells" in the grid
+     *
+     * @tparam InputIt The type of the iterator
+     *
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void insert(InputIt __begin, InputIt __end)
+    {
+      std::for_each(
+        std::move(__begin),
+        std::move(__end),
+        [&] (const cell::Cell& __cell) { insert(__cell); }
+      );
+    }
+
+    /**
+     * Erase a @ref cell::Cell from the grid
+     *
+     * @param[in] __cell The @ref cell::Cell to erase
+     * @return The _rectangle_ of this @ref cell::Cell
+     */
+
+    std::pair<iterator, iterator> erase(const cell::Cell& __cell);
+
+    /**
+     * Erase @ref cell::Cell "cells" from the grid
+     *
+     * @tparam The type of the iterator
+     *
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void erase(InputIt __begin, InputIt __end)
+    {
+      std::for_each(
+        std::move(__begin),
+        std::move(__end),
+        [&] (const cell::Cell& __cell) { erase(__cell); }
+      );
+    }
+  };
 
   /* acceptance */
 

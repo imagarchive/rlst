@@ -30,6 +30,30 @@ namespace rlst::par
     return distribution(generator);
   }
 
+  std::pair<placement_grid::iterator, placement_grid::iterator>
+  placement_grid::insert(const cell::Cell& __cell)
+  {
+    auto ret = rect(__cell);
+
+    for (auto i = ret.first; i != ret.second; ++i) {
+      i->push_front(__cell);
+    }
+
+    return ret;
+  }
+
+  std::pair<placement_grid::iterator, placement_grid::iterator>
+  placement_grid::erase(const cell::Cell& __cell)
+  {
+    auto ret = rect(__cell);
+
+    for (auto i = ret.first; i != ret.second; ++i) {
+      i->remove(__cell);
+    }
+
+    return ret;
+  }
+
   void overlap_grid::replace(cell::Cell& __lhs, cell::Cell& __rhs)
   {
     using std::swap;
