@@ -57,7 +57,7 @@ target_link_libraries(rlst PRIVATE Boost::boost)
 target_sources(
     rlst
 
-    PUBLIC
+    PRIVATE
         FILE_SET HEADERS
         TYPE HEADERS
         FILES "${RLST_HPP}" "${RLST_IPP}"
