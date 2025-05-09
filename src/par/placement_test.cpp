@@ -19,35 +19,14 @@
 #include "par/placement.hpp"
 #include <gmock/gmock.h>
 
-#include "cell/types.hpp"
+#include "test.hpp"
 
 using namespace rlst::par;
+using namespace rlst::test;
 
 using rlst::par::cell::Cell;
-using rlst::par::cell::CellType;
 using rlst::par::cell::Port;
 using rlst::par::cell::PortType;
-
-Cell cell_from_geometry_params(
-  literal_t __x,
-  literal_t __y,
-  uliteral_t __width,
-  uliteral_t __height
-)
-{
-  return
-    Cell {
-      Point(__x, __y, 0),
-
-      std::make_shared<CellType>(
-        CellType {
-          std::list<Port>(),
-          std::string(),
-          Size {__width, __height}
-        }
-      )
-    };
-}
 
 class overlap_grid__modifiers__test
   : public testing::TestWithParam<std::tuple<int, int>>

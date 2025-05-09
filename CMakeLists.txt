@@ -94,6 +94,15 @@ if (WITH_TESTS)
                     GTest::gtest_main
             )
 
+            target_sources(
+              "${test}"
+
+              PRIVATE
+                FILE_SET HEADERS
+                TYPE HEADERS
+                FILES "${CMAKE_SOURCE_DIR}/src/test.hpp"
+            )
+
             set_target_properties(
                 "${test}"
 
@@ -141,6 +150,15 @@ if (WITH_TESTS)
             target_include_directories(
                 "${target}"
                 PRIVATE "${CMAKE_SOURCE_DIR}/src"
+            )
+
+            target_sources(
+              "${target}"
+
+              PRIVATE
+                FILE_SET HEADERS
+                TYPE HEADERS
+                FILES "${CMAKE_SOURCE_DIR}/src/test.hpp"
             )
 
             set_target_properties(

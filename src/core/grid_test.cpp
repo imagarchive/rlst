@@ -19,16 +19,14 @@
 #include "core/grid.hpp"
 #include <gtest/gtest.h>
 
+#include "test.hpp"
+
 using namespace rlst::core;
+using namespace rlst::test;
 
 using rlst::par::cell::Cell;
-using rlst::par::cell::CellType;
-using rlst::par::cell::Port;
-
 using rlst::par::literal_t;
 using rlst::par::uliteral_t;
-using rlst::par::Point;
-using rlst::par::Size;
 
 namespace rlst::core::details
 {
@@ -427,27 +425,6 @@ protected:
 protected:
   grid_type g;
 };
-
-Cell cell_from_geometry_params(
-  literal_t __x,
-  literal_t __y,
-  uliteral_t __width,
-  uliteral_t __height
-)
-{
-  return
-    Cell {
-      Point(__x, __y, 0),
-
-      std::make_shared<CellType>(
-        CellType {
-          std::list<Port>(),
-          std::string(),
-          Size {__width, __height}
-        }
-      )
-    };
-}
 
 TEST_F(grid__cell__test, in_bin)
 {
