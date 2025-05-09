@@ -438,16 +438,10 @@ namespace rlst::par
      *
      * @param[in] __width The width of the grid
      * @param[in] __height The height of the grid
-     * @param[in, out] __default The default value to use
-     * @param[in, out] __a The allocator to use
      */
 
-    overlap_grid(
-      size_type __width,
-      size_type __height,
-      std::int16_t __default = 0
-    )
-      : base_type(__height + 2, __width,  __default)
+    overlap_grid(size_type __width, size_type __height)
+      : base_type(__height, __width,  0)
     {}
   public:
     /**
