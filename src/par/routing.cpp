@@ -6,7 +6,10 @@
 #include "par/cell/Cell.hpp"
 #include "par/routing.hpp"
 
-/* Cost is number of ticks */
+/*
+ * Cost is length + redstone length that could be traversed in the number of
+ * ticks it takes to go up to then down from the level of the route
+ */
 
 /* The number of blocks a signal can go without a repeater.
  * If block 0 is a restone block or a repeater, then block MAX_SIGNAL_LENGTH
