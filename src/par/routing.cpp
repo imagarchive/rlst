@@ -8,14 +8,15 @@
 
 /* Cost is number of ticks */
 
-/* The number of blocks a signal can go without a repeater */
-constexpr uint8_t MAX_SIGNAL_LENGTH = 15;
+/* The number of blocks a signal can go without a repeater.
+ * If block 0 is a restone block or a repeater, then block MAX_SIGNAL_LENGTH
+ * will be powered but won't be able to power anything (i.e. if block
+ * MAX_SIGNAL_LENGTH is a repeater or a piston it will be on, but if it's
+ * redstone it will be off).
+ */
+constexpr uint8_t MAX_SIGNAL_LENGTH = 16;
 /* The cost of going 1 level higher */
-constexpr uint8_t LEVEL_COST = 16 * 2; // TODO adjust
-/* The height of each level in blocks (for the z coordinate) */
-constexpr uint8_t LEVEL_HEIGHT = 4; // TODO adjust
-/* The z coordinate of the first (0th) level */
-constexpr uint8_t FIRST_LEVEL_Z = 10; // TODO adjust
+constexpr uint8_t LEVEL_COST = MAX_SIGNAL_LENGTH * 2; // TODO adjust
 /* The maximum number of levels */
 constexpr uint8_t MAX_LEVEL = 70; // TODO adjust
 
@@ -171,26 +172,32 @@ namespace rlst::par
       );
   }
 
-  std::vector<Point> reconstruct_path(
+  /**
+   * Reconstructs the path found by A* (backwards)
+   * RouteElement is left unset
+   */
+  std::vector<std::pair<Point, RouteElement>> reconstruct_path(
     const std::unordered_map<Point, Point, boost::hash<Point>>& __from,
     const Point& __start,
     const Point& __destination
   )
   {
-    std::vector<Point> path;
-    Point current = __from.at(__destination);
-    while (current != __start) {
+    std::vector<std::pair<Point, RouteElement>> path;
+    std::pair<Point, RouteElement> current;
+    current.first = __from.at(__destination);
+    while (current.first != __start) {
       path.push_back(current);
-      current = __from.at(current);
+      current.first = __from.at(current.first);
     }
     return path;
   }
 
   /**
-   * Returns the "A*" route
+   * Returns the "A*" route (backwards)
    * Studies a single level
+   * RouteElement is left unset
    */
-  std::vector<Point> a_star(
+  std::vector<std::pair<Point, RouteElement>> a_star(
     const net_t& __net,
     const uint8_t& level,
     const Levels& levels,
@@ -235,8 +242,9 @@ namespace rlst::par
         return reconstruct_path(from, start, destination);
       }
       discovered.erase(discovered.begin());
-      // TODO remove repeater incompatible directions from neighbors if a
-      // repeater is required
+      // POSSIBLE IMPROVEMENT: Remove repeater incompatible directions
+      // from neighbors if a repeater is required
+      // Currently, a repeater-incompatible route is unlikely but not impossible
       uliteral_t relative_x =
         static_cast<uliteral_t>(current.x() - __bottom_left.x());
       uliteral_t relative_y =
@@ -269,17 +277,81 @@ namespace rlst::par
       neighbors.clear();
     }
     // no path was found
-    return std::vector<Point>();
+    return std::vector<std::pair<Point, RouteElement>>();
   }
 
-  std::vector<std::vector<Point>> route(
+  /**
+   * Given a list of routes, sets the detailed composition of the route, i.e.
+   * the @RouteElement of each block of the route
+   *
+   * @param[in] __routes The routes
+   *
+   * @return The routes with an @ref RouteElement for each point
+   */
+
+  void set_route_elements(
+    std::vector<std::vector<std::pair<Point, RouteElement>>>& __routes
+  )
+  {
+    for (std::vector<std::pair<Point, RouteElement>>& route : __routes) {
+      // POSSIBLE IMPROVEMENT: Allow the first and last blocks to be repeaters
+      // last powered block is the one after the last repeater / redstone block
+      size_t last_powered_index = 0;
+      size_t last_candidate_index = 0;
+      RouteElement last_candidate_repeater;
+      for (
+        size_t block_index = 1;
+        block_index < route.size() - 1;
+        ++block_index)
+      {
+        // set default RouteElement
+        route[block_index].second = RouteElement::redstone;
+        // if possible repeater, find which one
+        Point previous_block_pos = route[block_index - 1].first;
+        Point next_block_pos = route[block_index + 1].first;
+        if (previous_block_pos.x() == next_block_pos.x()) {
+          last_candidate_index = block_index;
+          if (previous_block_pos.y() < next_block_pos.y()) {
+            last_candidate_repeater = RouteElement::northFacingRepeater;
+          } else {
+            last_candidate_repeater = RouteElement::southFacingRepeater;
+          }
+        } else if (previous_block_pos.y() == next_block_pos.y()) {
+          last_candidate_index = block_index;
+          if (previous_block_pos.x() < next_block_pos.x()) {
+            last_candidate_repeater = RouteElement::eastFacingRepeater;
+          } else {
+            last_candidate_repeater = RouteElement::westFacingRepeater;
+          }
+        }
+        // if this is the last powered block, place a repeater
+        if (block_index == last_powered_index + MAX_SIGNAL_LENGTH - 1) {
+          // if the closest candidate can't power the next block, throw an error
+          if (block_index + 1 > last_candidate_index + MAX_SIGNAL_LENGTH) {
+            throw std::runtime_error("Could not route (repeaters)");
+          }
+          route[last_candidate_index].second = last_candidate_repeater;
+          last_powered_index = last_candidate_index + 1;
+        }
+      }
+      // check if the last stretch is OK
+      if (route.size() > last_powered_index + MAX_SIGNAL_LENGTH - 1) {
+        if (route.size() > last_candidate_index + MAX_SIGNAL_LENGTH) {
+          throw std::runtime_error("Could not route (repeaters)");
+        }
+        route[last_candidate_index].second = last_candidate_repeater;
+      }
+    }
+  }
+
+  std::vector<std::vector<std::pair<Point, RouteElement>>> route(
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size
   )
   {
     // store the selected routes
-    std::vector<std::vector<Point>> routes;
+    std::vector<std::vector<std::pair<Point, RouteElement>>> routes;
     // first level with no routes on it
     uint8_t first_empty_level = 0;
     // store which spaces are available at each level after placing the routes
@@ -326,7 +398,7 @@ namespace rlst::par
     // route each net (nets are not moved once routed)
     for (const net_t& net : __nets) {
       uliteral_t best_cost = std::numeric_limits<uliteral_t>::max();
-      std::vector<Point> best_route;
+      std::vector<std::pair<Point, RouteElement>> best_route;
       for (uint8_t level = 0; level <= first_empty_level; ++level) {
         // make the spaces around the source and destination available
         uliteral_t source_x = static_cast<uliteral_t>(
@@ -340,7 +412,8 @@ namespace rlst::par
         levels.remove_reason_cross(source_x, source_y, level);
         levels.remove_reason_cross(destination_x, destination_y, level);
         // find a route
-        std::vector<Point> route = a_star(net, level, levels, __bottom_left);
+        std::vector<std::pair<Point, RouteElement>> route =
+          a_star(net, level, levels, __bottom_left);
         // make the spaces around the source and destination unavailable again
         levels.add_reason_cross(source_x, source_y, level);
         levels.add_reason_cross(destination_x, destination_y, level);
@@ -358,7 +431,7 @@ namespace rlst::par
         }
       }
       if (best_route.size() == 0) {
-        throw std::runtime_error("Could not route");
+        throw std::runtime_error("Could not route (space)");
       }
       // occupy the route
       for (
@@ -366,7 +439,7 @@ namespace rlst::par
         step_index < best_route.size() - 1;
         ++step_index)
       {
-        Point step = best_route[step_index];
+        Point step = best_route[step_index].first;
         levels.add_reason_cross(
           static_cast<uliteral_t>(step.x() - __bottom_left.x()),
           static_cast<uliteral_t>(step.y() - __bottom_left.y()),
@@ -375,19 +448,25 @@ namespace rlst::par
       }
       // make the start and end available for other routes
       levels.remove_reason(
-        static_cast<uliteral_t>(best_route[0].x() - __bottom_left.x()),
-        static_cast<uliteral_t>(best_route[0].y() - __bottom_left.y()),
-        static_cast<uliteral_t>(best_route[0].z())
+        static_cast<uliteral_t>(best_route[0].first.x() - __bottom_left.x()),
+        static_cast<uliteral_t>(best_route[0].first.y() - __bottom_left.y()),
+        static_cast<uliteral_t>(best_route[0].first.z())
         );
       levels.remove_reason(
         static_cast<uliteral_t>(
-          best_route[best_route.size() - 1].x() - __bottom_left.x()),
+          best_route[best_route.size() - 1].first.x() - __bottom_left.x()),
         static_cast<uliteral_t>(
-          best_route[best_route.size() - 1].y() - __bottom_left.y()),
-        static_cast<uliteral_t>(best_route[best_route.size() - 1].z())
+          best_route[best_route.size() - 1].first.y() - __bottom_left.y()),
+        static_cast<uliteral_t>(best_route[best_route.size() - 1].first.z())
         );
+      // reverse the route (A* returns it backwards) and save it
+      std::reverse(best_route.begin(), best_route.end());
       routes.push_back(best_route);
     }
+
+    // set the RouteElements
+    set_route_elements(routes);
+
     return routes;
   }
 }
