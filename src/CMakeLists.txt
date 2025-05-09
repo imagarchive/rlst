@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.30)
 
 set(
     RLST_HPP
+    core/grid.hpp
     par/cell/Cell.hpp
     par/cell/ports.hpp
     par/cell/types.hpp
@@ -31,6 +32,7 @@ set(
 
 set(
   RLST_IPP
+  core/grid.ipp
   par/placement.ipp
   core.ipp
 )
@@ -65,5 +67,6 @@ rlst_add_to_doc("${RLST_HPP}")
 
 rlst_add_unit_tests(
     TESTS
+        core/grid
         par/placement
 )

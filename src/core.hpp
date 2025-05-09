@@ -127,6 +127,26 @@ namespace rlst::core
 
   template <class Iterator>
   Iterator choice(Iterator __begin, Iterator __end);
+
+  /**
+   * A function to calculate the ceiling division of two numbers.
+   *
+   * This function takes two numbers, \p __a and \p __b, and calculates the
+   * ceiling division of \p __a divided by \p __b.
+   *
+   * @tparam T The type of the dividend
+   * @tparam U The type of the divisor
+   * @tparam V The type of the result (by default, T and U's common type)
+   *
+   * @param[in] __a The dividend
+   * @param[in] __b The divisor
+   *
+   * @return The result of the ceiling division
+   */
+
+  template <typename T, typename U, typename V = std::common_type_t<T, U>>
+  constexpr V ceil_divide(T __a, U __b)
+    { return static_cast<V>(__a == 0 ? 0 : (__a - 1) / __b + 1); }
 }
 
 #include "core.ipp"

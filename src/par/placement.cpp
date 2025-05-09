@@ -29,4 +29,17 @@ namespace rlst::par
 
     return distribution(generator);
   }
+
+  void overlap_grid::replace(cell::Cell& __lhs, cell::Cell& __rhs)
+  {
+    using std::swap;
+
+    erase(__lhs);
+    erase(__rhs);
+
+    swap(__lhs.position, __rhs.position);
+
+    insert(__lhs);
+    insert(__rhs);
+  }
 }
