@@ -204,10 +204,8 @@ namespace rlst::core
     }
 
     template <class R>
-    typename grid_iterator<R>::difference_type operator-(
-      const grid_iterator<R>& __lhs,
-      const grid_iterator<R>& __rhs
-    )
+    typename grid_iterator<R>::difference_type
+    operator-(const grid_iterator<R>& __lhs, const grid_iterator<R>& __rhs)
     {
       typename grid_iterator<R>::difference_type ret;
 

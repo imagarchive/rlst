@@ -51,9 +51,6 @@ namespace rlst::core
       using column_iterator_type =
         decltype(std::begin(*std::declval<RowIterator>()));
 
-      using const_column_iterator_type =
-        typename RowIterator::value_type::const_iterator;
-
       using value_type =
         typename std::iterator_traits<column_iterator_type>::value_type;
 
@@ -72,46 +69,26 @@ namespace rlst::core
       using iterator_category = std::random_access_iterator_tag;
     private:
       template <class R>
-      friend bool operator==(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator==(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend bool operator!=(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator!=(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend bool operator<(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator<(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend bool operator>(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator>(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend bool operator<=(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator<=(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend bool operator>=(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend bool operator>=(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
-      friend typename grid_iterator<R>::difference_type operator-(
-        const grid_iterator<R>&,
-        const grid_iterator<R>&
-      );
+      friend typename grid_iterator<R>::difference_type
+      operator-(const grid_iterator<R>&, const grid_iterator<R>&);
 
       template <class R>
       friend void swap(grid_iterator<R>&, grid_iterator<R>&);
@@ -163,7 +140,7 @@ namespace rlst::core
 
       constexpr grid_iterator operator-(difference_type __n) const;
 
-      constexpr reference operator[](difference_type __n)
+      constexpr reference operator[](difference_type __n) const
         { return *(*this + __n); }
     public:
       constexpr row_iterator_type row_iterator() const
@@ -172,23 +149,11 @@ namespace rlst::core
       constexpr difference_type column_index() const
         { return m_column_iterator - column_begin(); }
 
-      constexpr const_column_iterator_type column_begin() const
+      constexpr column_iterator_type column_begin() const
         { return m_row_iterator->begin() + m_offset; }
 
-      constexpr column_iterator_type column_begin()
-        { return m_row_iterator->begin() + m_offset; }
-
-      constexpr const_column_iterator_type column_cbegin() const
-        { return m_row_iterator->cbegin() + m_offset; }
-
-      constexpr const_column_iterator_type column_end() const
+      constexpr column_iterator_type column_end() const
         { return m_row_iterator->begin() + m_row_size + m_offset; }
-
-      constexpr column_iterator_type column_end()
-        { return m_row_iterator->begin() + m_row_size + m_offset; }
-
-      constexpr const_column_iterator_type column_cend() const
-        { return m_row_iterator->cbegin() + m_row_size + m_offset; }
     public:
       constexpr difference_type x() const
         { return m_offset + column_index(); }
@@ -259,10 +224,8 @@ namespace rlst::core
       { return __lhs += __n; }
 
     template <class R>
-    typename grid_iterator<R>::difference_type operator-(
-      const grid_iterator<R>& __lhs,
-      const grid_iterator<R>& __rhs
-    );
+    typename grid_iterator<R>::difference_type
+    operator-(const grid_iterator<R>& __lhs, const grid_iterator<R>& __rhs);
 
     template <class R>
     void swap(grid_iterator<R>& __lhs, grid_iterator<R>& __rhs);
