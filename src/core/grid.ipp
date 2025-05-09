@@ -237,6 +237,19 @@ namespace rlst::core
   }
 
   template <typename U, std::uint8_t b>
+  void grid<U, b>::replace(
+    const par::cell::Cell& __lhs,
+    const par::cell::Cell& __rhs
+  )
+  {
+    erase(__lhs);
+    erase(__rhs);
+
+    insert(__lhs);
+    insert(__rhs);
+  }
+
+  template <typename U, std::uint8_t b>
   void swap(grid<U, b>& __lhs, grid<U, b>& __rhs) noexcept
   {
     using std::swap;

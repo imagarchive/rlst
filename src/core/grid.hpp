@@ -671,6 +671,79 @@ namespace rlst::core
 
     const_iterator bottom_right(const par::cell::Cell& __cell) const
       { return bottom_right(__cell); }
+  public:
+    /**
+     * Insert a new @ref cell::Cell in the grid
+     *
+     * @param[in] The @ref cell::Cell to insert
+     * @return The _rectangle_ of this @ref cell::Cell
+     *
+     * @see rect()
+     */
+
+    virtual std::pair<iterator, iterator> insert(const par::cell::Cell& __cell)
+      { return {}; }
+
+    /**
+     * Insert new @ref cell::Cell "cells" in the grid
+     *
+     * @tparam InputIt The type of the iterator
+     *
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void insert(InputIt __begin, InputIt __end)
+    {
+      std::for_each(
+        std::move(__begin),
+        std::move(__end),
+        [&] (const par::cell::Cell& __cell) { insert(__cell); }
+      );
+    }
+
+    /**
+     * Erase a @ref cell::Cell from the grid
+     *
+     * @param[in] The @ref cell::Cell to erase
+     * @return The _rectangle_ of this @ref cell::Cell
+     *
+     * @see rect()
+     */
+
+    virtual std::pair<iterator, iterator> erase(const par::cell::Cell& __cell)
+      { return {}; }
+
+    /**
+     * Erase @ref cell::Cell "cells" from the grid
+     *
+     * @tparam The type of the iterator
+     *
+     * @param[in] __begin The begin iterator
+     * @param[in] __end The past-the-last iterator
+     */
+
+    template <class InputIt>
+    void erase(InputIt __begin, InputIt __end)
+    {
+      std::for_each(
+        std::move(__begin),
+        std::move(__end),
+        [&] (const par::cell::Cell& __cell) { erase(__cell); }
+      );
+    }
+
+    /**
+     * Replace a @ref cell::Cell by another in the grid
+     *
+     * @note Positions of these cells are swapped
+     *
+     * @param[in] __lhs The left-hand side @ref cell::Cell
+     * @param[in] __rhs The right-hand side @ref cell::Cell
+     */
+
+    void replace(const par::cell::Cell& __lhs, const par::cell::Cell& __rhs);
   private:
     grid_type m_grid;
   };

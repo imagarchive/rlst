@@ -162,26 +162,7 @@ namespace rlst::par
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> insert(const cell::Cell& __cell);
-
-    /**
-     * Insert new @ref cell::Cell "cells" in the grid
-     *
-     * @tparam InputIt The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void insert(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const cell::Cell& __cell) { insert(__cell); }
-      );
-    }
+    std::pair<iterator, iterator> insert(const cell::Cell& __cell) override;
 
     /**
      * Erase a @ref cell::Cell from the grid
@@ -190,26 +171,7 @@ namespace rlst::par
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> erase(const cell::Cell& __cell);
-
-    /**
-     * Erase @ref cell::Cell "cells" from the grid
-     *
-     * @tparam The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void erase(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const cell::Cell& __cell) { erase(__cell); }
-      );
-    }
+    std::pair<iterator, iterator> erase(const cell::Cell& __cell) override;
   };
 
   /* acceptance */
@@ -474,27 +436,8 @@ namespace rlst::par
      * @see rect()
      */
 
-    std::pair<iterator, iterator> insert(const cell::Cell& __cell)
+    std::pair<iterator, iterator> insert(const cell::Cell& __cell) override
       { return insert<true>(__cell); }
-
-    /**
-     * Insert new @ref cell::Cell "cells" in the grid
-     *
-     * @tparam InputIt The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void insert(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const cell::Cell& __cell) { insert(__cell); }
-      );
-    }
 
     /**
      * Erase a @ref cell::Cell from the grid
@@ -505,38 +448,8 @@ namespace rlst::par
      * @see rect()
      */
 
-    std::pair<iterator, iterator> erase(const cell::Cell& __cell)
+    std::pair<iterator, iterator> erase(const cell::Cell& __cell) override
       { return insert<false>(__cell); }
-
-    /**
-     * Erase @ref cell::Cell "cells" from the grid
-     *
-     * @tparam The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void erase(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const cell::Cell& __cell) { erase(__cell); }
-      );
-    }
-
-    /**
-     * Replace a @ref cell::Cell by another in the grid
-     *
-     * @note Positions of these cells are swapped
-     *
-     * @param[in] __lhs The left-hand side @ref cell::Cell
-     * @param[in] __rhs The right-hand side @ref cell::Cell
-     */
-
-    void replace(cell::Cell& __lhs, cell::Cell& __rhs);
   public:
     /**
      * Get the overlap penalty
