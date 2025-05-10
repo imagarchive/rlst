@@ -30,6 +30,8 @@ namespace rlst::par
     return distribution(generator);
   }
 
+  /* placement_grid */
+
   std::pair<placement_grid::iterator, placement_grid::iterator>
   placement_grid::insert(cell::Cell& __cell)
   {
@@ -52,6 +54,44 @@ namespace rlst::par
     }
 
     return ret;
+  }
+
+  /* evolutor */
+
+  void evolutor::evolute()
+  {
+    auto from = core::choice(m_cells.begin(), m_cells.end());
+    Point to = random_neighbor(*from);
+
+    m_overlap_grid.erase(*from);
+    m_placement_grid.erase(*from);
+
+    Point old = from->position;
+    from->position = to;
+
+    auto [begin, end] = m_placement_grid.rect(*from);
+
+    auto to_swap =
+      std::find_if_not(
+        begin,
+        end,
+        [] (const auto& __list) { return __list.empty(); }
+      );
+
+    if (to_swap != end) {
+      cell::Cell& cell = to_swap->front();
+
+      m_overlap_grid.erase(cell);
+      m_placement_grid.erase(cell);
+
+      cell.position = old;
+
+      m_overlap_grid.insert(cell);
+      m_placement_grid.insert(cell);
+    }
+
+    m_overlap_grid.insert(*from);
+    m_placement_grid.insert(*from);
   }
 
   Point random_neighbor(const cell::Cell& __cell)

@@ -931,6 +931,17 @@ namespace rlst::par
     {}
   public:
     /**
+     * Generate a random configuration
+     *
+     * A cell is selected randomly, and a random location is selected as the
+     * destination. If the destination is vacant, a displacement is performed;
+     * otherwise an interchange is performed. A range-limiting function is used,
+     * which restricts the motion of a cell to its neighborhood.
+     */
+
+    void evolute();
+
+    /**
      * Insert a new @ref cell::Cell in the grids
      *
      * @tparam U The type of the @ref cell::Cell (enable perfect forwarding)
