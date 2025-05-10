@@ -94,6 +94,15 @@ namespace rlst::par
     m_placement_grid.insert(*from);
   }
 
+  void swap(evolutor& __lhs, evolutor& __rhs)
+  {
+    using std::swap;
+
+    swap(__lhs.m_cells, __rhs.m_cells);
+    swap(__lhs.m_overlap_grid, __rhs.m_overlap_grid);
+    swap(__lhs.m_placement_grid, __rhs.m_placement_grid);
+  }
+
   Point random_neighbor(const cell::Cell& __cell)
   {
     literal_t delta_x =

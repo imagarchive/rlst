@@ -869,6 +869,8 @@ namespace rlst::par
 
   class evolutor
   {
+    friend bool operator==(const evolutor&, const evolutor&);
+    friend void swap(evolutor&, evolutor&);
   public:
     /// The size type
     using size_type =
@@ -955,6 +957,56 @@ namespace rlst::par
     overlap_grid m_overlap_grid;
     placement_grid m_placement_grid;
   };
+
+  /**
+   * Equality operator for @ref evolutor
+   *
+   * Compares two @ref evolutor objects for equality. Two @ref evolutor objects
+   * are considered equal if their internal states, including the cells, overlap
+   * grid, and placement grid, are identical.
+   *
+   * @param[in] __lhs The left-hand side @ref evolutor
+   * @param[in] __rhs The right-hand side @ref evolutor
+   *
+   * @return `true` if the two @ref evolutor objects are equal, `false` otherwise
+   */
+
+  inline bool operator==(const evolutor& __lhs, const evolutor& __rhs)
+  {
+    return
+      (__lhs.m_cells == __rhs.m_cells) &&
+      (__lhs.m_overlap_grid == __rhs.m_overlap_grid) &&
+      (__lhs.m_placement_grid == __rhs.m_placement_grid);
+  }
+
+  /**
+   * Inequality operator for @ref evolutor
+   *
+   * Compares two @ref evolutor objects for inequality. Two @ref evolutor
+   * objects are considered unequal if their internal states, including the
+   * cells, overlap grid, and placement grid, are not identical.
+   *
+   * @param[in] __lhs The left-hand side @ref evolutor
+   * @param[in] __rhs The right-hand side @ref evolutor
+   *
+   * @return `true` if the two @ref evolutor objects are unequal, `false`
+   * otherwise
+   */
+
+  inline bool operator!=(const evolutor& __lhs, const evolutor& __rhs)
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Swap two @ref evolutor objects
+   *
+   * Swaps the internal states of two @ref evolutor objects, including their
+   * cells, overlap grid, and placement grid.
+   *
+   * @param[in, out] __lhs The left-hand side @ref evolutor
+   * @param[in, out] __rhs The right-hand side @ref evolutor
+   */
+
+  void swap(evolutor& __lhs, evolutor& __rhs);
 
   /**
    * Get a random neighbor of a @ref cell::Cell
