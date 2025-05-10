@@ -53,4 +53,30 @@ namespace rlst::par
 
     return ret;
   }
+
+  Point random_neighbor(const cell::Cell& __cell)
+  {
+    literal_t delta_x =
+      static_cast<literal_t>(
+        core::randint(
+          -__cell.type->size.width,
+          __cell.type->size.width
+        )
+      );
+
+    literal_t delta_y =
+      static_cast<literal_t>(
+        core::randint(
+          -__cell.type->size.height,
+          __cell.type->size.height
+        )
+      );
+
+    return
+      Point(
+        __cell.position.x() + delta_x,
+        __cell.position.y() + delta_y,
+        0
+      );
+  }
 }

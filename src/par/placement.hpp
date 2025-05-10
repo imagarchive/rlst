@@ -944,6 +944,15 @@ namespace rlst::par
     overlap_grid m_overlap_grid;
     placement_grid m_placement_grid;
   };
+
+  /**
+   * Get a random neighbor of a @ref cell::Cell
+   *
+   * @param[in] __cell The @ref cell::Cell to get the neighbor from
+   * @return A random neighbor of the @ref cell::Cell
+   */
+
+  Point random_neighbor(const cell::Cell& __cell);
 }
 
 #include "placement.ipp"
