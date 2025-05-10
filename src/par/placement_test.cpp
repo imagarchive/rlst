@@ -37,7 +37,7 @@ protected:
   using value_type = overlap_grid::value_type;
 protected:
   overlap_grid__modifiers__test()
-    : g(20, 20)
+    : g(overlap_grid::bin_size * 20, overlap_grid::bin_size * 20)
   {}
 protected:
   template <

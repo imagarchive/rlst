@@ -391,13 +391,13 @@ TEST_F(grid__iterator__test, select_backward)
 
 TEST_F(grid__iterator__test, distance)
 {
-  ASSERT_EQ(g.end() - g.begin(), 400);
+  ASSERT_EQ(g.end() - g.begin(), 4);
 }
 
 TEST(grid__size__test, basic)
 {
   grid<int, 8> grid(20, 20);
-  ASSERT_EQ(grid.size(), 400);
+  ASSERT_EQ(grid.size(), 4);
 }
 
 TEST(grid__size__test, empty)
@@ -413,7 +413,7 @@ protected:
   using difference_type = grid_type::difference_type;
 protected:
   grid__cell__test()
-    : g(20, 20)
+    : g(grid_type::bin_size * 20, grid_type::bin_size * 20)
   {
     auto it = g.begin();
 
