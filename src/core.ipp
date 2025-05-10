@@ -25,8 +25,9 @@ namespace rlst::core
       typename std::iterator_traits<Iterator>::difference_type;
 
     difference_type n = std::distance(__begin, __end);
+    std::advance(__begin, randint(static_cast<difference_type>(0), n - 1));
 
-    return std::advance(__begin, randint(0, n - 1));
+    return __begin;
   }
 
   template <typename T>
