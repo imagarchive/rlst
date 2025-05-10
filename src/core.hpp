@@ -147,6 +147,20 @@ namespace rlst::core
   template <typename T, typename U, typename V = std::common_type_t<T, U>>
   constexpr V ceil_divide(T __a, U __b)
     { return static_cast<V>(__a == 0 ? 0 : (__a - 1) / __b + 1); }
+
+  /**
+   * A function to generate a random integer in a range
+   *
+   * @tparam T The type of the random integer
+   *
+   * @param[in] __first The first value of the range
+   * @param[in] __last The last value of the range
+   *
+   * @return A random integer in the range [@p __first, @p __last)
+   */
+
+  template <typename T>
+  T randint(T __first, T __last);
 }
 
 #include "core.ipp"

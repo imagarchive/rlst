@@ -26,10 +26,16 @@ namespace rlst::core
 
     difference_type n = std::distance(__begin, __end);
 
+    return std::advance(__begin, randint(0, n - 1));
+  }
+
+  template <typename T>
+  T randint(T __first, T __last)
+  {
     std::random_device device;
     std::mt19937 generator(device());
-    std::uniform_int_distribution<difference_type> distribution(0, n - 1);
+    std::uniform_int_distribution<T> distribution(__first, __last - 1);
 
-    return std::advance(__begin, distribution());
+    return distribution(generator);
   }
 }
