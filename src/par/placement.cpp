@@ -31,7 +31,7 @@ namespace rlst::par
   }
 
   std::pair<placement_grid::iterator, placement_grid::iterator>
-  placement_grid::insert(const cell::Cell& __cell)
+  placement_grid::insert(cell::Cell& __cell)
   {
     auto ret = rect(__cell);
 
@@ -43,7 +43,7 @@ namespace rlst::par
   }
 
   std::pair<placement_grid::iterator, placement_grid::iterator>
-  placement_grid::erase(const cell::Cell& __cell)
+  placement_grid::erase(cell::Cell& __cell)
   {
     auto ret = rect(__cell);
 

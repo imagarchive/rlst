@@ -681,7 +681,7 @@ namespace rlst::core
      * @see rect()
      */
 
-    virtual std::pair<iterator, iterator> insert(const par::cell::Cell& __cell)
+    virtual std::pair<iterator, iterator> insert(par::cell::Cell& __cell)
       { return {}; }
 
     /**
@@ -712,7 +712,7 @@ namespace rlst::core
      * @see rect()
      */
 
-    virtual std::pair<iterator, iterator> erase(const par::cell::Cell& __cell)
+    virtual std::pair<iterator, iterator> erase(par::cell::Cell& __cell)
       { return {}; }
 
     /**

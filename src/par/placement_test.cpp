@@ -41,7 +41,7 @@ protected:
   {}
 protected:
   template <
-    std::pair<iterator, iterator> (overlap_grid::*modifier)(const Cell&),
+    std::pair<iterator, iterator> (overlap_grid::*modifier)(Cell&),
     value_type val
   >
   void check_modifier()

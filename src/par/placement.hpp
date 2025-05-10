@@ -93,14 +93,14 @@ namespace rlst::par
 
   class placement_grid
     : public core::grid<
-      std::forward_list<std::reference_wrapper<const cell::Cell>>,
+      std::forward_list<std::reference_wrapper<cell::Cell>>,
       1
     >
   {
   private:
     using base_type =
       core::grid<
-        std::forward_list<std::reference_wrapper<const cell::Cell>>,
+        std::forward_list<std::reference_wrapper<cell::Cell>>,
         1
       >;
   public:
@@ -162,7 +162,7 @@ namespace rlst::par
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> insert(const cell::Cell& __cell) override;
+    std::pair<iterator, iterator> insert(cell::Cell& __cell) override;
 
     /**
      * Erase a @ref cell::Cell from the grid
@@ -171,7 +171,7 @@ namespace rlst::par
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> erase(const cell::Cell& __cell) override;
+    std::pair<iterator, iterator> erase(cell::Cell& __cell) override;
   };
 
   /* acceptance */
@@ -436,7 +436,7 @@ namespace rlst::par
      * @see rect()
      */
 
-    std::pair<iterator, iterator> insert(const cell::Cell& __cell) override
+    std::pair<iterator, iterator> insert(cell::Cell& __cell) override
       { return insert<true>(__cell); }
 
     /**
@@ -448,7 +448,7 @@ namespace rlst::par
      * @see rect()
      */
 
-    std::pair<iterator, iterator> erase(const cell::Cell& __cell) override
+    std::pair<iterator, iterator> erase(cell::Cell& __cell) override
       { return insert<false>(__cell); }
   public:
     /**
