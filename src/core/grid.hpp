@@ -336,8 +336,8 @@ namespace rlst::core
       T __default = {}
     )
       : m_grid(
-        __height + 2,
-        line_type(__width, std::move(__default))
+        __height / bin_size + 2,
+        line_type(__width / bin_size, std::move(__default))
       )
     {}
   public:

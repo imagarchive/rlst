@@ -132,4 +132,15 @@ namespace rlst::par
       details::row_length_penalty_binop {}
     ) / static_cast<real_t>(row_to_min_max.size());
   }
+
+  /* evolutor */
+
+  template <class U>
+  void evolutor::insert(U&& __cell)
+  {
+    m_cells.push_back(std::forward<U>(__cell));
+
+    m_overlap_grid.insert(m_cells.back());
+    m_placement_grid.insert(m_cells.back());
+  }
 }

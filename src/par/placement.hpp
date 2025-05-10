@@ -864,6 +864,86 @@ namespace rlst::par
         details::wire_length_cost_binop {}
       );
   }
+
+  /* evolutor */
+
+  class evolutor
+  {
+  public:
+    /// The size type
+    using size_type =
+      std::common_type_t<
+        placement_grid::size_type,
+        overlap_grid::size_type
+      >;
+  public:
+    /// The default constructor
+    evolutor() = default;
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The evolutor to copy from
+     */
+
+    evolutor(const evolutor& __other) = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The evolutor to move from
+     */
+
+    evolutor(evolutor&& __other) = default;
+
+    /// The destructor
+    ~evolutor() = default;
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __rhs The evolutor to copy from
+     * @return A reference to the updated evolutor
+     */
+
+    evolutor& operator=(const evolutor& __rhs) = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __rhs The evolutor to move from
+     * @return A reference to the updated evolutor
+     */
+
+    evolutor& operator=(evolutor&& __rhs) = default;
+  public:
+    /**
+     * Constructs an evolutor with its parameters
+     *
+     * @param[in] __width The width of the grid
+     * @param[in] __height The height of the grid
+     */
+
+    evolutor(size_type __width, size_type __height)
+      : m_cells()
+      , m_overlap_grid(__width, __height)
+      , m_placement_grid(__width, __height)
+    {}
+  public:
+    /**
+     * Insert a new @ref cell::Cell in the grids
+     *
+     * @tparam U The type of the @ref cell::Cell (enable perfect forwarding)
+     * @param[in] __cell The @ref cell::Cell to insert
+     */
+
+    template <class U>
+    void insert(U&& __cell);
+  private:
+    std::vector<cell::Cell> m_cells;
+    overlap_grid m_overlap_grid;
+    placement_grid m_placement_grid;
+  };
 }
 
 #include "placement.ipp"
