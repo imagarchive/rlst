@@ -19,6 +19,7 @@
 #ifndef RLST_RLST_CORE_HPP
 #  define RLST_RLST_CORE_HPP
 
+#include <functional>
 #include <random>
 
 /**
@@ -161,6 +162,246 @@ namespace rlst::core
 
   template <typename T>
   T randint(T __first, T __last);
+
+  /**
+   * @brief Determine the function signature of a callable type
+   *
+   * @tparam F The callable type
+   */
+
+  template <class F>
+  struct function_signature;
+
+#ifndef RLST_DOXYGEN_SHOULD_SKIP_THIS
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) & noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) && noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const & noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const && noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) volatile noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) volatile & noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) volatile && noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const volatile noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const volatile & noexcept(nx)>
+      { using type = R(Args...); };
+
+  template <class R, class T, bool nx, class... Args>
+  struct function_signature<R (T::*) (Args...) const volatile && noexcept(nx)>
+      { using type = R(Args...); };
+#endif // RLST_DOXYGEN_SHOULD_SKIP_THIS
+
+  /**
+   * The function signature of a callable type
+   *
+   * @tparam F The callable type
+   */
+
+  template <class F>
+  using function_signature_t = typename function_signature<F>::type;
+
+  /**
+   * A helper allowing to transform arguments before applying a plus operation
+   *
+   * @tparam Transformer The type of the transformer
+   */
+
+  template <class Transformer>
+  class transformed_binop;
+
+  // TODO: add `noexcept`
+
+  /**
+   * A helper allowing to transform arguments before applying a plus operation
+   *
+   * @tparam R The return type of the transformer
+   * @tparam T The type of the argument of the transformer
+   */
+
+  template <class R, class T>
+  class transformed_binop<R(T)>
+  {
+    static_assert(std::is_arithmetic_v<R>);
+  public:
+    /// The type of the result of the transformation
+    using result_type = R;
+
+    /// The type of the argument of the transformation
+    using argument_type = T;
+  public:
+    /// The default constructor
+    transformed_binop() noexcept = default;
+
+    /**
+     * The copy constructor
+     *
+     * @param[in] __other The object to copy
+     */
+
+    transformed_binop(const transformed_binop& __other) = default;
+
+    /**
+     * The move constructor
+     *
+     * @param[in, out] __other The object to move
+     */
+
+    transformed_binop(transformed_binop&& __other) noexcept = default;
+
+    /// The destructor
+    ~transformed_binop() = default;
+  public:
+    /**
+     * The copy assignment operator
+     *
+     * @param[in] __other The object to copy
+     * @return A reference to this object
+     */
+
+    transformed_binop& operator=(const transformed_binop& __rhs) = default;
+
+    /**
+     * The move assignment operator
+     *
+     * @param[in, out] __other The object to move
+     * @return A reference to this object
+     */
+
+    transformed_binop& operator=(transformed_binop&& __rhs) = default;
+  public:
+    /**
+     * Construct a @ref transformed_binop with its parameters
+     *
+     * @param[in, out] __transformer The transformer to apply
+     */
+
+    template <class Tr>
+    transformed_binop(Tr&& __transformer)
+      : m_transformer(std::forward<Tr>(__transformer))
+    {}
+  public:
+    /**
+     * Apply the transformer to the arguments and return their sum
+     *
+     * @tparam U The type of the first argument (enable perfect forwarding)
+     * @tparam V The type of the second argument (enable perfect forwarding)
+     *
+     * @param[in] __lhs The first argument
+     * @param[in] __rhs The second argument
+     *
+     * @return The sum of the transformed arguments
+     */
+
+    template <class U, class V>
+    std::enable_if_t<
+      std::conjunction_v<
+        std::is_same<std::decay_t<U>, std::decay_t<T>>,
+        std::is_same<std::decay_t<V>, std::decay_t<T>>
+      >,
+
+      R
+    >
+    operator()(U&& __lhs, V&& __rhs) const
+    {
+      return
+        m_transformer(std::forward<U>(__lhs)) +
+        m_transformer(std::forward<V>(__rhs));
+    }
+
+    /**
+     * Apply the transformer to the first argument and return its sum with the
+     * second argument
+     *
+     * @tparam U The type of the first argument (enable perfect forwarding)
+     *
+     * @param[in, out] __lhs The first argument
+     * @param[in] __rhs The second argument
+     *
+     * @return The sum of the transformed first argument and the second
+     * argument
+     */
+
+    template <class U>
+    std::enable_if_t<
+      std::is_same_v<std::decay_t<U>, std::decay_t<T>>,
+      R
+    >
+    operator()(U&& __lhs, R __rhs) const
+      { return m_transformer(std::forward<U>(__lhs)) + __rhs; }
+
+    /**
+     * Apply the transformer to the second argument and return its sum with the
+     * first argument
+     *
+     * @tparam U The type of the second argument (enable perfect forwarding)
+     *
+     * @param[in] __lhs The first argument
+     * @param[in, out] __rhs The second argument
+     *
+     * @return The sum of the transformed second argument and the first
+     * argument
+     */
+
+    template <class U>
+    std::enable_if_t<
+      std::is_same_v<std::decay_t<U>, std::decay_t<T>>,
+      R
+    >
+    operator()(R __lhs, U&& __rhs) const
+      { return operator()(std::forward<U>(__rhs), __lhs); }
+
+    /**
+     * Apply the transformer to the arguments and return their sum
+     *
+     * @param[in] __lhs The first argument
+     * @param[in] __rhs The second argument
+     *
+     * @return The sum of the transformed arguments
+     */
+
+    R operator()(R __lhs, R __rhs)
+      { return __lhs + __rhs; }
+  private:
+    std::function<R(T)> m_transformer;
+  };
+
+  template <class R, class T>
+  transformed_binop(R (*)(T)) -> transformed_binop<R(T)>;
+
+  template <class Tr>
+  transformed_binop(Tr&&)
+    -> transformed_binop<function_signature_t<decltype(&Tr::operator())>>;
 }
 
 #include "core.ipp"

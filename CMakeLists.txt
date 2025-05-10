@@ -208,7 +208,6 @@ list(
         -Wmissing-field-initializers
         -Wmissing-include-dirs
         -Wno-div-by-zero
-        -Wnoexcept
         -Wold-style-cast
         -Woverloaded-virtual
         -Wpedantic

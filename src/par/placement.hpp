@@ -33,8 +33,6 @@
 
 namespace rlst::par
 {
-  namespace details {}
-
   /* iteration_t */
 
   using iteration_t = std::uint8_t; ///< The type of the number of iterations
@@ -759,53 +757,6 @@ namespace rlst::par
 
   /* wire length */
 
-  namespace details
-  {
-    struct wire_length_cost_binop
-    {
-      constexpr real_t operator()(real_t __lhs, real_t __rhs) const noexcept
-        { return __lhs + __rhs; }
-
-      real_t operator()(
-        const std::pair<cell::Port, cell::Port>& __lhs,
-        real_t __rhs
-      ) const noexcept
-      {
-        return
-          operator()(
-            static_cast<real_t>(
-              __lhs.first.position.manhattan(__lhs.second.position)
-            ),
-
-            __rhs
-          );
-      }
-
-      real_t operator()(
-        real_t __lhs,
-        const std::pair<cell::Port, cell::Port>& __rhs
-      ) const noexcept
-        { return operator()(__rhs, __lhs); }
-
-      real_t operator()(
-        const std::pair<cell::Port, cell::Port>& __lhs,
-        const std::pair<cell::Port, cell::Port>& __rhs
-      ) const noexcept
-      {
-        return
-          operator()(
-            static_cast<real_t>(
-              __lhs.first.position.manhattan(__lhs.second.position)
-            ),
-
-            static_cast<real_t>(
-              __rhs.first.position.manhattan(__rhs.second.position)
-            )
-          );
-      }
-    };
-  }
-
   /**
    * Compute the wire length cost of nets
    *
@@ -825,7 +776,24 @@ namespace rlst::par
         std::move(__begin),
         std::move(__end),
         0._r,
-        details::wire_length_cost_binop {}
+
+        core::transformed_binop(
+          [] (const std::pair<cell::PlacedPort, cell::PlacedPort>& __net) {
+            Point first = __net.first.parent->position;
+
+            first.x() += __net.first.port.position.x();
+            first.y() += __net.first.port.position.y();
+            first.z() += __net.first.port.position.z();
+
+            Point second = __net.second.parent->position;
+
+            second.x() += __net.second.port.position.x();
+            second.y() += __net.second.port.position.y();
+            second.z() += __net.second.port.position.z();
+
+            return static_cast<real_t>(first.manhattan(second));
+          }
+        )
       );
   }
 

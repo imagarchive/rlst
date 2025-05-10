@@ -151,52 +151,16 @@ namespace rlst::par
     return ret;
   }
 
-  namespace details
-  {
-    struct row_length_penalty_binop
-    {
-      constexpr real_t operator()(real_t __lhs, real_t __rhs) const noexcept
-        { return __lhs + __rhs; }
-
-      constexpr real_t operator()(
-        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __lhs,
-        real_t __rhs
-      ) const noexcept
-      {
-        return
-          operator()(
-            static_cast<real_t>(__lhs.second.second - __lhs.second.first),
-            __rhs
-          );
-      }
-
-      constexpr real_t operator()(
-        real_t __lhs,
-        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __rhs
-      ) const noexcept
-        { return operator()(__rhs, __lhs); }
-
-      constexpr real_t operator()(
-        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __lhs,
-        const std::pair<literal_t, std::pair<literal_t, literal_t>>& __rhs
-      ) const noexcept
-      {
-        return
-          operator()(
-            static_cast<real_t>(__lhs.second.second - __lhs.second.first),
-            __rhs
-          );
-      }
-    };
-  }
-
   template <class InputIt>
   real_t row_length_penalty(InputIt __begin, InputIt __end)
   {
-    std::unordered_map<
-      literal_t,
-      std::pair<literal_t, literal_t>
-    > row_to_min_max;
+    using row_to_min_max_type =
+      std::unordered_map<
+        literal_t,
+        std::pair<literal_t, literal_t>
+      >;
+
+    row_to_min_max_type row_to_min_max;
 
     if constexpr (core::is_random_access_iterator_v<InputIt>) {
       row_to_min_max.reserve(__end - __begin);
@@ -233,7 +197,12 @@ namespace rlst::par
       row_to_min_max.cbegin(),
       row_to_min_max.cend(),
       0._r,
-      details::row_length_penalty_binop {}
+
+      core::transformed_binop(
+        [] (const row_to_min_max_type::value_type& __p) {
+          return static_cast<real_t>(__p.second.second - __p.second.first);
+        }
+      )
     ) / static_cast<real_t>(row_to_min_max.size());
   }
 

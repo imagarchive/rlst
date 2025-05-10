@@ -26,6 +26,7 @@ using namespace rlst::test;
 
 using rlst::par::cell::Cell;
 using rlst::par::cell::Port;
+using rlst::par::cell::PlacedPort;
 using rlst::par::cell::PortType;
 
 class overlap_grid__modifiers__test
@@ -165,10 +166,13 @@ TEST(row_length_penalty__basics__test, several_lines)
 
 TEST(wire_length_cost__basics__test, same_row)
 {
-  std::vector<std::pair<Port, Port>> nets = {
+  auto cell =
+    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+
+  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
-      Port { Point(0_l, 0_l, 0_l), PortType::output },
-      Port { Point(10_l, 0_l, 0_l), PortType::input }
+      PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
+      PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::input } }
     )
   };
 
@@ -180,10 +184,13 @@ TEST(wire_length_cost__basics__test, same_row)
 
 TEST(wire_length_cost__basics__test, same_column)
 {
-  std::vector<std::pair<Port, Port>> nets = {
+  auto cell =
+    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+
+  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
-      Port { Point(0_l, 0_l, 0_l), PortType::output },
-      Port { Point(0_l, 10_l, 0_l), PortType::input }
+      PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
+      PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
     )
   };
 
@@ -195,10 +202,13 @@ TEST(wire_length_cost__basics__test, same_column)
 
 TEST(wire_length_cost__basics__test, random)
 {
-  std::vector<std::pair<Port, Port>> nets = {
+  auto cell =
+    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+
+  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
-      Port { Point(10_l, 0_l, 0_l), PortType::output },
-      Port { Point(0_l, 10_l, 0_l), PortType::input }
+      PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::output } },
+      PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
     )
   };
 
