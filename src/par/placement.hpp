@@ -89,6 +89,30 @@ namespace rlst::par
 
   real_t uniform();
 
+  /**
+   * Place a @ref cell::Cell "cells"
+   *
+   * @tparam InputIt The iterator type used for nets
+   * @tparam OutputIt The iterator type used for @ref cell::Cell "cells"
+   *
+   * @param[in, out] __begin_cell The begin iterator of the
+   * @ref cell::Cell "cells"
+   *
+   * @param[in, out] __end_cell The past-the-last iterator of the
+   * @ref cell::Cell "cells"
+   *
+   * @param[in] __begin_net The begin iterator of the nets
+   * @param[in] __end_net The past-the-last iterator of the nets
+   */
+
+  template <class InputIt, class OutputIt>
+  void place(
+    OutputIt __begin_cell,
+    OutputIt __end_cell,
+    InputIt __begin_net,
+    InputIt __end_net
+  );
+
   /* placement */
 
   class placement_grid
@@ -247,7 +271,7 @@ namespace rlst::par
 
     constexpr acceptance_scale(
       acceptance_rate_target __acceptance_rate_target = {},
-      real_t __alpha = 50._r
+      real_t __alpha = 40._r
     ) noexcept
       : m_acceptance_rate_target(std::move(__acceptance_rate_target))
       , m_alpha(__alpha)
@@ -286,31 +310,10 @@ namespace rlst::par
 
   class scaled_cost
   {
-    RLST_ENFORCE_RULE_OF_FOUR(scaled_cost);
+    RLST_ENFORCE_RULE_OF_FIVE(scaled_cost);
   public:
-    /**
-     * Constructs a scaled cost with its parameters
-     *
-     * @param[in] __acceptance_scale The acceptance scale
-     */
-
-    constexpr scaled_cost(acceptance_scale __acceptance_scale = {}) noexcept
-      : m_acceptance_scale(std::move(__acceptance_scale))
-    {}
-  public:
-    constexpr real_t operator()(
-      iteration_t __i,
-      real_t __acceptance_rate,
-      real_t __acceptance_scale,
-      real_t __cost
-    ) const
-    {
-      return
-        m_acceptance_scale(__i, __acceptance_rate, __acceptance_scale) *
-        __cost;
-    }
-  private:
-    acceptance_scale m_acceptance_scale;
+    constexpr real_t operator()(real_t __acceptance_scale, real_t __cost) const
+      { return __acceptance_scale * __cost; }
   };
 
   /* temperature */
@@ -548,11 +551,11 @@ namespace rlst::par
      */
 
     constexpr overlap_penalty_weight(
-      overlap_penalty_target __overlap_penalty_target = {},
-      real_t __desired_row_length = 0._r
+      real_t __desired_row_length = 0._r,
+      overlap_penalty_target __overlap_penalty_target = {}
     ) noexcept
-      : m_overlap_penalty_target(std::move(__overlap_penalty_target))
-      , m_desired_row_length(__desired_row_length)
+      : m_desired_row_length(__desired_row_length)
+      , m_overlap_penalty_target(std::move(__overlap_penalty_target))
     {}
   public:
     /**
@@ -581,8 +584,8 @@ namespace rlst::par
         );
     }
   private:
-    overlap_penalty_target m_overlap_penalty_target;
     real_t m_desired_row_length;
+    overlap_penalty_target m_overlap_penalty_target;
   };
 
   /**
@@ -593,35 +596,13 @@ namespace rlst::par
 
   class overlap_penalty_cost
   {
-    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_cost);
-  public:
-    /**
-     * Constructs an overlap penalty cost with its parameters
-     *
-     * @param[in] __overlap_penalty_weight The overlap penalty weight
-     */
-
-    constexpr overlap_penalty_cost(
-      overlap_penalty_weight __overlap_penalty_weight = {}
-    ) noexcept
-      : m_overlap_penalty_weight(std::move(__overlap_penalty_weight))
-    {}
+    RLST_ENFORCE_RULE_OF_FIVE(overlap_penalty_cost);
   public:
     constexpr real_t operator()(
       real_t __overlap_penalty_weight,
-      real_t __overlap_penalty,
-      iteration_t __i
+      real_t __overlap_penalty
     ) const
-    {
-      return
-        m_overlap_penalty_weight(
-          __overlap_penalty_weight,
-          __overlap_penalty,
-          __i
-        ) * __overlap_penalty;
-    }
-  private:
-    overlap_penalty_weight m_overlap_penalty_weight;
+      { return __overlap_penalty_weight * __overlap_penalty; }
   };
 
   /* row length */
@@ -741,17 +722,7 @@ namespace rlst::par
 
   class row_length_cost
   {
-    RLST_ENFORCE_RULE_OF_FOUR(row_length_cost);
-  public:
-    /**
-     * Constructs a row length cost with its parameters
-     *
-     * @param[in] __row_length_weight The row length weight
-     */
-
-    constexpr row_length_cost(row_length_weight __row_length_weight = {})
-      : m_row_length_weight(std::move(__row_length_weight))
-    {}
+    RLST_ENFORCE_RULE_OF_FIVE(row_length_cost);
   public:
     /**
      * Get the next row length cost
@@ -764,17 +735,10 @@ namespace rlst::par
      */
 
     constexpr real_t operator()(
-      iteration_t __i,
       real_t __row_length_weight,
       real_t __row_length_penalty
     ) const
-    {
-      return
-        m_row_length_weight(__i, __row_length_weight, __row_length_penalty) *
-        __row_length_penalty;
-    }
-  private:
-    row_length_weight m_row_length_weight;
+      { return __row_length_weight * __row_length_penalty; }
   };
 
   /**
@@ -932,6 +896,9 @@ namespace rlst::par
       , m_placement_grid(__width, __height)
     {}
   public:
+    overlap_grid::value_type overlap_penalty() const noexcept
+      { return m_overlap_grid.penalty(); }
+  public:
     /**
      * Generate a random configuration
      *
@@ -946,14 +913,12 @@ namespace rlst::par
     /**
      * Insert a new @ref cell::Cell in the grids
      *
-     * @tparam U The type of the @ref cell::Cell (enable perfect forwarding)
      * @param[in] __cell The @ref cell::Cell to insert
      */
 
-    template <class U>
-    void insert(U&& __cell);
+    void insert(cell::Cell& __cell);
   private:
-    std::vector<cell::Cell> m_cells;
+    std::vector<std::reference_wrapper<cell::Cell>> m_cells;
     overlap_grid m_overlap_grid;
     placement_grid m_placement_grid;
   };

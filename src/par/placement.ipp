@@ -18,6 +18,110 @@
 
 namespace rlst::par
 {
+  namespace details
+  {
+    template <bool is_accepted>
+    real_t update_rho(real_t __rho, iteration_t __n)
+    {
+      __rho *= __n;
+
+      if constexpr (is_accepted) {
+        ++__rho;
+      }
+
+      __rho /= __n + 1;
+
+      return __rho;
+    }
+  }
+
+  template <class InputIt, class OutputIt>
+  void place(
+    OutputIt __begin_cell,
+    OutputIt __end_cell,
+    InputIt __begin_net,
+    InputIt __end_net
+  )
+  {
+    iteration_t i = 1_it;
+    real_t t = default_first_temperature;
+
+    evolutor config;
+
+    for (auto i = __begin_cell; i != __end_cell; ++i) {
+      config.insert(*i);
+    }
+
+    temperature_schedule reduce;
+
+    real_t c_1 = std::numeric_limits<real_t>::max();
+
+    real_t w_2 = 0._r, c_2 = std::numeric_limits<real_t>::max();
+    overlap_penalty_weight compute_w_2(.1_r);
+    overlap_penalty_cost compute_c_2;
+
+    real_t w_3 = 0._r, c_3 = std::numeric_limits<real_t>::max();
+    row_length_weight compute_w_3;
+    row_length_cost compute_c_3;
+
+    real_t rho = .5_r, s = 1._r, c_prime = std::numeric_limits<real_t>::max();
+    acceptance_scale compute_s;
+    scaled_cost compute_c_prime;
+
+    iteration_t n = 0_it;
+
+    while ((i != 120_it) || (c_2 != 0._r)) {
+      for (auto j = 0_it; j != 100_it; ++j) {
+        evolutor new_config = config;
+        new_config.evolute();
+
+        real_t new_w_2 = compute_w_2(w_2, config.overlap_penalty(), i);
+        real_t new_c_2 = compute_c_2(new_w_2, config.overlap_penalty());
+
+        real_t p_r = row_length_penalty(__begin_cell, __end_cell);
+        real_t new_w_3 = compute_w_3(i, w_3, p_r);
+        real_t new_c_3 = compute_c_3(new_w_3, p_r);
+
+        real_t new_s = compute_s(i, rho, s);
+        real_t new_c_prime = compute_c_prime(new_s, new_c_2 + new_c_3);
+
+        real_t delta_c = new_c_prime - c_prime;
+
+        if (delta_c < 0._r) {
+          real_t new_c_1 =
+            compute_c_prime(
+              new_s,
+              wire_length_cost(__begin_net, __end_net)
+            );
+
+          delta_c += new_c_1 - c_1;
+
+          if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
+            c_1 = new_c_1;
+
+            w_2 = new_w_2;
+            c_2 = new_c_2;
+
+            w_3 = new_w_3;
+            c_3 = new_c_3;
+
+            s = new_s;
+            c_prime = new_c_prime;
+
+            rho = details::update_rho<true>(rho, n);
+          }
+        } else {
+          rho = details::update_rho<false>(rho, n);
+        }
+
+        ++n;
+      }
+
+      t = reduce(t);
+      ++i;
+    }
+  }
+
   template <bool is_inserting>
   std::pair<overlap_grid::iterator, overlap_grid::iterator>
   overlap_grid::insert(const cell::Cell& __cell)
@@ -135,12 +239,4 @@ namespace rlst::par
 
   /* evolutor */
 
-  template <class U>
-  void evolutor::insert(U&& __cell)
-  {
-    m_cells.push_back(std::forward<U>(__cell));
-
-    m_overlap_grid.insert(m_cells.back());
-    m_placement_grid.insert(m_cells.back());
-  }
 }

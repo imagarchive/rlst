@@ -58,6 +58,14 @@ namespace rlst::par
 
   /* evolutor */
 
+  void evolutor::insert(cell::Cell& __cell)
+  {
+    m_cells.push_back(__cell);
+
+    m_overlap_grid.insert(m_cells.back());
+    m_placement_grid.insert(m_cells.back());
+  }
+
   void evolutor::evolute()
   {
     auto from = core::choice(m_cells.begin(), m_cells.end());
@@ -66,8 +74,8 @@ namespace rlst::par
     m_overlap_grid.erase(*from);
     m_placement_grid.erase(*from);
 
-    Point old = from->position;
-    from->position = to;
+    Point old = from->get().position;
+    from->get().position = to;
 
     auto [begin, end] = m_placement_grid.rect(*from);
 
