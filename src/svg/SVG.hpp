@@ -13,7 +13,7 @@
  *
  */
 
-namespace rlst::svg::svg
+namespace rlst::svg
 {
   /**
    * An SVG generator
