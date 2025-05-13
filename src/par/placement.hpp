@@ -462,19 +462,17 @@ namespace rlst::par
     value_type penalty() const noexcept
     {
       return
-        static_cast<value_type>(
-          std::reduce(
-            cbegin(),
-            cend(),
-            0,
+        std::reduce(
+          cbegin(),
+          cend(),
+          static_cast<value_type>(0),
 
-            [] (value_type __lhs, value_type __rhs)
-            {
-              return
-                std::abs(__lhs - bin_size) +
-                std::abs(__rhs - bin_size);
-            }
-          )
+          [] (value_type __lhs, value_type __rhs)
+          {
+            return
+              std::abs(__lhs - bin_size) +
+              std::abs(__rhs - bin_size);
+          }
         );
     }
   };
@@ -866,6 +864,9 @@ namespace rlst::par
   public:
     overlap_grid::value_type overlap_penalty() const noexcept
       { return m_overlap_grid.penalty(); }
+
+    size_type width() const
+      { return m_placement_grid.column_number(); }
   public:
     /**
      * Generate a random configuration
@@ -876,7 +877,15 @@ namespace rlst::par
      * which restricts the motion of a cell to its neighborhood.
      */
 
-    void evolute();
+    std::variant<
+      std::pair<std::reference_wrapper<cell::Cell>, Point>,
+
+      std::pair<
+        std::reference_wrapper<cell::Cell>,
+        std::reference_wrapper<cell::Cell>
+      >
+    >
+    evolute();
 
     /**
      * Insert a new @ref cell::Cell in the grids
@@ -885,6 +894,9 @@ namespace rlst::par
      */
 
     void insert(cell::Cell& __cell);
+
+    void replace(cell::Cell& __lhs, cell::Cell& __rhs);
+    void replace(cell::Cell& __lhs, const Point& __rhs);
   private:
     std::vector<std::reference_wrapper<cell::Cell>> m_cells;
     overlap_grid m_overlap_grid;
@@ -948,7 +960,11 @@ namespace rlst::par
    * @return A random neighbor of the @ref cell::Cell
    */
 
-  Point random_neighbor(const cell::Cell& __cell);
+  Point random_neighbor(
+    const cell::Cell& __cell,
+    uliteral_t __width,
+    uliteral_t __height
+  );
 }
 
 #include "placement.ipp"

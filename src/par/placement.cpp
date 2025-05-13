@@ -21,6 +21,29 @@
 
 namespace rlst::par
 {
+  namespace
+  {
+    bool is_outside(
+      const Point& __top_left,
+      const cell::Cell& __cell,
+      uliteral_t __width,
+      uliteral_t __height
+    ) noexcept
+    {
+      Point bottom_right(
+        __top_left.x() + static_cast<literal_t>(__cell.type->size.width),
+        __top_left.y() + static_cast<literal_t>(__cell.type->size.height),
+        0_l
+      );
+
+      return
+        (__top_left.x() < 0_l) ||
+        (__top_left.y() < 0_l) ||
+        (bottom_right.x() >= static_cast<literal_t>(__width)) ||
+        (bottom_right.y() >= static_cast<literal_t>(__height));
+    }
+  }
+
   real_t uniform()
   {
     std::random_device device;
@@ -62,44 +85,110 @@ namespace rlst::par
   {
     m_cells.push_back(__cell);
 
-    m_overlap_grid.insert(m_cells.back());
-    m_placement_grid.insert(m_cells.back());
+    m_overlap_grid.insert(__cell);
+    m_placement_grid.insert(__cell);
   }
 
-  void evolutor::evolute()
+  void evolutor::replace(cell::Cell& __lhs, cell::Cell& __rhs)
   {
+    using std::swap;
+
+    m_overlap_grid.erase(__lhs);
+    m_placement_grid.erase(__lhs);
+
+    m_overlap_grid.erase(__rhs);
+    m_placement_grid.erase(__rhs);
+
+    swap(__lhs.position, __rhs.position);
+
+    m_overlap_grid.insert(__lhs);
+    m_placement_grid.insert(__lhs);
+
+    m_overlap_grid.insert(__rhs);
+    m_placement_grid.insert(__rhs);
+  }
+
+  void evolutor::replace(cell::Cell& __lhs, const Point& __rhs)
+  {
+    m_overlap_grid.erase(__lhs);
+    m_placement_grid.erase(__lhs);
+
+    __lhs.position = __rhs;
+
+    m_overlap_grid.insert(__lhs);
+    m_placement_grid.insert(__lhs);
+  }
+
+  std::variant<
+    std::pair<std::reference_wrapper<cell::Cell>, Point>,
+
+    std::pair<
+      std::reference_wrapper<cell::Cell>,
+      std::reference_wrapper<cell::Cell>
+    >
+  >
+  evolutor::evolute()
+  {
+    using std::swap;
+
     auto from = core::choice(m_cells.begin(), m_cells.end());
-    Point to = random_neighbor(*from);
+
+    Point to =
+      random_neighbor(
+        *from,
+        m_placement_grid.column_number(),
+        m_placement_grid.row_number()
+      );
 
     m_overlap_grid.erase(*from);
     m_placement_grid.erase(*from);
 
-    Point old = from->get().position;
-    from->get().position = to;
+    swap(from->get().position, to);
+
+    m_overlap_grid.insert(*from);
+    m_placement_grid.insert(*from);
 
     auto [begin, end] = m_placement_grid.rect(*from);
 
     auto to_swap =
-      std::find_if_not(
+      std::find_if(
         begin,
         end,
-        [] (const auto& __list) { return __list.empty(); }
+
+        [&] (const auto& __list) {
+          if (__list.empty()) {
+            return false;
+          } else {
+            const cell::Cell& cell = __list.front();
+
+            return
+              (&cell != &from->get()) &&
+
+              !is_outside(
+                to,
+                cell,
+                m_placement_grid.column_number(),
+                m_placement_grid.row_number()
+              );
+          }
+        }
       );
 
-    if (to_swap != end) {
+    if (to_swap == end) {
+      return std::make_pair(*from, to);
+    } else {
       cell::Cell& cell = to_swap->front();
 
       m_overlap_grid.erase(cell);
       m_placement_grid.erase(cell);
 
-      cell.position = old;
+      cell.position = to;
 
       m_overlap_grid.insert(cell);
       m_placement_grid.insert(cell);
-    }
 
-    m_overlap_grid.insert(*from);
-    m_placement_grid.insert(*from);
+      return std::make_pair(*from, std::ref(cell));
+    }
   }
 
   void swap(evolutor& __lhs, evolutor& __rhs)
@@ -111,29 +200,43 @@ namespace rlst::par
     swap(__lhs.m_placement_grid, __rhs.m_placement_grid);
   }
 
-  Point random_neighbor(const cell::Cell& __cell)
+  Point random_neighbor(
+    const cell::Cell& __cell,
+    uliteral_t __width,
+    uliteral_t __height
+  )
   {
-    literal_t delta_x =
-      static_cast<literal_t>(
-        core::randint(
-          -__cell.type->size.width,
-          __cell.type->size.width
-        )
-      );
+    Point ret(
+      static_cast<literal_t>(__width),
+      static_cast<literal_t>(__height),
+      0
+    );
 
-    literal_t delta_y =
-      static_cast<literal_t>(
-        core::randint(
-          -__cell.type->size.height,
-          __cell.type->size.height
-        )
-      );
+    while (is_outside(ret, __cell, __width, __height)) {
+      literal_t delta_x =
+        static_cast<literal_t>(
+          core::randint(
+            -__cell.type->size.width,
+            __cell.type->size.width
+          )
+        );
 
-    return
-      Point(
-        __cell.position.x() + delta_x,
-        __cell.position.y() + delta_y,
-        0
-      );
+      literal_t delta_y =
+        static_cast<literal_t>(
+          core::randint(
+            -__cell.type->size.height,
+            __cell.type->size.height
+          )
+        );
+
+      ret =
+        Point(
+          __cell.position.x() + delta_x,
+          __cell.position.y() + delta_y,
+          0
+        );
+    }
+
+    return ret;
   }
 }

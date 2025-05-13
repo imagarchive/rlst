@@ -546,8 +546,7 @@ namespace rlst::core
      * @return The top left and bottom right iterator
      */
 
-    std::pair<iterator, iterator> rect(const par::cell::Cell& __cell)
-      { return std::make_pair(top_left(__cell), bottom_right(__cell)); }
+    std::pair<iterator, iterator> rect(const par::cell::Cell& __cell);
 
     /**
      * Get the top left and bottom right iterator
@@ -557,8 +556,7 @@ namespace rlst::core
      */
 
     std::pair<const_iterator, const_iterator>
-    rect(const par::cell::Cell& __cell) const
-      { return std::make_pair(top_left(__cell), bottom_right(__cell)); }
+    rect(const par::cell::Cell& __cell) const;
 
     /**
      * Get the number of bins that intersect with the given @ref par::cell::Cell
@@ -648,7 +646,11 @@ namespace rlst::core
     {
       return
         iterator(
-          m_grid.begin() + 1 + height_of(__cell),
+          m_grid.begin() +
+            (__cell.position.y() / bin_size) +
+            height_of(__cell)
+            + 1,
+
           0,
           static_cast<difference_type>(width_of(__cell)),
           __cell.position.x() / bin_size

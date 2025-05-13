@@ -236,6 +236,48 @@ namespace rlst::core
     }
   }
 
+  template <class T, std::uint8_t b>
+  std::pair<
+    typename grid<T, b>::iterator,
+    typename grid<T, b>::iterator
+  >
+  grid<T, b>::rect(const par::cell::Cell& __cell)
+  {
+    std::pair<iterator, iterator> ret;
+
+    boost::contract::check c =
+      boost::contract::public_function(this)
+
+        .postcondition(
+          [&] { BOOST_CONTRACT_ASSERT(ret.second >= ret.first); }
+        );
+
+    ret = std::make_pair(top_left(__cell), bottom_right(__cell));
+
+    return ret;
+  }
+
+  template <class T, std::uint8_t b>
+  std::pair<
+    typename grid<T, b>::const_iterator,
+    typename grid<T, b>::const_iterator
+  >
+  grid<T, b>::rect(const par::cell::Cell& __cell) const
+  {
+    std::pair<const_iterator, const_iterator> ret;
+
+    boost::contract::check c =
+      boost::contract::public_function(this)
+
+        .postcondition(
+          [&] { BOOST_CONTRACT_ASSERT(ret.second >= ret.first); }
+        );
+
+    ret = std::make_pair(top_left(__cell), bottom_right(__cell));
+
+    return ret;
+  }
+
   template <typename U, std::uint8_t b>
   void grid<U, b>::replace(
     const par::cell::Cell& __lhs,

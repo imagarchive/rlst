@@ -29,6 +29,131 @@ using rlst::par::cell::Port;
 using rlst::par::cell::PlacedPort;
 using rlst::par::cell::PortType;
 
+class placement_grid__modifiers__test
+  : public testing::TestWithParam<std::tuple<uliteral_t, uliteral_t>>
+{
+protected:
+  placement_grid__modifiers__test()
+    : g(5, 5)
+  {}
+protected:
+  placement_grid g;
+};
+
+TEST_P(placement_grid__modifiers__test, identity)
+{
+  auto [width, height] = GetParam();
+  Cell cell = cell_from_geometry_params(1_l, 1_l, width, height);
+
+  g.insert(cell);
+  g.erase(cell);
+
+  ASSERT_TRUE(
+    std::all_of(
+      g.cbegin(),
+      g.cend(),
+      [] (const auto& __list) { return __list.empty(); }
+    )
+  );
+}
+
+TEST_P(placement_grid__modifiers__test, identity_width_two)
+{
+  auto [width, height] = GetParam();
+
+  Cell first = cell_from_geometry_params(1_l, 1_l, width, height);
+  Cell second = cell_from_geometry_params(1_l, 1_l, width, height);
+
+  g.insert(first);
+  g.insert(second);
+
+  g.erase(second);
+  g.erase(first);
+
+  ASSERT_TRUE(
+    std::all_of(
+      g.cbegin(),
+      g.cend(),
+      [] (const auto& __list) { return __list.empty(); }
+    )
+  );
+}
+
+TEST_P(placement_grid__modifiers__test, insert)
+{
+  auto [width, height] = GetParam();
+  Cell cell = cell_from_geometry_params(1_l, 1_l, width, height);
+
+  g.insert(cell);
+
+  ASSERT_EQ(
+    std::count_if(
+      g.cbegin(),
+      g.cend(),
+
+      [&] (const auto& __list) {
+        return !__list.empty() && (&__list.front().get() == &cell);
+      }
+    ),
+
+    width * height
+  );
+}
+
+TEST_P(placement_grid__modifiers__test, one_above_another)
+{
+  auto [width, height] = GetParam();
+
+  Cell first = cell_from_geometry_params(1_l, 1_l, width, height);
+  Cell second = cell_from_geometry_params(1_l, 1_l, width, height);
+
+  g.insert(first);
+  g.insert(second);
+
+  ASSERT_EQ(
+    std::count_if(
+      g.cbegin(),
+      g.cend(),
+
+      [&] (const auto& __list) {
+        return !__list.empty() && (&__list.front().get() == &second);
+      }
+    ),
+
+    width * height
+  );
+}
+
+INSTANTIATE_TEST_SUITE_P(
+  column,
+  placement_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Range(1_ul, 2_ul),
+    testing::Range(1_ul, 5_ul)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  row,
+  placement_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Range(1_ul, 5_ul),
+    testing::Range(1_ul, 2_ul)
+  )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+  any,
+  placement_grid__modifiers__test,
+
+  testing::Combine(
+    testing::Range(2_ul, 5_ul),
+    testing::Range(2_ul, 5_ul)
+  )
+);
+
 class overlap_grid__modifiers__test
   : public testing::TestWithParam<std::tuple<int, int>>
 {
