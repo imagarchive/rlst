@@ -31,8 +31,8 @@ namespace rlst::par
     ) noexcept
     {
       Point bottom_right(
-        __top_left.x() + static_cast<literal_t>(__cell.type->size.width),
-        __top_left.y() + static_cast<literal_t>(__cell.type->size.height),
+        __top_left.x() + static_cast<literal_t>(__cell.type.get().size.width),
+        __top_left.y() + static_cast<literal_t>(__cell.type.get().size.height),
         0_l
       );
 
@@ -216,16 +216,16 @@ namespace rlst::par
       literal_t delta_x =
         static_cast<literal_t>(
           core::randint(
-            -__cell.type->size.width,
-            __cell.type->size.width
+            -__cell.type.get().size.width,
+            __cell.type.get().size.width
           )
         );
 
       literal_t delta_y =
         static_cast<literal_t>(
           core::randint(
-            -__cell.type->size.height,
-            __cell.type->size.height
+            -__cell.type.get().size.height,
+            __cell.type.get().size.height
           )
         );
 

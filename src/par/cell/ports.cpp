@@ -45,6 +45,12 @@ namespace rlst::par::cell
 
   /* PlacedPort */
 
+  bool operator==(
+    const PlacedPort& __lhs,
+    const PlacedPort& __rhs
+  ) noexcept
+    { return (__lhs.parent == __rhs.parent) && (__lhs.port == __rhs.port); }
+
   std::size_t hash_value(const PlacedPort& __input)
   {
     std::size_t seed = 0;
@@ -65,11 +71,15 @@ namespace rlst::par::cell
 
   literal_t absolute_x(const PlacedPort& __placed_port)
   {
-    return __placed_port.port.position.x() + __placed_port.parent->position.x();
+    return
+      __placed_port.port.position.x() +
+      __placed_port.parent.get().position.x();
   }
 
   literal_t absolute_y(const PlacedPort& __placed_port)
   {
-    return __placed_port.port.position.y() + __placed_port.parent->position.y();
+    return
+      __placed_port.port.position.y() +
+      __placed_port.parent.get().position.y();
   }
 }

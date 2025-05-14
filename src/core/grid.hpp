@@ -571,7 +571,11 @@ namespace rlst::core
     std::size_t width_of(const par::cell::Cell& __cell) const
     {
       return
-        ceil_divide(__cell.position.x() + __cell.type->size.width, bin_size) -
+        ceil_divide(
+          __cell.position.x() + __cell.type.get().size.width,
+          bin_size
+        ) -
+
         __cell.position.x() / bin_size;
     }
 
@@ -588,7 +592,11 @@ namespace rlst::core
     std::size_t height_of(const par::cell::Cell& __cell) const
     {
       return
-        ceil_divide(__cell.position.y() + __cell.type->size.height, bin_size) -
+        ceil_divide(
+          __cell.position.y() + __cell.type.get().size.height,
+          bin_size
+        ) -
+
         __cell.position.y() / bin_size;
     }
 

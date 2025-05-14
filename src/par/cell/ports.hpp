@@ -20,7 +20,6 @@
 #  define RLST_RLST_PAR_CELL_PORTS_HPP
 
 #include "par/geometry.hpp"
-#include <memory>
 
 /**
  * @file
@@ -120,7 +119,9 @@ namespace rlst::par::cell
 
   struct PlacedPort
   {
-    std::shared_ptr<const Cell> parent; ///< The parent of the @ref PlacedPort
+    /// The parent of the @ref PlacedPort
+    std::reference_wrapper<const Cell> parent;
+
     Port port; ///< The corresponding @ref Port
   };
 
@@ -133,11 +134,10 @@ namespace rlst::par::cell
    * @return True if both @ref PlacedPort objects are the same, false otherwise
    */
 
-  inline bool operator==(
+  bool operator==(
     const PlacedPort& __lhs,
     const PlacedPort& __rhs
-  ) noexcept
-    { return (__lhs.parent == __rhs.parent) && (__lhs.port == __rhs.port); }
+  ) noexcept;
 
   /**
    * Compare two @ref PlacedPort objects for inequality

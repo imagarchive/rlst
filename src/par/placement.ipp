@@ -53,7 +53,7 @@ namespace rlst::par
       __end_cell,
 
       [] (const cell::Cell& __lhs, const cell::Cell& __rhs) {
-        return __lhs.type->size.width < __rhs.type->size.width;
+        return __lhs.type.get().size.width < __rhs.type.get().size.width;
       }
     );
 
@@ -63,8 +63,8 @@ namespace rlst::par
     for (auto i = __begin_cell; i != __end_cell; ++i) {
       i->position = position;
 
-      max_height = std::max(max_height, i->type->size.height);
-      position.x() += i->type->size.width;
+      max_height = std::max(max_height, i->type.get().size.height);
+      position.x() += i->type.get().size.width;
 
       if (position.x() >= static_cast<literal_t>(config.width())) {
         position.x() = 0;
@@ -164,7 +164,7 @@ end:
         static_cast<value_type>(
           std::min(
             __cell.position.x() +
-              static_cast<literal_t>(__cell.type->size.width),
+              static_cast<literal_t>(__cell.type.get().size.width),
 
             (i.x() + 1) * bin_size
           ) -
@@ -218,7 +218,7 @@ end:
             i->second.second,
 
             __begin->position.x() +
-              static_cast<literal_t>(__begin->type->size.width)
+              static_cast<literal_t>(__begin->type.get().size.width)
           )
         );
     }

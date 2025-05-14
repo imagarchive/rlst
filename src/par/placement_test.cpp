@@ -291,8 +291,7 @@ TEST(row_length_penalty__basics__test, several_lines)
 
 TEST(wire_length_cost__basics__test, same_row)
 {
-  auto cell =
-    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+  Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
   std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
@@ -309,8 +308,7 @@ TEST(wire_length_cost__basics__test, same_row)
 
 TEST(wire_length_cost__basics__test, same_column)
 {
-  auto cell =
-    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+  Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
   std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
@@ -327,8 +325,7 @@ TEST(wire_length_cost__basics__test, same_column)
 
 TEST(wire_length_cost__basics__test, random)
 {
-  auto cell =
-    std::make_shared<const Cell>(cell_from_geometry_params(0, 0, 10, 10));
+  Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
   std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
     std::make_pair(
