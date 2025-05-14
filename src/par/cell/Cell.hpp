@@ -22,6 +22,8 @@
 #include "par/cell/types.hpp"
 #include "par/geometry.hpp"
 
+#include <memory>
+
 /**
  * @file
  *
@@ -47,7 +49,7 @@ namespace rlst::par::cell
   struct Cell
   {
     Point position; ///< The position of the @ref Cell
-    std::reference_wrapper<const CellType> type; ///< The type of the @ref Cell
+    std::shared_ptr<const CellType> type; ///< The type of the @ref Cell
   };
 
   /**

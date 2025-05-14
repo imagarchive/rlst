@@ -29,8 +29,8 @@ namespace rlst::svg::svg
     // don't exist as of writing this code
     m_svg_file
       << "<rect"
-      << " width='" << __cell.type.get().size.width * SIZE_FACTOR << "'"
-      << " height='" << __cell.type.get().size.height * SIZE_FACTOR << "'"
+      << " width='" << __cell.type->size.width * SIZE_FACTOR << "'"
+      << " height='" << __cell.type->size.height * SIZE_FACTOR << "'"
       << " x='" << __cell.position.x() * SIZE_FACTOR << "'"
       << " y='" << __cell.position.y() * SIZE_FACTOR << "'"
       << " fill='" << CELL_BACKGROUND_COLOR << "'"
@@ -40,17 +40,12 @@ namespace rlst::svg::svg
       << " x='" << (__cell.position.x() + 1) * SIZE_FACTOR << "'"
       << " y='"
 
-      << (
-          __cell.position.y() +
-          static_cast<par::literal_t>(__cell.type.get().size.height) -
-          1
-        ) * SIZE_FACTOR
-
+      << (__cell.position.y() + __cell.type->size.height - 1) * SIZE_FACTOR
         << "'"
 
       << " fill='" << CELL_TEXT_COLOR << "'"
-      << ">" << __cell.type.get().name << "</text>\n";
-    for (par::cell::Port port : __cell.type.get().ports) {
+      << ">" << __cell.type->name << "</text>\n";
+    for (par::cell::Port port : __cell.type->ports) {
       par::Point port_point;
       port_point.x() = __cell.position.x() + port.position.x();
       port_point.y() = __cell.position.y() + port.position.y();

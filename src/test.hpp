@@ -69,7 +69,7 @@ namespace rlst::test
       par::cell::Cell {
         par::Point(__x, __y, 0),
 
-        *std::make_shared<par::cell::CellType>(
+        std::make_shared<par::cell::CellType>(
           par::cell::CellType {
             std::list<par::cell::Port>(),
             std::string(),
