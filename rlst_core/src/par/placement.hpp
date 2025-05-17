@@ -101,6 +101,7 @@ namespace rlst::par
    *
    * @param[in] __begin_net The begin iterator of the nets
    * @param[in] __end_net The past-the-last iterator of the nets
+   * @param[in] __desired_row_length The desired row length
    */
 
   template <class InputIt, class OutputIt>
@@ -108,7 +109,8 @@ namespace rlst::par
     OutputIt __begin_cell,
     OutputIt __end_cell,
     InputIt __begin_net,
-    InputIt __end_net
+    InputIt __end_net,
+    uliteral_t __desired_row_length
   );
 
   /* placement */

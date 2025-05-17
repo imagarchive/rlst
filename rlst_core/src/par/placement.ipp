@@ -40,116 +40,28 @@ namespace rlst::par
     OutputIt __begin_cell,
     OutputIt __end_cell,
     InputIt __begin_net,
-    InputIt __end_net
+    InputIt __end_net,
+    uliteral_t __desired_row_length
   )
   {
-    iteration_t i = 1_it;
-    real_t t = default_first_temperature;
-
-    evolutor config(16, 16);
-
-    std::sort(
-      __begin_cell,
-      __end_cell,
-
-      [] (const cell::Cell& __lhs, const cell::Cell& __rhs) {
-        return __lhs.type->size.width < __rhs.type->size.width;
-      }
-    );
-
-    Point position(0, 0, 0);
+    Point tl(0, 0, 0);
+    Point tr(0, 0, 0);
     uliteral_t max_height = 0_ul;
 
     for (auto i = __begin_cell; i != __end_cell; ++i) {
-      i->position = position;
+      tr.x() += i->type->size.width;
 
+      if (tr.x() >= __desired_row_length) {
+        tl.x() = 0;
+        tl.y() += max_height;
+
+        tr.x() = i->type->size.width;
+        tr.y() += max_height;
+      }
+
+      i->position = tl;
+      tl.x() += i->type->size.width;
       max_height = std::max(max_height, i->type->size.height);
-      position.x() += i->type->size.width;
-
-      if (position.x() >= static_cast<literal_t>(config.width())) {
-        position.x() = 0;
-        position.y() += max_height;
-
-        max_height = 0;
-      }
-    }
-
-    for (auto i = __begin_cell; i != __end_cell; ++i) {
-      config.insert(*i);
-    }
-
-    temperature_schedule reduce;
-
-    real_t c_1 = wire_length_cost(__begin_net, __end_net);
-
-    real_t w_2 = 0._r, c_2 = std::numeric_limits<real_t>::max();
-    overlap_penalty_weight compute_w_2(.1_r);
-    overlap_penalty_cost compute_c_2;
-
-    real_t w_3 = 0._r;
-    row_length_weight compute_w_3;
-    row_length_cost compute_c_3;
-
-    real_t rho = 100._r, s = 1._r, c_prime = std::numeric_limits<real_t>::max();
-    acceptance_scale compute_s;
-    scaled_cost compute_c_prime;
-
-    iteration_t n = 0_it;
-
-    while ((i != 120_it) || (c_2 != 0._r)) {
-      for (auto j = 0_it; j != 100_it; ++j) {
-        auto changed = config.evolute();
-
-        real_t new_w_2 = compute_w_2(w_2, config.overlap_penalty(), i);
-        real_t new_c_2 = compute_c_2(new_w_2, config.overlap_penalty());
-
-        real_t p_r = row_length_penalty(__begin_cell, __end_cell);
-        real_t new_w_3 = compute_w_3(i, w_3, p_r);
-        real_t new_c_3 = compute_c_3(new_w_3, p_r);
-
-        real_t new_s = compute_s(i, rho, s);
-        real_t new_c_prime = compute_c_prime(new_s, new_c_2 + new_c_3);
-
-        real_t delta_c = new_c_prime - c_prime;
-
-        if (delta_c < 0._r) {
-          real_t new_c_1 = wire_length_cost(__begin_net, __end_net);
-          delta_c += compute_c_prime(s, new_c_1 - c_1);
-
-          if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
-            c_1 = new_c_1;
-
-            w_2 = new_w_2;
-            c_2 = new_c_2;
-
-            w_3 = new_w_3;
-
-            s = new_s;
-            c_prime = new_c_prime;
-
-            rho = details::update_rho<true>(rho, n);
-            goto end;
-          }
-        }
-
-        std::visit(
-          [&] (const auto& __swapper) {
-            config.replace(__swapper.first, __swapper.second);
-          },
-
-          changed
-        );
-
-        rho = details::update_rho<false>(rho, n);
-
-end:
-        ++n;
-      }
-
-      if (i != 120_it) {
-        t = reduce(t);
-        ++i;
-      }
     }
   }
 
