@@ -352,6 +352,37 @@ namespace rlst::par
      */
 
     std::pair<iterator, iterator> erase(cell::Cell& __cell);
+  public:
+    /**
+     * Compute the overlap penalty
+     *
+     * @return The overlap penalty
+     */
+
+    real_t overlap_penalty() const
+    {
+      return
+        std::reduce(
+          cbegin(),
+          cend(),
+          0._r,
+
+          core::transformed_binop(
+            [] (const value_type& __set) {
+              return std::max(0._r, __set.size() - 1._r);
+            }
+          )
+        ) / size();
+    }
+
+    /**
+     * Compute the overlap cost
+     *
+     * @return The overlap cost
+     */
+
+    real_t overlap_cost() const
+      { return 100._r * overlap_penalty(); }
   };
 
   /* temperature */
