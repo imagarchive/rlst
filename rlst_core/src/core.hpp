@@ -348,16 +348,18 @@ namespace rlst::core
      * @return The sum of the transformed arguments
      */
 
-    template <class U, class V>
-    std::enable_if_t<
-      std::conjunction_v<
-        std::is_same<std::decay_t<U>, std::decay_t<T>>,
-        std::is_same<std::decay_t<V>, std::decay_t<T>>
-      >,
+    template <
+      class U,
+      class V,
 
-      R
+      std::enable_if_t<
+        std::conjunction_v<
+          std::is_same<std::decay_t<U>, std::decay_t<T>>,
+          std::is_same<std::decay_t<V>, std::decay_t<T>>
+        >
+      >* = nullptr
     >
-    operator()(U&& __lhs, V&& __rhs) const
+    R operator()(U&& __lhs, V&& __rhs) const
     {
       return
         m_transformer(std::forward<U>(__lhs)) +
@@ -377,12 +379,14 @@ namespace rlst::core
      * argument
      */
 
-    template <class U>
-    std::enable_if_t<
-      std::is_same_v<std::decay_t<U>, std::decay_t<T>>,
-      R
+    template <
+      class U,
+
+      std::enable_if_t<
+        std::is_same_v<std::decay_t<U>, std::decay_t<T>>
+      >* = nullptr
     >
-    operator()(U&& __lhs, R __rhs) const
+    R operator()(U&& __lhs, R __rhs) const
       { return m_transformer(std::forward<U>(__lhs)) + __rhs; }
 
     /**
@@ -398,12 +402,13 @@ namespace rlst::core
      * argument
      */
 
-    template <class U>
-    std::enable_if_t<
-      std::is_same_v<std::decay_t<U>, std::decay_t<T>>,
-      R
+    template <
+      class U,
+      std::enable_if_t<
+        std::is_same_v<std::decay_t<U>, std::decay_t<T>>
+      >* = nullptr
     >
-    operator()(R __lhs, U&& __rhs) const
+    R operator()(R __lhs, U&& __rhs) const
       { return operator()(std::forward<U>(__rhs), __lhs); }
 
     /**
