@@ -25,8 +25,8 @@
 #include "par/cell/ports.hpp"
 #include "par/geometry.hpp"
 
-#include <forward_list>
 #include <numeric>
+#include <unordered_set>
 #include <utility>
 
 /**
@@ -137,12 +137,31 @@ namespace rlst::par
 
   /* placement */
 
+  namespace details
+  {
+    struct placement_grid_hasher
+    {
+      std::size_t operator()(std::reference_wrapper<cell::Cell> __cell) const
+        { return std::hash<cell::Cell*>()(&__cell.get()); }
+    };
+  }
+
   class placement_grid
-    : public core::grid<std::forward_list<std::reference_wrapper<cell::Cell>>>
+    : public core::grid<
+      std::unordered_set<
+        std::reference_wrapper<cell::Cell>,
+        details::placement_grid_hasher
+      >
+    >
   {
   private:
     using base_type =
-      core::grid<std::forward_list<std::reference_wrapper<cell::Cell>>>;
+      core::grid<
+        std::unordered_set<
+          std::reference_wrapper<cell::Cell>,
+          details::placement_grid_hasher
+        >
+      >;
   public:
     /// The default constructor
     placement_grid() = default;

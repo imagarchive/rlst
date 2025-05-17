@@ -72,7 +72,7 @@ namespace rlst::par
     auto ret = rect(__cell);
 
     for (auto i = ret.first; i != ret.second; ++i) {
-      i->push_front(__cell);
+      i->insert(__cell);
     }
 
     return ret;
@@ -84,7 +84,7 @@ namespace rlst::par
     auto ret = rect(__cell);
 
     for (auto i = ret.first; i != ret.second; ++i) {
-      i->remove(__cell);
+      i->erase(__cell);
     }
 
     return ret;
