@@ -24,7 +24,7 @@ project(
 )
 
 set(
-    RLST_CORE_PRIVATE_HPP
+    RLST_CORE_HPP
     core/grid.hpp
     par/cell/Cell.hpp
     par/cell/ports.hpp
@@ -38,7 +38,7 @@ set(
     par.hpp
 )
 
-list(TRANSFORM RLST_CORE_PRIVATE_HPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+list(TRANSFORM RLST_CORE_HPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 set(
   RLST_CORE_IPP
@@ -48,7 +48,7 @@ set(
   core.ipp
 )
 
-list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 set(
     RLST_CORE_CPP
@@ -70,17 +70,16 @@ target_link_libraries(rlst_core PRIVATE Boost::boost)
 
 target_include_directories(
     rlst_core
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/"
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
 target_sources(
     rlst_core
 
-    PRIVATE
+    PUBLIC
         FILE_SET HEADERS
         TYPE HEADERS
-        FILES "${RLST_CORE_PRIVATE_HPP}" "${RLST_CORE_IPP}"
+        FILES "${RLST_CORE_HPP}" "${RLST_CORE_IPP}"
 )
 
 rlst_add_to_doc("${RLST_CORE_HPP}")
