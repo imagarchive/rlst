@@ -539,6 +539,22 @@ namespace rlst::par
   /* row length */
 
   /**
+   * Get the row length penalty
+   *
+   * @tparam The iterator type
+   *
+   * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
+   * @param[in] __end The past-the-last iterator of the @ref cell::Cell "cells"
+   *
+   * @return The row length penalty
+   *
+   * @see https://doi.org/10.1145/103724.103725
+   */
+
+  template <class InputIt>
+  real_t row_length_penalty(InputIt __begin, InputIt __end);
+
+  /**
    * The row length cost
    */
 
@@ -560,37 +576,37 @@ namespace rlst::par
     /**
      * Get the row length cost
      *
-     * @param[in] __penalty The current row length penalty
+     * @tparam InputIt0 The iterator type (enable perfect forwarding)
+     * @tparam InputIt1 The iterator type (enable perfect forwarding)
+     *
+     * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
+     *
+     * @param[in] __end The past-the-last iterator of the
+     * @ref cell::Cell "cells"
+     *
      * @return The row length cost
      */
 
-    constexpr real_t operator()(real_t __penalty) const
+    template <class InputIt0, class InputIt1>
+    constexpr real_t operator()(InputIt0&& __begin, InputIt1&& __end) const
     {
       return
         normalize(
-          (__penalty - m_desired_row_length) /
+          (
+            row_length_penalty(
+              std::forward<InputIt0>(__begin),
+              std::forward<InputIt1>(__end)
+            ) -
+
+            m_desired_row_length
+          ) /
+
           m_desired_row_length
         );
     }
   private:
     real_t m_desired_row_length;
   };
-
-  /**
-   * Get the row length penalty
-   *
-   * @tparam The iterator type
-   *
-   * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
-   * @param[in] __end The past-the-last iterator of the @ref cell::Cell "cells"
-   *
-   * @return The row length penalty
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  template <class InputIt>
-  real_t row_length_penalty(InputIt __begin, InputIt __end);
 
   /**
    * Compute the wire length penalty of net
@@ -643,16 +659,28 @@ namespace rlst::par
   }
 
   /**
-   * Compute the wire length cost from the given wire length penalty
+   * Compute the wire length cost of net
    *
-   * @param[in] __penalty The wire length penalty
-   * @return The wire length cost
+   * @tparam InputIt0 The iterator type (enable perfect forwarding)
+   * @tparam InputIt1 The iterator type (enable perfect forwarding)
    *
-   * @see wire_length_penalty()
+   * @param[in] __begin The begin iterator of the net
+   * @param[in] __end The end iterator of the net
+   *
+   * @return The wire length cost of the given net
    */
 
-  inline real_t wire_length_cost(real_t __penalty)
-    { return normalize(__penalty); }
+  template <class InputIt0, class InputIt1>
+  real_t wire_length_cost(InputIt0&& __begin, InputIt1&& __end)
+  {
+    return
+      normalize(
+        wire_length_penalty(
+          std::forward<InputIt0>(__begin),
+          std::forward<InputIt1>(__end)
+        )
+      );
+  }
 
   /**
    * Get a random neighbor of a @ref cell::Cell
