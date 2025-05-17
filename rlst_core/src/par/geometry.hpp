@@ -58,6 +58,60 @@ namespace rlst::par
   constexpr uliteral_t operator ""_ul(unsigned long long __input) noexcept
     { return static_cast<uliteral_t>(__input); }
 
+  /* Size */
+
+  /**
+   * A size
+   */
+
+  struct Size
+  {
+    uliteral_t width; ///< The width
+    uliteral_t height; ///< The height
+  };
+
+  /**
+   * Compare two @ref rlst::par::Size "sizes" for equality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the sizes are equal, false otherwise
+   */
+
+  constexpr bool operator==(const Size& __lhs, const Size& __rhs) noexcept
+    { return (__lhs.width == __rhs.width) && (__lhs.height == __rhs.height); }
+
+  /**
+   * Compare two @ref rlst::par::Size "sizes" for inequality
+   *
+   * @param[in] __lhs The left hand side operand
+   * @param[in] __rhs The right hand side operand
+   *
+   * @return True if the sizes are not equal, false otherwise
+   */
+
+  constexpr bool operator!=(const Size& __lhs, const Size& __rhs) noexcept
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Hash function for @ref rlst::par::Size
+   *
+   * @param[in] __input The @ref rlst::par::Size to hash
+   * @return The hash value of the @ref rlst::par::Size
+   */
+
+  std::size_t hash_value(const Size& __input);
+
+  /**
+   * Swap two @ref rlst::par::Size "sizes"
+   *
+   * @param[in, out] __lhs The left hand side operand
+   * @param[in, out] __rhs The right hand side operand
+   */
+
+  void swap(Size& __lhs, Size& __rhs) noexcept;
+
   /* Point */
 
   /**
@@ -145,6 +199,22 @@ namespace rlst::par
     constexpr literal_t& z() noexcept { return m_z; }
   public:
     /**
+     * Check if a @ref Point is outside a given @ref Size "frame"
+     *
+     * @param[in] __frame The given @ref Size "frame"
+     * @return if a @ref Point is outside a given @ref Size "frame"
+     */
+
+    constexpr bool is_outside(const Size& __frame) const noexcept
+    {
+      return
+        (m_x < 0_l) ||
+        (m_y < 0_l) ||
+        (m_x >= __frame.width) ||
+        (m_y >= __frame.height);
+    }
+
+    /**
      * Get the Manhattan length of the segment between this point and another
      *
      * @return The Manhattan length of the segment between this point and
@@ -210,60 +280,6 @@ namespace rlst::par
    */
 
   void swap(Point& __lhs, Point& __rhs) noexcept;
-
-  /* Size */
-
-  /**
-   * A size
-   */
-
-  struct Size
-  {
-    uliteral_t width; ///< The width
-    uliteral_t height; ///< The height
-  };
-
-  /**
-   * Compare two @ref rlst::par::Size "sizes" for equality
-   *
-   * @param[in] __lhs The left hand side operand
-   * @param[in] __rhs The right hand side operand
-   *
-   * @return True if the sizes are equal, false otherwise
-   */
-
-  constexpr bool operator==(const Size& __lhs, const Size& __rhs) noexcept
-    { return (__lhs.width == __rhs.width) && (__lhs.height == __rhs.height); }
-
-  /**
-   * Compare two @ref rlst::par::Size "sizes" for inequality
-   *
-   * @param[in] __lhs The left hand side operand
-   * @param[in] __rhs The right hand side operand
-   *
-   * @return True if the sizes are not equal, false otherwise
-   */
-
-  constexpr bool operator!=(const Size& __lhs, const Size& __rhs) noexcept
-    { return !(__lhs == __rhs); }
-
-  /**
-   * Hash function for @ref rlst::par::Size
-   *
-   * @param[in] __input The @ref rlst::par::Size to hash
-   * @return The hash value of the @ref rlst::par::Size
-   */
-
-  std::size_t hash_value(const Size& __input);
-
-  /**
-   * Swap two @ref rlst::par::Size "sizes"
-   *
-   * @param[in, out] __lhs The left hand side operand
-   * @param[in, out] __rhs The right hand side operand
-   */
-
-  void swap(Size& __lhs, Size& __rhs) noexcept;
 }
 
 #endif // RLST_RLST_PAR_GEOMETRY_HPP

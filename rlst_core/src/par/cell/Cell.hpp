@@ -128,6 +128,22 @@ namespace rlst::par::cell
      */
 
     std::shared_ptr<const CellType> type() const noexcept { return m_type; }
+  public:
+    /**
+     * Check if the @ref Cell can be moved to the given @ref Point "location"
+     * taking into account the given @ref Size frame
+     *
+     * @param[in] __to The new @ref Point "location"
+     * @param[in] __frame The given @ref Size "frame"
+     *
+     * @return if the @ref Cell can be moved to the given @ref Point "location"
+     * taking into account the given @ref Size frame
+     */
+
+    constexpr bool can_be_moved_to(
+      Point __to,
+      const Size& __frame
+    ) const noexcept;
   private:
     Point m_position;
     std::shared_ptr<const CellType> m_type;
