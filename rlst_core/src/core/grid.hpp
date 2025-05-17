@@ -71,6 +71,9 @@ namespace rlst::core
 
       using iterator_category = std::random_access_iterator_tag;
     private:
+      template <class>
+      friend class grid_iterator;
+
       template <class R>
       friend bool operator==(const grid_iterator<R>&, const grid_iterator<R>&);
 
@@ -111,6 +114,33 @@ namespace rlst::core
         , m_row_size(0)
       {}
 
+      template <
+        class U,
+
+        std::enable_if_t<
+          std::conjunction_v<
+            core::is_same_template<std::decay_t<U>, grid_iterator>,
+            std::negation<std::is_same<U, grid_iterator>>,
+
+            std::is_convertible<
+              typename U::row_iterator_type,
+              row_iterator_type
+            >,
+
+            std::is_convertible<
+              typename U::column_iterator_type,
+              column_iterator_type
+            >
+          >
+        >* = nullptr
+      >
+      constexpr grid_iterator(U&& __other)
+        : m_column_iterator(std::forward<U>(__other).m_column_iterator)
+        , m_row_iterator(std::forward<U>(__other).m_row_iterator)
+        , m_offset(__other.m_offset)
+        , m_row_size(__other.m_row_size)
+      {}
+
       template <class U>
       explicit constexpr grid_iterator(
         U&& __row_iterator,
@@ -123,6 +153,28 @@ namespace rlst::core
         , m_offset(__offset)
         , m_row_size(__row_size)
       {}
+    public:
+      template <
+        class U,
+
+        std::enable_if_t<
+          std::conjunction_v<
+            core::is_same_template<std::decay_t<U>, grid_iterator>,
+            std::negation<std::is_same<U, grid_iterator>>,
+
+            std::is_convertible<
+              typename U::row_iterator_type,
+              row_iterator_type
+            >,
+
+            std::is_convertible<
+              typename U::column_iterator_type,
+              column_iterator_type
+            >
+          >
+        >* = nullptr
+      >
+      constexpr grid_iterator& operator=(U&& __rhs);
     public:
       constexpr reference operator*() const
         { return *m_column_iterator; }

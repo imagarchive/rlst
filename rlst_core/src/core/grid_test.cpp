@@ -401,3 +401,24 @@ TEST(grid__size__test, empty)
   grid<int> grid;
   EXPECT_DEATH({ grid.size(); }, "");
 }
+
+TEST(grid__basics__test, to_const_iterator)
+{
+  ASSERT_TRUE(
+    (
+      std::is_assignable_v<
+        grid<int>::const_iterator,
+        grid<int>::iterator
+      >
+    )
+  );
+
+  ASSERT_TRUE(
+    (
+      std::is_constructible_v<
+        grid<int>::const_iterator,
+        grid<int>::iterator
+      >
+    )
+  );
+}

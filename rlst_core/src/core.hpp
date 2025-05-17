@@ -118,6 +118,31 @@ namespace rlst::core
     is_random_access_iterator<T>::value;
 
   /**
+   * Check if two types have the same template class
+   *
+   * @tparam T The first type
+   * @tparam U The second type
+   */
+
+  template <class T, class U>
+  struct is_same_template : std::false_type {};
+
+#ifndef RLST_DOXYGEN_SHOULD_SKIP_THIS
+  template <template <class...> class T, class... A, class... B>
+  struct is_same_template<T<A...>, T<B...>> : std::true_type {};
+#endif // RLST_DOXYGEN_SHOULD_SKIP_THIS
+
+  /**
+   * Corresponding value of @ref is_same_template
+   *
+   * @tparam T The first type
+   * @tparam U The second type
+   */
+
+  template <class T, class U>
+  constexpr bool is_same_template_v = is_same_template<T, U>::value;
+
+  /**
    * Choose a random element from a range
    *
    * @param[in] __begin The beginning of the range
