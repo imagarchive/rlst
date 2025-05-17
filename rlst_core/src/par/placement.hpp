@@ -385,29 +385,40 @@ namespace rlst::par
 
   /**
    * The row length cost
-   *
-   * @see https://doi.org/10.1145/103724.103725
    */
 
   class row_length_cost
   {
-    RLST_ENFORCE_RULE_OF_FIVE(row_length_cost);
+    RLST_ENFORCE_RULE_OF_FOUR(row_length_cost);
   public:
     /**
-     * Get the next row length cost
+     * Construct a row length cost object
      *
-     * @param[in] __i The current iteration
-     * @param[in] __row_length_weight The current row length weight
-     * @param[in] __row_length_penalty The current row length penalty
-     *
-     * @return The next row length cost
+     * @param[in] __desired_row_length The desired row length to be used for
+     * computing the cost
      */
 
-    constexpr real_t operator()(
-      real_t __row_length_weight,
-      real_t __row_length_penalty
-    ) const
-      { return __row_length_weight * __row_length_penalty; }
+    explicit constexpr row_length_cost(real_t __desired_row_length) noexcept
+      : m_desired_row_length(__desired_row_length)
+    {}
+  public:
+    /**
+     * Get the row length cost
+     *
+     * @param[in] __penalty The current row length penalty
+     * @return The row length cost
+     */
+
+    constexpr real_t operator()(real_t __penalty) const
+    {
+      return
+        normalize(
+          (__penalty - m_desired_row_length) /
+          m_desired_row_length
+        );
+    }
+  private:
+    real_t m_desired_row_length;
   };
 
   /**
