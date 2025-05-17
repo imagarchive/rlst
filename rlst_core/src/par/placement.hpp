@@ -23,9 +23,11 @@
 #include "core.hpp"
 
 #include "par/cell/ports.hpp"
+#include "par/geometry.hpp"
 
 #include <forward_list>
 #include <numeric>
+#include <utility>
 
 /**
  * This namespace describes all utilities related to Place And Route
@@ -116,17 +118,11 @@ namespace rlst::par
   /* placement */
 
   class placement_grid
-    : public core::grid<
-      std::forward_list<std::reference_wrapper<cell::Cell>>,
-      1
-    >
+    : public core::grid<std::forward_list<std::reference_wrapper<cell::Cell>>>
   {
   private:
     using base_type =
-      core::grid<
-        std::forward_list<std::reference_wrapper<cell::Cell>>,
-        1
-      >;
+      core::grid<std::forward_list<std::reference_wrapper<cell::Cell>>>;
   public:
     /// The default constructor
     placement_grid() = default;
@@ -180,13 +176,134 @@ namespace rlst::par
     placement_grid& operator=(placement_grid&& __rhs) = default;
   public:
     /**
+     * Get the top left and bottom right iterator
+     *
+     * @param[in] __cell The given @ref par::cell::Cell
+     * @return The top left and bottom right iterator
+     */
+
+    std::pair<iterator, iterator> rect(const par::cell::Cell& __cell);
+
+    /**
+     * Get the top left and bottom right iterator
+     *
+     * @param[in] __cell The given @ref par::cell::Cell
+     * @return The top left and bottom right iterator
+     */
+
+    std::pair<const_iterator, const_iterator>
+    rect(const par::cell::Cell& __cell) const;
+
+    /**
+     * Get the top left iterator
+     *
+     * The top left iterator is the one pointing to the first element of the
+     * submatrix corresponding to the bins intersecting with the given
+     * @ref par::cell::Cell.
+     *
+     * @param[in]  __cell The given @ref par::cell::Cell
+     * @return The top left iterator
+     */
+
+    iterator top_left(const par::cell::Cell& __cell)
+    {
+      return
+        iterator(
+          m_grid.begin() + 1 + __cell.position.y(),
+          0,
+          static_cast<difference_type>(__cell.type->size.width),
+          __cell.position.x()
+        );
+    }
+
+    /**
+     * Get the top left iterator
+     *
+     * The top left iterator is the one pointing to the first element of the
+     * submatrix corresponding to the bins intersecting with the given
+     * @ref par::cell::Cell.
+     *
+     * @param[in]  __cell The given @ref par::cell::Cell
+     * @return The top left iterator
+     */
+
+    const_iterator top_left(const par::cell::Cell& __cell) const
+    {
+      return
+        const_iterator(
+          m_grid.cbegin() + 1 + __cell.position.y(),
+          0,
+          static_cast<difference_type>(__cell.type->size.width),
+          __cell.position.x()
+        );
+    }
+
+    /**
+     * Get the bottom right iterator
+     *
+     * The bottom right iterator is the one pointing to the past-the-last
+     * element of the submatrix corresponding to the bins intersecting with the
+     * given @ref par::cell::Cell.
+     *
+     * Thus, the returned iterator is, in fact, not the bottom right iterator
+     * but the one just after it.
+     *
+     * @param[in] __cell The bottom right iterator
+     * @return The bottom right iterator
+     */
+
+    iterator bottom_right(const par::cell::Cell& __cell)
+    {
+      return
+        iterator(
+          m_grid.begin() +
+            __cell.position.y() +
+            static_cast<difference_type>(__cell.type->size.height)
+            + 1,
+
+          0,
+          static_cast<difference_type>(__cell.type->size.width),
+          __cell.position.x()
+        );
+    }
+
+    /**
+     * Get the bottom right iterator
+     *
+     * The bottom right iterator is the one pointing to the past-the-last
+     * element of the submatrix corresponding to the bins intersecting with the
+     * given @ref par::cell::Cell.
+     *
+     * Thus, the returned iterator is, in fact, not the bottom right iterator
+     * but the one just after it.
+     *
+     * @param[in] __cell The bottom right iterator
+     * @return The bottom right iterator
+     */
+
+    const_iterator bottom_right(const par::cell::Cell& __cell) const
+    {
+      return
+        const_iterator(
+          m_grid.cbegin() +
+            __cell.position.y() +
+            static_cast<difference_type>(__cell.type->size.height)
+            + 1,
+
+          0,
+          static_cast<difference_type>(__cell.type->size.width),
+          __cell.position.x()
+        );
+    }
+  public:
+    /**
      * Insert a new @ref cell::Cell in the grid
      *
      * @param[in] __cell The @ref cell::Cell to insert
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> insert(cell::Cell& __cell) override;
+    std::pair<iterator, iterator> insert(cell::Cell& __cell);
 
     /**
      * Erase a @ref cell::Cell from the grid
@@ -195,125 +312,7 @@ namespace rlst::par
      * @return The _rectangle_ of this @ref cell::Cell
      */
 
-    std::pair<iterator, iterator> erase(cell::Cell& __cell) override;
-  };
-
-  /* acceptance */
-
-  /**
-   * The acceptance rate target
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class acceptance_rate_target
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(acceptance_rate_target);
-  public:
-    /**
-     * Constructs an acceptance rate target with its parameters
-     */
-
-    constexpr acceptance_rate_target(
-      real_t __alpha = 50._r,
-      iteration_t __max_iterations = 120_it
-    ) noexcept
-      : m_alpha(__alpha)
-      , m_max_iterations(__max_iterations)
-    {}
-
-  public:
-    /**
-     * The acceptance rate target
-     *
-     * @param[in] __i The current iteration
-     * @return The acceptance rate target
-     */
-
-    constexpr real_t operator()(iteration_t __i) const
-    {
-      return
-        m_alpha *
-
-        (
-          1 -
-          (static_cast<real_t>(__i) / static_cast<real_t>(m_max_iterations))
-        );
-    }
-  private:
-    real_t m_alpha;
-    iteration_t m_max_iterations;
-  };
-
-  /**
-   * Get the next acceptance scale
-   *
-   * Due to the wide variety of the circuits to be placed, a fixed temperature
-   * schedule does not always produce an appropriate value of the rate of
-   * acceptance of new configurations. It was observed that the ideal acceptance
-   * rate was 50% in the beginning (@f$ i = 0 @f$) and was reduced to zero at
-   * low temperatures (@f$i = i_{max}@f$). To achieve this acceptance
-   * rate profile, negative feedback control has been provided.
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class acceptance_scale
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(acceptance_scale);
-  public:
-    /**
-     * Constructs an acceptance scale with its parameters
-     *
-     * @param[in] __acceptance_rate_target The acceptance rate target
-     * @param[in] __beta The beta parameter
-     */
-
-    constexpr acceptance_scale(
-      acceptance_rate_target __acceptance_rate_target = {},
-      real_t __alpha = 40._r
-    ) noexcept
-      : m_acceptance_rate_target(std::move(__acceptance_rate_target))
-      , m_alpha(__alpha)
-    {}
-  public:
-    /**
-     * Get the next acceptance scale
-     *
-     * @param[in] __i The current iteration
-     * @param[in] __acceptance_rate The current acceptance rate
-     * @param[in] __acceptance_scale The current acceptance scale
-     *
-     * @return The new acceptance scale
-     */
-
-    constexpr real_t operator()(
-      iteration_t __i,
-      real_t __acceptance_rate,
-      real_t __acceptance_scale
-    ) const
-    {
-      return
-        __acceptance_scale *
-
-        (
-          1 +
-
-          (__acceptance_rate - m_acceptance_rate_target(__i)) /
-          m_alpha
-        );
-    }
-  private:
-    acceptance_rate_target m_acceptance_rate_target;
-    real_t m_alpha;
-  };
-
-  class scaled_cost
-  {
-    RLST_ENFORCE_RULE_OF_FIVE(scaled_cost);
-  public:
-    constexpr real_t operator()(real_t __acceptance_scale, real_t __cost) const
-      { return __acceptance_scale * __cost; }
+    std::pair<iterator, iterator> erase(cell::Cell& __cell);
   };
 
   /* temperature */
@@ -362,355 +361,7 @@ namespace rlst::par
     real_t m_alpha;
   };
 
-  /* overlap */
-
-  /**
-   * The overlap grid
-   *
-   * This data structure aims to provide an easy way to compute the overlap
-   * score.
-   */
-
-  class overlap_grid : public core::grid<std::int16_t, 8>
-  {
-  private:
-    using base_type = core::grid<std::int16_t, 8>;
-  public:
-    /// The default constructor
-    overlap_grid() = default;
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The overlap grid to copy from
-     */
-
-    overlap_grid(const overlap_grid& __other) = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The overlap grid to move from
-     */
-
-    overlap_grid(overlap_grid&& __other) = default;
-
-    /// The destructor
-    ~overlap_grid() = default;
-  public:
-    /**
-     * Constructs an overlap grid with its parameters
-     *
-     * @param[in] __width The width of the grid
-     * @param[in] __height The height of the grid
-     */
-
-    overlap_grid(size_type __width, size_type __height)
-      : base_type(__height, __width,  0)
-    {}
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __rhs The overlap grid to copy from
-     * @return A reference to the updated overlap grid
-     */
-
-    overlap_grid& operator=(const overlap_grid& __rhs) = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __rhs The overlap grid to move from
-     * @return A reference to the updated overlap grid
-     */
-
-    overlap_grid& operator=(overlap_grid&& __rhs) noexcept = default;
-  private:
-    template <bool is_inserting>
-    std::pair<iterator, iterator> insert(const cell::Cell& __cell);
-  public:
-    /**
-     * Insert a new @ref cell::Cell in the grid
-     *
-     * @param[in] The @ref cell::Cell to insert
-     * @return The _rectangle_ of this @ref cell::Cell
-     *
-     * @see rect()
-     */
-
-    std::pair<iterator, iterator> insert(cell::Cell& __cell) override
-      { return insert<true>(__cell); }
-
-    /**
-     * Erase a @ref cell::Cell from the grid
-     *
-     * @param[in] The @ref cell::Cell to erase
-     * @return The _rectangle_ of this @ref cell::Cell
-     *
-     * @see rect()
-     */
-
-    std::pair<iterator, iterator> erase(cell::Cell& __cell) override
-      { return insert<false>(__cell); }
-  public:
-    /**
-     * Get the overlap penalty
-     *
-     * @return The overlap penalty
-     * @see https://doi.org/10.1145/103724.103725
-     */
-
-    value_type penalty() const noexcept
-    {
-      return
-        std::reduce(
-          cbegin(),
-          cend(),
-          static_cast<value_type>(0),
-
-          [] (value_type __lhs, value_type __rhs)
-          {
-            return
-              std::abs(__lhs - bin_size) +
-              std::abs(__rhs - bin_size);
-          }
-        );
-    }
-  };
-
-  /**
-   * The overlap penalty target
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class overlap_penalty_target
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_target);
-  public:
-    /**
-     * Constructs an overlap penalty target with its parameters
-     */
-
-    constexpr overlap_penalty_target(
-      real_t __alpha = 1.4_r,
-      real_t __beta = 0.15_r,
-      real_t __desired_row_length = 0._r,
-      iteration_t __max_iterations = 120_it
-    ) noexcept
-      : m_alpha(__alpha)
-      , m_beta(__beta)
-      , m_desired_row_length(__desired_row_length)
-      , m_max_iterations(__max_iterations)
-    {}
-  public:
-    /**
-     * Get the next overlap penalty target
-     *
-     * @param[in] __i The current iteration
-     * @return The next overlap penalty target
-     */
-
-    constexpr real_t operator()(iteration_t __i) const
-    {
-      return
-        (
-          m_alpha -
-
-          m_beta * (
-            static_cast<real_t>(__i) /
-            static_cast<real_t>(m_max_iterations)
-          )
-        ) * m_desired_row_length;
-    }
-  private:
-    real_t m_alpha;
-    real_t m_beta;
-    real_t m_desired_row_length;
-    iteration_t m_max_iterations;
-  };
-
-  /**
-   * The overlap penalty weight
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class overlap_penalty_weight
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(overlap_penalty_weight);
-  public:
-    /**
-     * Constructs an overlap penalty weight with its parameters
-     *
-     * @param[in] __overlap_penalty_target The overlap penalty target
-     * @param[in] __desired_row_length The desired row length
-     */
-
-    constexpr overlap_penalty_weight(
-      real_t __desired_row_length = 0._r,
-      overlap_penalty_target __overlap_penalty_target = {}
-    ) noexcept
-      : m_desired_row_length(__desired_row_length)
-      , m_overlap_penalty_target(std::move(__overlap_penalty_target))
-    {}
-  public:
-    /**
-     * Gets the next overlap penalty weight
-     *
-     * @param[in] __overlap_penalty_weight The current overlap penalty weight
-     * @param[in] __i The current iteration
-     *
-     * @return The next overlap penalty weight
-     */
-
-    constexpr real_t operator()(
-      real_t __overlap_penalty_weight,
-      real_t __overlap_penalty,
-      iteration_t __i
-    ) const
-    {
-      return
-        std::max(
-          0._r,
-
-          __overlap_penalty_weight +
-
-          (__overlap_penalty - m_overlap_penalty_target(__i)) /
-          m_desired_row_length
-        );
-    }
-  private:
-    real_t m_desired_row_length;
-    overlap_penalty_target m_overlap_penalty_target;
-  };
-
-  /**
-   * The overlap penalty cost
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class overlap_penalty_cost
-  {
-    RLST_ENFORCE_RULE_OF_FIVE(overlap_penalty_cost);
-  public:
-    constexpr real_t operator()(
-      real_t __overlap_penalty_weight,
-      real_t __overlap_penalty
-    ) const
-      { return __overlap_penalty_weight * __overlap_penalty; }
-  };
-
   /* row length */
-
-  /**
-   * The row length control penalty target
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class row_length_penalty_target
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(row_length_penalty_target);
-  public:
-    /**
-     * Constructs a row length penalty target with its parameters
-     *
-     * @param[in] __alpha The alpha parameter
-     * @param[in] __beta The beta parameter
-     * @param[in] __desired_row_length The desired row length
-     * @param[in] __max_iterations The maximum number of iterations
-     */
-
-    constexpr row_length_penalty_target(
-      real_t __alpha = 5._r,
-      real_t __beta = 4._r,
-      real_t __desired_row_length = 0._r,
-      iteration_t __max_iterations = 120_it,
-      real_t __xi = 0._r
-    ) noexcept
-      : m_alpha(__alpha)
-      , m_beta(__beta)
-      , m_desired_row_length(__desired_row_length)
-      , m_max_iterations(__max_iterations)
-      , m_xi(__xi)
-    {}
-  public:
-    /**
-     * Get the next row length penalty target
-     *
-     * @param[in] __i The current iteration
-     * @return The next row length penalty target
-     */
-
-    constexpr real_t operator()(iteration_t __i) const
-    {
-      return
-        m_alpha -
-
-        m_beta * (
-          static_cast<real_t>(__i) / static_cast<real_t>(m_max_iterations)
-        ) * m_xi * m_desired_row_length;
-    }
-  private:
-    real_t m_alpha;
-    real_t m_beta;
-    real_t m_desired_row_length;
-    iteration_t m_max_iterations;
-    real_t m_xi;
-  };
-
-  /**
-   * The row length control weight
-   *
-   * @see https://doi.org/10.1145/103724.103725
-   */
-
-  class row_length_weight
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(row_length_weight);
-  public:
-    /**
-     * Constructs a row length weight with its parameters
-     *
-     * @param[in] __row_length_penalty_target The row length penalty target
-     */
-
-    constexpr row_length_weight(
-      row_length_penalty_target __row_length_penalty_target = {}
-    ) noexcept
-      : m_row_length_penalty_target(std::move(__row_length_penalty_target))
-    {}
-  public:
-    /**
-     * Get the next row length weight
-     *
-     * @param[in] __i The current iteration
-     * @param[in] __row_length_weight The current row length weight
-     * @param[in] __row_length_penalty The current row length penalty
-     *
-     * @return The next row length weight
-     */
-
-    constexpr real_t operator()(
-      iteration_t __i,
-      real_t __row_length_weight,
-      real_t __row_length_penalty
-    ) const
-    {
-      real_t rlp_target = m_row_length_penalty_target(__i);
-
-      return
-        std::max(
-          0._r,
-          __row_length_weight + (__row_length_penalty - rlp_target) / rlp_target
-        );
-    }
-  private:
-    row_length_penalty_target m_row_length_penalty_target;
-  };
 
   /**
    * The row length cost
@@ -755,8 +406,6 @@ namespace rlst::par
   template <class InputIt>
   real_t row_length_penalty(InputIt __begin, InputIt __end);
 
-  /* wire length */
-
   /**
    * Compute the wire length cost of nets
    *
@@ -768,13 +417,13 @@ namespace rlst::par
    * @return The wire length cost of the nets
    */
 
-  template <class InputIt>
-  constexpr real_t wire_length_cost(InputIt __begin, InputIt __end)
+  template <class InputIt0, class InputIt1>
+  constexpr real_t wire_length_cost(InputIt0&& __begin, InputIt1&& __end)
   {
     return
       std::reduce(
-        std::move(__begin),
-        std::move(__end),
+        std::forward<InputIt0>(__begin),
+        std::forward<InputIt1>(__end),
         0._r,
 
         core::transformed_binop(
@@ -797,176 +446,40 @@ namespace rlst::par
       );
   }
 
-  /* evolutor */
-
-  class evolutor
-  {
-    friend bool operator==(const evolutor&, const evolutor&);
-    friend void swap(evolutor&, evolutor&);
-  public:
-    /// The size type
-    using size_type =
-      std::common_type_t<
-        placement_grid::size_type,
-        overlap_grid::size_type
-      >;
-  public:
-    /// The default constructor
-    evolutor() = default;
-
-    /**
-     * Copy constructor
-     *
-     * @param[in] __other The evolutor to copy from
-     */
-
-    evolutor(const evolutor& __other) = default;
-
-    /**
-     * Move constructor
-     *
-     * @param[in, out] __other The evolutor to move from
-     */
-
-    evolutor(evolutor&& __other) = default;
-
-    /// The destructor
-    ~evolutor() = default;
-  public:
-    /**
-     * Copy assignment operator
-     *
-     * @param[in] __rhs The evolutor to copy from
-     * @return A reference to the updated evolutor
-     */
-
-    evolutor& operator=(const evolutor& __rhs) = default;
-
-    /**
-     * Move assignment operator
-     *
-     * @param[in, out] __rhs The evolutor to move from
-     * @return A reference to the updated evolutor
-     */
-
-    evolutor& operator=(evolutor&& __rhs) = default;
-  public:
-    /**
-     * Constructs an evolutor with its parameters
-     *
-     * @param[in] __width The width of the grid
-     * @param[in] __height The height of the grid
-     */
-
-    evolutor(size_type __width, size_type __height)
-      : m_cells()
-      , m_overlap_grid(__width, __height)
-      , m_placement_grid(__width, __height)
-    {}
-  public:
-    overlap_grid::value_type overlap_penalty() const noexcept
-      { return m_overlap_grid.penalty(); }
-
-    size_type width() const
-      { return m_placement_grid.column_number(); }
-  public:
-    /**
-     * Generate a random configuration
-     *
-     * A cell is selected randomly, and a random location is selected as the
-     * destination. If the destination is vacant, a displacement is performed;
-     * otherwise an interchange is performed. A range-limiting function is used,
-     * which restricts the motion of a cell to its neighborhood.
-     */
-
-    std::variant<
-      std::pair<std::reference_wrapper<cell::Cell>, Point>,
-
-      std::pair<
-        std::reference_wrapper<cell::Cell>,
-        std::reference_wrapper<cell::Cell>
-      >
-    >
-    evolute();
-
-    /**
-     * Insert a new @ref cell::Cell in the grids
-     *
-     * @param[in] __cell The @ref cell::Cell to insert
-     */
-
-    void insert(cell::Cell& __cell);
-
-    void replace(cell::Cell& __lhs, cell::Cell& __rhs);
-    void replace(cell::Cell& __lhs, const Point& __rhs);
-  private:
-    std::vector<std::reference_wrapper<cell::Cell>> m_cells;
-    overlap_grid m_overlap_grid;
-    placement_grid m_placement_grid;
-  };
-
-  /**
-   * Equality operator for @ref evolutor
-   *
-   * Compares two @ref evolutor objects for equality. Two @ref evolutor objects
-   * are considered equal if their internal states, including the cells, overlap
-   * grid, and placement grid, are identical.
-   *
-   * @param[in] __lhs The left-hand side @ref evolutor
-   * @param[in] __rhs The right-hand side @ref evolutor
-   *
-   * @return `true` if the two @ref evolutor objects are equal, `false` otherwise
-   */
-
-  inline bool operator==(const evolutor& __lhs, const evolutor& __rhs)
-  {
-    return
-      (__lhs.m_cells == __rhs.m_cells) &&
-      (__lhs.m_overlap_grid == __rhs.m_overlap_grid) &&
-      (__lhs.m_placement_grid == __rhs.m_placement_grid);
-  }
-
-  /**
-   * Inequality operator for @ref evolutor
-   *
-   * Compares two @ref evolutor objects for inequality. Two @ref evolutor
-   * objects are considered unequal if their internal states, including the
-   * cells, overlap grid, and placement grid, are not identical.
-   *
-   * @param[in] __lhs The left-hand side @ref evolutor
-   * @param[in] __rhs The right-hand side @ref evolutor
-   *
-   * @return `true` if the two @ref evolutor objects are unequal, `false`
-   * otherwise
-   */
-
-  inline bool operator!=(const evolutor& __lhs, const evolutor& __rhs)
-    { return !(__lhs == __rhs); }
-
-  /**
-   * Swap two @ref evolutor objects
-   *
-   * Swaps the internal states of two @ref evolutor objects, including their
-   * cells, overlap grid, and placement grid.
-   *
-   * @param[in, out] __lhs The left-hand side @ref evolutor
-   * @param[in, out] __rhs The right-hand side @ref evolutor
-   */
-
-  void swap(evolutor& __lhs, evolutor& __rhs);
-
   /**
    * Get a random neighbor of a @ref cell::Cell
    *
    * @param[in] __cell The @ref cell::Cell to get the neighbor from
+   * @param[in] __frame The frame that should contain the @ref cell::Cell
+   *
    * @return A random neighbor of the @ref cell::Cell
    */
 
-  Point random_neighbor(
-    const cell::Cell& __cell,
-    uliteral_t __width,
-    uliteral_t __height
-  );
+  inline Point random_neighbor(const cell::Cell& __cell, const Size& __frame)
+  {
+    return
+      Point(
+        std::min(
+          core::randint(
+            0_l,
+            static_cast<literal_t>(__frame.width - __cell.type->size.width)
+          ),
+
+          static_cast<literal_t>(__cell.type->size.width) / 10_l
+        ),
+
+        std::min(
+          core::randint(
+            0_l,
+            static_cast<literal_t>(__frame.height - __cell.type->size.height)
+          ),
+
+          static_cast<literal_t>(__cell.type->size.height) / 10_l
+        ),
+
+        0_l
+      );
+  }
 }
 
 #include "placement.ipp"

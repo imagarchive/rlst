@@ -157,9 +157,6 @@ namespace rlst::core
 
       constexpr column_iterator_type column_end() const
         { return m_row_iterator->begin() + m_row_size + m_offset; }
-    public:
-      constexpr difference_type x() const
-        { return m_offset + column_index(); }
     private:
       column_iterator_type m_column_iterator;
       row_iterator_type m_row_iterator;
@@ -240,23 +237,14 @@ namespace rlst::core
    * A grid
    */
 
-  template <typename T, std::uint8_t bs>
+  template <typename T>
   class grid
   {
-    template <typename U, std::uint8_t b>
-    friend bool operator==(
-      const grid<U, b>&,
-      const grid<U, b>&
-    );
-
-    template <typename U, std::uint8_t b>
-    friend void swap(grid<U, b>&, grid<U, b>&) noexcept;
+    template <typename U>
+    friend void swap(grid<U>&, grid<U>&) noexcept;
   public:
     /// The type of the data stored in the grid
     using value_type = T;
-
-    /// The size of the bins
-    static constexpr std::uint8_t bin_size = bs;
   private:
     using line_type = std::vector<value_type>;
     using grid_type = std::vector<line_type>;
@@ -336,8 +324,8 @@ namespace rlst::core
       T __default = {}
     )
       : m_grid(
-        __height / bin_size + 2,
-        line_type(__width / bin_size, std::move(__default))
+        __height + 2,
+        line_type(__width, std::move(__default))
       )
     {}
   public:
@@ -366,7 +354,7 @@ namespace rlst::core
      */
 
     iterator begin()
-      { return iterator(m_grid.begin() + 1, 0, m_grid.front().size()); }
+      { return iterator(m_grid.begin() + 1, 0, width()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -375,7 +363,7 @@ namespace rlst::core
      */
 
     const_iterator begin() const
-      { return const_iterator(m_grid.begin() + 1, 0, m_grid.front().size()); }
+      { return const_iterator(m_grid.cbegin() + 1, 0, width()); }
 
     /**
      * Get a constant iterator to the beginning of the grid
@@ -393,14 +381,7 @@ namespace rlst::core
      */
 
     iterator end()
-    {
-      return
-        iterator(
-          m_grid.begin() + 1 + row_number(),
-          0,
-          m_grid.front().size()
-        );
-    }
+      { return iterator(m_grid.begin() + 1 + height(), 0, width()); }
 
     /**
      * Get a constant iterator to the ending of the grid
@@ -409,14 +390,7 @@ namespace rlst::core
      */
 
     const_iterator end() const
-    {
-      return
-        const_iterator(
-          m_grid.begin() + 1 + row_number(),
-          0,
-          m_grid.front().size()
-        );
-    }
+      { return const_iterator(m_grid.cbegin() + 1 + height(), 0, width()); }
 
     /**
      * Get a constant iterator to the ending of the grid
@@ -443,7 +417,7 @@ namespace rlst::core
      */
 
     const_reverse_iterator rbegin() const
-      { return const_reverse_iterator(end()); }
+      { return const_reverse_iterator(cend()); }
 
     /**
      * Get a constant reverse iterator to the ending of the grid
@@ -470,7 +444,7 @@ namespace rlst::core
      */
 
     const_reverse_iterator rend() const
-      { return const_reverse_iterator(begin()); }
+      { return const_reverse_iterator(cbegin()); }
 
     /**
      * Get a constant reverse iterator to the beginning of the grid
@@ -487,7 +461,7 @@ namespace rlst::core
      * @return The number of column in the grid
      */
 
-    size_type column_number() const
+    size_type width() const noexcept
       { return m_grid.front().size(); }
 
     /**
@@ -496,7 +470,7 @@ namespace rlst::core
      * @return The number of row in the grid
      */
 
-    size_type row_number() const noexcept
+    size_type height() const noexcept
       { return m_grid.size() - 2; }
 
     /**
@@ -506,7 +480,7 @@ namespace rlst::core
      */
 
     size_type size() const
-      { return row_number() * column_number(); }
+      { return width() * height(); }
 
     /**
      * Get the maximum size of the container
@@ -538,215 +512,7 @@ namespace rlst::core
 
     void swap(grid& __rhs) noexcept
       { return swap(*this, __rhs); }
-  public:
-    /**
-     * Get the top left and bottom right iterator
-     *
-     * @param[in] __cell The given @ref par::cell::Cell
-     * @return The top left and bottom right iterator
-     */
-
-    std::pair<iterator, iterator> rect(const par::cell::Cell& __cell);
-
-    /**
-     * Get the top left and bottom right iterator
-     *
-     * @param[in] __cell The given @ref par::cell::Cell
-     * @return The top left and bottom right iterator
-     */
-
-    std::pair<const_iterator, const_iterator>
-    rect(const par::cell::Cell& __cell) const;
-
-    /**
-     * Get the number of bins that intersect with the given @ref par::cell::Cell
-     * on the x axis
-     *
-     * @param[in] __cell The given @ref par::cell::Cell
-     *
-     * @return The number of bins that intersect with the given
-     * @ref par::cell::Cell on the x axis
-     */
-
-    std::size_t width_of(const par::cell::Cell& __cell) const
-    {
-      return
-        ceil_divide(__cell.position.x() + __cell.type->size.width, bin_size) -
-        __cell.position.x() / bin_size;
-    }
-
-    /**
-     * Get the number of bins that intersect with the given
-     * @ref par::cell::Cell on the y axis
-     *
-     * @param[in] __cell The given @ref par::cell::Cell
-     *
-     * @return The number of bins that intersect with the given
-     * @ref par::cell::Cell on the y axis
-     */
-
-    std::size_t height_of(const par::cell::Cell& __cell) const
-    {
-      return
-        ceil_divide(__cell.position.y() + __cell.type->size.height, bin_size) -
-        __cell.position.y() / bin_size;
-    }
-
-    /**
-     * Get the top left iterator
-     *
-     * The top left iterator is the one pointing to the first element of the
-     * submatrix corresponding to the bins intersecting with the given
-     * @ref par::cell::Cell.
-     *
-     * @param[in]  __cell The given @ref par::cell::Cell
-     * @return The top left iterator
-     */
-
-    iterator top_left(const par::cell::Cell& __cell)
-    {
-      return
-        iterator(
-          m_grid.begin() + 1 + __cell.position.y() / bin_size,
-          0,
-          static_cast<difference_type>(width_of(__cell)),
-          __cell.position.x() / bin_size
-        );
-    }
-
-    /**
-     * Get the top left iterator
-     *
-     * The top left iterator is the one pointing to the first element of the
-     * submatrix corresponding to the bins intersecting with the given
-     * @ref par::cell::Cell.
-     *
-     * @param[in]  __cell The given @ref par::cell::Cell
-     * @return The top left iterator
-     */
-
-    const_iterator top_left(const par::cell::Cell& __cell) const
-      { return top_left(__cell); }
-
-    /**
-     * Get the bottom right iterator
-     *
-     * The bottom right iterator is the one pointing to the past-the-last
-     * element of the submatrix corresponding to the bins intersecting with the
-     * given @ref par::cell::Cell.
-     *
-     * Thus, the returned iterator is, in fact, not the bottom right iterator
-     * but the one just after it.
-     *
-     * @param[in] __cell The bottom right iterator
-     * @return The bottom right iterator
-     */
-
-    iterator bottom_right(const par::cell::Cell& __cell)
-    {
-      return
-        iterator(
-          m_grid.begin() +
-            (__cell.position.y() / bin_size) +
-            height_of(__cell)
-            + 1,
-
-          0,
-          static_cast<difference_type>(width_of(__cell)),
-          __cell.position.x() / bin_size
-        );
-    }
-
-    /**
-     * Get the bottom right iterator
-     *
-     * The bottom right iterator is the one pointing to the past-the-last
-     * element of the submatrix corresponding to the bins intersecting with the
-     * given @ref par::cell::Cell.
-     *
-     * Thus, the returned iterator is, in fact, not the bottom right iterator
-     * but the one just after it.
-     *
-     * @param[in] __cell The bottom right iterator
-     * @return The bottom right iterator
-     */
-
-    const_iterator bottom_right(const par::cell::Cell& __cell) const
-      { return bottom_right(__cell); }
-  public:
-    /**
-     * Insert a new @ref cell::Cell in the grid
-     *
-     * @param[in] The @ref cell::Cell to insert
-     * @return The _rectangle_ of this @ref cell::Cell
-     *
-     * @see rect()
-     */
-
-    virtual std::pair<iterator, iterator> insert(par::cell::Cell& __cell)
-      { return {}; }
-
-    /**
-     * Insert new @ref cell::Cell "cells" in the grid
-     *
-     * @tparam InputIt The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void insert(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const par::cell::Cell& __cell) { insert(__cell); }
-      );
-    }
-
-    /**
-     * Erase a @ref cell::Cell from the grid
-     *
-     * @param[in] The @ref cell::Cell to erase
-     * @return The _rectangle_ of this @ref cell::Cell
-     *
-     * @see rect()
-     */
-
-    virtual std::pair<iterator, iterator> erase(par::cell::Cell& __cell)
-      { return {}; }
-
-    /**
-     * Erase @ref cell::Cell "cells" from the grid
-     *
-     * @tparam The type of the iterator
-     *
-     * @param[in] __begin The begin iterator
-     * @param[in] __end The past-the-last iterator
-     */
-
-    template <class InputIt>
-    void erase(InputIt __begin, InputIt __end)
-    {
-      std::for_each(
-        std::move(__begin),
-        std::move(__end),
-        [&] (const par::cell::Cell& __cell) { erase(__cell); }
-      );
-    }
-
-    /**
-     * Replace a @ref cell::Cell by another in the grid
-     *
-     * @note Positions of these cells are swapped
-     *
-     * @param[in] __lhs The left-hand side @ref cell::Cell
-     * @param[in] __rhs The right-hand side @ref cell::Cell
-     */
-
-    void replace(const par::cell::Cell& __lhs, const par::cell::Cell& __rhs);
-  private:
+  protected:
     grid_type m_grid;
   };
 
@@ -766,11 +532,12 @@ namespace rlst::core
    * otherwise
    */
 
-  template <typename U, std::uint8_t b>
-  bool operator==(const grid<U, b>& __lhs, const grid<U, b>& __rhs)
+  template <typename U>
+  bool operator==(const grid<U>& __lhs, const grid<U>& __rhs)
   {
     return
-      (__lhs.size() == __rhs.size()) &&
+      (__lhs.width() == __rhs.width()) &&
+      (__lhs.height() == __rhs.height()) &&
       std::equal(__lhs.cbegin(), __lhs.cend(), __rhs.cbegin());
   }
 
@@ -790,8 +557,8 @@ namespace rlst::core
    * otherwise
    */
 
-  template <typename U, std::uint8_t b>
-  bool operator!=(const grid<U, b>& __lhs, const grid<U, b>& __rhs)
+  template <typename U>
+  bool operator!=(const grid<U>& __lhs, const grid<U>& __rhs)
     { return !(__lhs == __rhs); }
 
   /**
@@ -808,8 +575,8 @@ namespace rlst::core
    * @param[in, out] __rhs The second @ref grid object
    */
 
-  template <typename U, std::uint8_t b>
-  void swap(grid<U, b>& __lhs, grid<U, b>& __rhs) noexcept;
+  template <typename U>
+  void swap(grid<U>& __lhs, grid<U>& __rhs) noexcept;
 }
 
 #include "grid.ipp"

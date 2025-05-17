@@ -19,12 +19,8 @@
 #include "core/grid.hpp"
 #include <gtest/gtest.h>
 
-#include "test.hpp"
-
 using namespace rlst::core;
-using namespace rlst::test;
 
-using rlst::par::cell::Cell;
 using rlst::par::literal_t;
 using rlst::par::uliteral_t;
 
@@ -372,7 +368,7 @@ protected:
     : g(20, 20, 1)
   {}
 protected:
-  grid<int, 8> g;
+  grid<int> g;
 };
 
 TEST_F(grid__iterator__test, select_forward)
@@ -391,187 +387,17 @@ TEST_F(grid__iterator__test, select_backward)
 
 TEST_F(grid__iterator__test, distance)
 {
-  ASSERT_EQ(g.end() - g.begin(), 4);
+  ASSERT_EQ(g.end() - g.begin(), 400);
 }
 
 TEST(grid__size__test, basic)
 {
-  grid<int, 8> grid(20, 20);
-  ASSERT_EQ(grid.size(), 4);
+  grid<int> grid(20, 20);
+  ASSERT_EQ(grid.size(), 400);
 }
 
 TEST(grid__size__test, empty)
 {
-  grid<int, 8> grid;
+  grid<int> grid;
   EXPECT_DEATH({ grid.size(); }, "");
 }
-
-class grid__cell__test : public testing::Test
-{
-protected:
-  using grid_type = grid<int, 8>;
-  using difference_type = grid_type::difference_type;
-protected:
-  grid__cell__test()
-    : g(grid_type::bin_size * 20, grid_type::bin_size * 20)
-  {
-    auto it = g.begin();
-
-    for (int i = 0; i != static_cast<int>(g.size()); ++i) {
-      *it = i;
-      ++it;
-    }
-  }
-protected:
-  grid_type g;
-};
-
-TEST_F(grid__cell__test, in_bin)
-{
-  Cell c = cell_from_geometry_params(1, 1, 4, 4);
-  auto rect = g.rect(c);
-
-  ASSERT_EQ(g.width_of(c), 1);
-  ASSERT_EQ(g.height_of(c), 1);
-  ASSERT_EQ(rect.second - rect.first, 1);
-
-  ASSERT_EQ(rect.first[0], g.begin()[0]);
-}
-
-TEST_F(grid__cell__test, fit_one_bin)
-{
-  Cell c = cell_from_geometry_params(0, 0, 8, 8);
-  auto rect = g.rect(c);
-
-  ASSERT_EQ(g.width_of(c), 1);
-  ASSERT_EQ(g.height_of(c), 1);
-  ASSERT_EQ(rect.second - rect.first, 1);
-
-  ASSERT_EQ(rect.first[0], g.begin()[0]);
-}
-
-TEST_F(grid__cell__test, fit_two_bin)
-{
-  Cell c = cell_from_geometry_params(0, 0, 16, 8);
-  auto rect = g.rect(c);
-
-  ASSERT_EQ(g.width_of(c), 2);
-  ASSERT_EQ(g.height_of(c), 1);
-  ASSERT_EQ(rect.second - rect.first, 2);
-
-  ASSERT_EQ(rect.first[0], g.begin()[0]);
-  ASSERT_EQ(rect.first[1], g.begin()[1]);
-}
-
-TEST_F(grid__cell__test, small_accross_two_bin)
-{
-  Cell c = cell_from_geometry_params(6, 1, 3, 4);
-  auto rect = g.rect(c);
-
-  ASSERT_EQ(g.width_of(c), 2);
-  ASSERT_EQ(g.height_of(c), 1);
-  ASSERT_EQ(rect.second - rect.first, 2);
-
-  ASSERT_EQ(rect.first[0], g.begin()[0]);
-  ASSERT_EQ(rect.first[1], g.begin()[1]);
-}
-
-
-TEST_F(grid__cell__test, big_accross_two_bin)
-{
-  Cell c = cell_from_geometry_params(6, 1, 5, 4);
-  auto rect = g.rect(c);
-
-  ASSERT_EQ(g.width_of(c), 2);
-  ASSERT_EQ(g.height_of(c), 1);
-  ASSERT_EQ(rect.second - rect.first, 2);
-
-  ASSERT_EQ(rect.first[0], g.begin()[0]);
-  ASSERT_EQ(rect.first[1], g.begin()[1]);
-}
-
-class grid__cell_select__test
-  : public grid__cell__test
-  , public testing::WithParamInterface<std::tuple<int, int>>
-{};
-
-TEST_P(grid__cell_select__test, forward)
-{
-  auto width = static_cast<uliteral_t>(std::get<0>(GetParam()));
-  auto height = static_cast<uliteral_t>(std::get<1>(GetParam()));
-
-  Cell c = cell_from_geometry_params(0, 0, 8 * width, 8 * height);
-
-  auto cell_it = g.top_left(c);
-  auto grid_it = g.begin();
-
-  for (uliteral_t i = 0; i != height; ++i) {
-    for (uliteral_t j = 0; j != width; ++j) {
-      ASSERT_EQ(*cell_it, *grid_it);
-
-      ++grid_it;
-      ++cell_it;
-    }
-
-    grid_it += static_cast<difference_type>(g.column_number() - width);
-  }
-}
-
-TEST_P(grid__cell_select__test, backward)
-{
-  auto width = static_cast<uliteral_t>(std::get<0>(GetParam()));
-  auto height = static_cast<uliteral_t>(std::get<1>(GetParam()));
-
-  Cell c = cell_from_geometry_params(0, 0, 8 * width, 8 * height);
-
-  auto cell_it = g.bottom_right(c) - 1;
-
-  auto grid_it =
-    g.begin() +
-
-    static_cast<difference_type>(
-      (width - 1) +
-      (height - 1) * g.column_number()
-    );
-
-  for (uliteral_t i = 0; i != height; ++i) {
-    for (uliteral_t j = 0; j != width; ++j) {
-      ASSERT_EQ(*cell_it, *grid_it);
-
-      --grid_it;
-      --cell_it;
-    }
-
-    grid_it -= static_cast<difference_type>(g.column_number() - width);
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(
-  same_row,
-  grid__cell_select__test,
-
-  testing::Combine(
-    testing::Range(1, 8),
-    testing::Values(1)
-  )
-);
-
-INSTANTIATE_TEST_SUITE_P(
-  same_column,
-  grid__cell_select__test,
-
-  testing::Combine(
-    testing::Values(1),
-    testing::Range(1, 8)
-  )
-);
-
-INSTANTIATE_TEST_SUITE_P(
-  many_rows_and_columns,
-  grid__cell_select__test,
-
-  testing::Combine(
-    testing::Range(2, 8),
-    testing::Range(2, 8)
-  )
-);

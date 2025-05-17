@@ -18,23 +18,6 @@
 
 namespace rlst::par
 {
-  namespace details
-  {
-    template <bool is_accepted>
-    real_t update_rho(real_t __rho, iteration_t __n)
-    {
-      __rho *= __n;
-
-      if constexpr (is_accepted) {
-        ++__rho;
-      }
-
-      __rho /= __n + 1;
-
-      return __rho;
-    }
-  }
-
   template <class InputIt, class OutputIt>
   void place(
     OutputIt __begin_cell,
@@ -63,35 +46,6 @@ namespace rlst::par
       tl.x() += i->type->size.width;
       max_height = std::max(max_height, i->type->size.height);
     }
-  }
-
-  template <bool is_inserting>
-  std::pair<overlap_grid::iterator, overlap_grid::iterator>
-  overlap_grid::insert(const cell::Cell& __cell)
-  {
-    auto ret = rect(__cell);
-
-    for (auto i = ret.first; i != ret.second; ++i) {
-      value_type v =
-        static_cast<value_type>(
-          std::min(
-            __cell.position.x() +
-              static_cast<literal_t>(__cell.type->size.width),
-
-            (i.x() + 1) * bin_size
-          ) -
-
-          std::max(__cell.position.x(), i.x() * bin_size)
-        );
-
-      if constexpr (is_inserting) {
-        *i += v;
-      } else {
-        *i -= v;
-      }
-    }
-
-    return ret;
   }
 
   template <class InputIt>
@@ -148,7 +102,4 @@ namespace rlst::par
       )
     ) / static_cast<real_t>(row_to_min_max.size());
   }
-
-  /* evolutor */
-
 }
