@@ -216,11 +216,11 @@ TEST(row_length_penalty__basics__test, several_lines)
   ASSERT_DOUBLE_EQ(penalty, 11._r);
 }
 
-TEST(wire_length_cost__basics__test, same_row)
+TEST(wire_length_penalty__basics__test, same_row)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
-  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
+  std::vector<std::pair<PlacedPort, PlacedPort>> net = {
     std::make_pair(
       PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
       PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::input } }
@@ -228,16 +228,16 @@ TEST(wire_length_cost__basics__test, same_row)
   };
 
   ASSERT_EQ(
-    wire_length_cost(nets.cbegin(), nets.cend()),
+    wire_length_penalty(net.cbegin(), net.cend()),
     10._r
   );
 }
 
-TEST(wire_length_cost__basics__test, same_column)
+TEST(wire_length_penalty__basics__test, same_column)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
-  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
+  std::vector<std::pair<PlacedPort, PlacedPort>> net = {
     std::make_pair(
       PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
       PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
@@ -245,16 +245,16 @@ TEST(wire_length_cost__basics__test, same_column)
   };
 
   ASSERT_EQ(
-    wire_length_cost(nets.cbegin(), nets.cend()),
+    wire_length_penalty(net.cbegin(), net.cend()),
     10._r
   );
 }
 
-TEST(wire_length_cost__basics__test, random)
+TEST(wire_length_penalty__basics__test, random)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
-  std::vector<std::pair<PlacedPort, PlacedPort>> nets = {
+  std::vector<std::pair<PlacedPort, PlacedPort>> net = {
     std::make_pair(
       PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::output } },
       PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
@@ -262,7 +262,7 @@ TEST(wire_length_cost__basics__test, random)
   };
 
   ASSERT_EQ(
-    wire_length_cost(nets.cbegin(), nets.cend()),
+    wire_length_penalty(net.cbegin(), net.cend()),
     20._r
   );
 }

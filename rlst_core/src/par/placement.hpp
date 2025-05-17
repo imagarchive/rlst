@@ -407,18 +407,28 @@ namespace rlst::par
   real_t row_length_penalty(InputIt __begin, InputIt __end);
 
   /**
-   * Compute the wire length cost of nets
+   * Compute the wire length penalty of net
    *
-   * @tparam InputIt The iterator type
+   * @tparam InputIt0 The iterator type (enable perfect forwarding)
+   * @tparam InputIt1 The iterator type (enable perfect forwarding)
    *
-   * @param[in] __begin The begin iterator of the nets
-   * @param[in] __end The end iterator of the nets
+   * @param[in] __begin The begin iterator of the net
+   * @param[in] __end The end iterator of the net
    *
-   * @return The wire length cost of the nets
+   * @return The wire length penalty of the given net
    */
 
-  template <class InputIt0, class InputIt1>
-  constexpr real_t wire_length_cost(InputIt0&& __begin, InputIt1&& __end)
+  template <
+    class InputIt0,
+    class InputIt1,
+
+    std::enable_if_t<
+      std::is_same_v<
+        std::decay_t<InputIt0>,
+        std::decay_t<InputIt1>>
+    >* = nullptr
+  >
+  constexpr real_t wire_length_penalty(InputIt0&& __begin, InputIt1&& __end)
   {
     return
       std::reduce(
@@ -444,6 +454,24 @@ namespace rlst::par
           }
         )
       );
+  }
+
+  /**
+   * Compute the wire length cost from the given wire length penalty
+   *
+   * @param[in] __penalty The wire length penalty
+   * @return The wire length cost
+   *
+   * @see wire_length_penalty()
+   */
+
+  inline real_t wire_length_cost(real_t __penalty)
+  {
+    return
+      (100._r / M_PI) *
+      std::copysign(1._r, __penalty) *
+      std::atan(std::log(std::abs(__penalty) + 1._r)) +
+      50._r;
   }
 
   /**
