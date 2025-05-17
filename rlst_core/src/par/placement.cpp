@@ -116,4 +116,64 @@ namespace rlst::par
 
     return ret;
   }
+
+  evolve_reverter placement_grid::evolve()
+  {
+    using std::swap;
+
+    Size frame {
+      static_cast<uliteral_t>(width()),
+      static_cast<uliteral_t>(height())
+    };
+
+    cell::Cell& from = m_cells.front();
+    Point to = from.position();
+
+    while (from.position() == to) {
+      from = *core::choice(m_cells.begin(), m_cells.end());
+      to = random_neighbor(from, frame);
+    }
+
+    erase(from);
+    swap(from.position(), to);
+
+    auto [dest_begin, dest_end] = rect(from);
+
+    value_type::iterator to_swap;
+    bool is_found = false;
+
+    for (auto i = dest_begin; (i != dest_end) && !is_found; ++i) {
+      to_swap =
+        std::find_if(
+          i->begin(),
+          i->end(),
+
+          [&] (const cell::Cell& __c) {
+            return (&__c != &from) && __c.can_be_moved_to(to, frame);
+          }
+        );
+
+      is_found = to_swap != i->end();
+    }
+
+    if (is_found) {
+      insert(from);
+      return evolve_reverter(*this, std::make_pair(std::ref(from), to));
+    } else {
+      cell::Cell& t = *to_swap;
+
+      erase(t);
+
+      t.position() = to;
+
+      insert(t);
+      insert(from);
+
+      return
+        evolve_reverter(
+          *this,
+          std::make_pair(std::ref(from), std::ref(t))
+        );
+    }
+  }
 }

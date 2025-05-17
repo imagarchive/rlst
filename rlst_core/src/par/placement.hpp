@@ -177,19 +177,9 @@ namespace rlst::par
 
     ~evolve_reverter() = default; ///< The destructor
   private:
-    template <
-      class U,
-
-      std::enable_if_t<
-        std::disjunction_v<
-          std::is_same<std::decay_t<U>, first_diff_type>,
-          std::is_same<std::decay_t<U>, second_diff_type>
-        >
-      >* = nullptr
-    >
-    explicit evolve_reverter(placement_grid& __placement_grid, U&& __diff)
+    explicit evolve_reverter(placement_grid& __placement_grid, diff_type __diff)
       : m_placement_grid(__placement_grid)
-      , m_diff(std::forward<U>(__diff))
+      , m_diff(std::move(__diff))
     {}
   public:
     /**
@@ -447,6 +437,14 @@ namespace rlst::par
      */
 
     std::pair<iterator, iterator> erase(cell::Cell& __cell);
+  public:
+    /**
+     * Evolve the current configuration
+     *
+     * @return A @ref evolve_reverter associated with the current change
+     */
+
+    evolve_reverter evolve();
   public:
     /**
      * Compute the overlap penalty
