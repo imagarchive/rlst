@@ -383,6 +383,37 @@ namespace rlst::par
 
     real_t overlap_cost() const
       { return 100._r * overlap_penalty(); }
+
+    /**
+     * Compute the emptiness penalty
+     *
+     * @return The emptiness penalty
+     */
+
+    real_t emptiness_penalty() const
+    {
+      return
+        std::reduce(
+          cbegin(),
+          cend(),
+          0._r,
+
+          core::transformed_binop(
+            [] (const value_type& __set) {
+              return static_cast<real_t>(__set.empty());
+            }
+          )
+        ) / size();
+    }
+
+    /**
+     * Compute the emptiness cost
+     *
+     * @return The emptiness cost
+     */
+
+    real_t emptiness_cost() const
+      { return 100._r * emptiness_penalty(); }
   };
 
   /* temperature */
