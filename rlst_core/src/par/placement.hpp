@@ -152,7 +152,7 @@ namespace rlst::par
    * A helper allowing to revert a change in a @ref placement_grid
    */
 
-  class evolute_reverter
+  class evolve_reverter
   {
     friend class placement_grid;
   private:
@@ -170,12 +170,12 @@ namespace rlst::par
     /**
      * The copy constructor
      *
-     * @param[in] __other The other @ref evolute_reverter to copy
+     * @param[in] __other The other @ref evolve_reverter to copy
      */
 
-    evolute_reverter(const evolute_reverter& __other) noexcept = default;
+    evolve_reverter(const evolve_reverter& __other) noexcept = default;
 
-    ~evolute_reverter() = default; ///< The destructor
+    ~evolve_reverter() = default; ///< The destructor
   private:
     template <
       class U,
@@ -187,7 +187,7 @@ namespace rlst::par
         >
       >* = nullptr
     >
-    explicit evolute_reverter(placement_grid& __placement_grid, U&& __diff)
+    explicit evolve_reverter(placement_grid& __placement_grid, U&& __diff)
       : m_placement_grid(__placement_grid)
       , m_diff(std::forward<U>(__diff))
     {}
@@ -196,10 +196,10 @@ namespace rlst::par
      * The copy assignment operator
      *
      * @param[in] __rhs The right-hand side operand
-     * @return The assigned @ref evolute_reverter
+     * @return The assigned @ref evolve_reverter
      */
 
-    evolute_reverter& operator=(const evolute_reverter& __rhs) = default;
+    evolve_reverter& operator=(const evolve_reverter& __rhs) = default;
   public:
     /**
      * Revert the previous change

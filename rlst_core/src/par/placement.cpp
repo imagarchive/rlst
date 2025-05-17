@@ -32,7 +32,7 @@ namespace rlst::par
 
   /* placement_grid */
 
-  void evolute_reverter::revert()
+  void evolve_reverter::revert()
   {
     std::visit(
       core::lambda_wrapper {
