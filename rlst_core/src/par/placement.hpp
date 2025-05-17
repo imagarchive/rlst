@@ -351,35 +351,14 @@ namespace rlst::par
    * It gives the next temperature as a function of the number of iterations or
    * the previous temperature.
    *
+   * @param[in] __t The current temperature
+   * @return The next temperature value
+   *
    * @see https://doi.org/10.1145/103724.103725
    */
 
-  class temperature_schedule
-  {
-    RLST_ENFORCE_RULE_OF_FOUR(temperature_schedule);
-  public:
-    /**
-     * Constructs a temperature schedule with its parameter
-     *
-     * @param[in] __alpha The alpha parameter
-     */
-
-    constexpr temperature_schedule(real_t __alpha = .98_r) noexcept
-      : m_alpha(__alpha)
-    {}
-  public:
-    /**
-     * Get the next temperature
-     *
-     * @param[in] __t The current temperature
-     * @return The next temperature
-     */
-
-    constexpr real_t operator()(real_t __t) const noexcept
-      { return m_alpha * __t; }
-  private:
-    real_t m_alpha;
-  };
+  constexpr real_t reduce(real_t __t) noexcept
+    { return .98_r * __t; }
 
   /* row length */
 
