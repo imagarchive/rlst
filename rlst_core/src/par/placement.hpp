@@ -253,6 +253,18 @@ namespace rlst::par
     /**
      * Constructs a placement grid with its parameters
      *
+     * @param[in] __width The width of the grid
+     * @param[in] __height The height of the grid
+     */
+
+    placement_grid(size_type __width, size_type __height)
+      : base_type(__height, __width,  {})
+      , m_cells()
+    {}
+
+    /**
+     * Constructs a placement grid with its parameters
+     *
      * @tparam InputIt0 The iterator type (enable perfect forwarding)
      * @tparam InputIt1 The iterator type (enable perfect forwarding)
      *

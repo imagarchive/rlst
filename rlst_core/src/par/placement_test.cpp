@@ -90,10 +90,7 @@ TEST_P(placement_grid__modifiers__test, insert)
     std::count_if(
       g.cbegin(),
       g.cend(),
-
-      [&] (const auto& __list) {
-        return !__list.empty() && (&__list.front().get() == &cell);
-      }
+      [&] (const auto& __set) { return __set.find(cell) != __set.cend(); }
     ),
 
     width * height
@@ -114,10 +111,7 @@ TEST_P(placement_grid__modifiers__test, one_above_another)
     std::count_if(
       g.cbegin(),
       g.cend(),
-
-      [&] (const auto& __list) {
-        return !__list.empty() && (&__list.front().get() == &second);
-      }
+      [&] (const auto& __set) { return __set.find(second) != __set.cend(); }
     ),
 
     width * height
