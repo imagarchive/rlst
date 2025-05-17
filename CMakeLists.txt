@@ -86,7 +86,7 @@ if (WITH_TESTS)
             target_compile_definitions("${test}" PRIVATE RLST_WITH_TESTS)
 
             target_include_directories(
-                "${target}"
+                "${test}"
                 PRIVATE "${CMAKE_SOURCE_DIR}/tests/"
             )
 
