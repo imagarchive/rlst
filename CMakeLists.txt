@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.30)
 project(
     rlst
     VERSION 0.9.0
-    DESCRIPTION "A Redstone Logic Synthesis Tool because Redstone written in VHDL is cool "
+    DESCRIPTION "A Redstone Logic Synthesis Tool because Redstone written in VHDL is cool"
     HOMEPAGE_URL "https://github.com/imagarchive/rlst/"
     LANGUAGES CXX
 )
@@ -71,7 +71,7 @@ if (WITH_TESTS)
     function (rlst_add_integration_tests)
         set(options)
         set(one_value_args)
-        set(multi_value_args TESTS)
+        set(multi_value_args EXTRA_LIBS TESTS)
 
         cmake_parse_arguments(
             RLST_ADD_INTEGRATION_TEST
@@ -83,8 +83,12 @@ if (WITH_TESTS)
 
         foreach (test ${RLST_ADD_INTEGRATION_TEST_TESTS})
             add_executable("${test}" "${CMAKE_SOURCE_DIR}/tests/${test}.cpp")
-
             target_compile_definitions("${test}" PRIVATE RLST_WITH_TESTS)
+
+            target_include_directories(
+                "${target}"
+                PRIVATE "${CMAKE_SOURCE_DIR}/tests/"
+            )
 
             target_link_libraries(
                 "${test}"
@@ -92,6 +96,7 @@ if (WITH_TESTS)
                 PRIVATE
                     GTest::gtest
                     GTest::gtest_main
+                    "${RLST_ADD_INTEGRATION_TEST_EXTRA_LIBS}"
             )
 
             target_sources(
@@ -100,7 +105,8 @@ if (WITH_TESTS)
               PRIVATE
                 FILE_SET HEADERS
                 TYPE HEADERS
-                FILES "${CMAKE_SOURCE_DIR}/src/test.hpp"
+                BASE_DIRS "${CMAKE_SOURCE_DIR}/tests/"
+                FILES "${CMAKE_SOURCE_DIR}/tests/test.hpp"
             )
 
             set_target_properties(
@@ -109,8 +115,6 @@ if (WITH_TESTS)
                 PROPERTIES
                     RUNTIME_OUTPUT_DIRECTORY
                         "${CMAKE_BINARY_DIR}/integration-tests/"
-
-                    RUNTIME_OUTPUT_NAME "${scope}"
             )
 
             gtest_discover_tests(
@@ -123,7 +127,7 @@ if (WITH_TESTS)
     function (rlst_add_unit_tests)
         set(options)
         set(one_value_args)
-        set(multi_value_args TESTS)
+        set(multi_value_args EXTRA_LIBS TESTS)
 
         cmake_parse_arguments(
             RLST_ADD_UNIT_TEST
@@ -135,9 +139,21 @@ if (WITH_TESTS)
 
         foreach (test ${RLST_ADD_UNIT_TEST_TESTS})
             string(REPLACE "/" "_" target "${test}")
-            add_executable("${target}" "${test}_test.cpp")
+
+            add_executable(
+                "${target}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/src/${test}_test.cpp"
+            )
 
             target_compile_definitions("${target}" PRIVATE RLST_WITH_TESTS)
+
+            target_include_directories(
+                "${target}"
+
+                PRIVATE
+                    "${CMAKE_SOURCE_DIR}/tests/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+            )
 
             target_link_libraries(
                 "${target}"
@@ -145,11 +161,7 @@ if (WITH_TESTS)
                 PRIVATE
                     GTest::gtest
                     GTest::gtest_main
-            )
-
-            target_include_directories(
-                "${target}"
-                PRIVATE "${CMAKE_SOURCE_DIR}/src"
+                    "${RLST_ADD_UNIT_TEST_EXTRA_LIBS}"
             )
 
             target_sources(
@@ -158,14 +170,17 @@ if (WITH_TESTS)
               PRIVATE
                 FILE_SET HEADERS
                 TYPE HEADERS
-                FILES "${CMAKE_SOURCE_DIR}/src/test.hpp"
+                BASE_DIRS "${CMAKE_SOURCE_DIR}/tests/"
+                FILES "${CMAKE_SOURCE_DIR}/tests/test.hpp"
             )
 
             set_target_properties(
                 "${target}"
 
                 PROPERTIES
-                    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/unit-tests/"
+                    RUNTIME_OUTPUT_DIRECTORY
+                        "${CMAKE_CURRENT_BINARY_DIR}/unit-tests/"
+
                     RUNTIME_OUTPUT_NAME "${scope}"
             )
 
@@ -229,7 +244,7 @@ foreach (flag IN LISTS RLST_CXX_GNU_FLAGS)
     )
 endforeach ()
 
-add_subdirectory(src)
+add_subdirectory(rlst_core)
 
 if (WITH_DOC)
     doxygen_add_docs(

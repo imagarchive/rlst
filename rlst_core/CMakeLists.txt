@@ -15,8 +15,16 @@
 
 cmake_minimum_required(VERSION 3.30)
 
+project(
+    rlst_core
+    VERSION 0.9.0
+    DESCRIPTION "A Redstone Logic Synthesis Tool because Redstone written in VHDL is cool (core API)"
+    HOMEPAGE_URL "https://github.com/imagarchive/rlst/"
+    LANGUAGES CXX
+)
+
 set(
-    RLST_HPP
+    RLST_CORE_PRIVATE_HPP
     core/grid.hpp
     par/cell/Cell.hpp
     par/cell/ports.hpp
@@ -30,15 +38,19 @@ set(
     par.hpp
 )
 
+list(TRANSFORM RLST_CORE_PRIVATE_HPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+
 set(
-  RLST_IPP
+  RLST_CORE_IPP
   core/grid.ipp
   par/placement.ipp
   core.ipp
 )
 
+list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+
 set(
-    RLST_CPP
+    RLST_CORE_CPP
     par/cell/Cell.cpp
     par/cell/ports.cpp
     par/cell/types.cpp
@@ -46,26 +58,35 @@ set(
     par/placement.cpp
     par/routing.cpp
     svg/SVG.cpp
-    main.cpp
 )
 
-find_package(Boost REQUIRED)
-add_executable(rlst "${RLST_CPP}")
+list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
-target_link_libraries(rlst PRIVATE Boost::boost)
+find_package(Boost REQUIRED)
+add_library(rlst_core STATIC "${RLST_CORE_CPP}")
+
+target_link_libraries(rlst_core PRIVATE Boost::boost)
+
+target_include_directories(
+    rlst_core
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+)
 
 target_sources(
-    rlst
+    rlst_core
 
     PRIVATE
         FILE_SET HEADERS
         TYPE HEADERS
-        FILES "${RLST_HPP}" "${RLST_IPP}"
+        FILES "${RLST_CORE_PRIVATE_HPP}" "${RLST_CORE_IPP}"
 )
 
-rlst_add_to_doc("${RLST_HPP}")
+rlst_add_to_doc("${RLST_CORE_HPP}")
 
 rlst_add_unit_tests(
+    EXTRA_LIBS rlst_core
+
     TESTS
         core/grid
         par/placement
