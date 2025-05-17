@@ -82,6 +82,26 @@ namespace rlst::par
     { return std::exp(-__delta_c / __t); }
 
   /**
+   * Normalize a value to the range @f$ (0; 100) @f$
+   *
+   * This function takes a real number as input and maps it to a value within
+   * the range @f$ (0; 100) @f$ using a specific normalization formula. The
+   * normalization ensures that the output is bounded and scaled
+   * appropriately.
+   *
+   * @param[in] __x The input value to normalize
+   * @return The normalized value in the range @f$ (0; 100) @f$
+   */
+
+  inline real_t normalize(real_t __x)
+  {
+    return
+      (100._r / M_PI) *
+      std::copysign(1._r, __x) *
+      std::atan(std::log(std::abs(__x) + 1._r)) + 50._r;
+  }
+
+  /**
    * Generate a random number in the range [0, 1]
    *
    * @return A random number in the range [0, 1]
@@ -466,13 +486,7 @@ namespace rlst::par
    */
 
   inline real_t wire_length_cost(real_t __penalty)
-  {
-    return
-      (100._r / M_PI) *
-      std::copysign(1._r, __penalty) *
-      std::atan(std::log(std::abs(__penalty) + 1._r)) +
-      50._r;
-  }
+    { return normalize(__penalty); }
 
   /**
    * Get a random neighbor of a @ref cell::Cell
