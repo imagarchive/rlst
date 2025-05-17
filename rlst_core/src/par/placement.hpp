@@ -146,6 +146,71 @@ namespace rlst::par
     };
   }
 
+  class placement_grid;
+
+  /**
+   * A helper allowing to revert a change in a @ref placement_grid
+   */
+
+  class evolute_reverter
+  {
+    friend class placement_grid;
+  private:
+    using first_diff_type =
+      std::pair<std::reference_wrapper<cell::Cell>, Point>;
+
+    using second_diff_type =
+      std::pair<
+        std::reference_wrapper<cell::Cell>,
+        std::reference_wrapper<cell::Cell>
+      >;
+
+    using diff_type = std::variant<first_diff_type, second_diff_type>;
+  public:
+    /**
+     * The copy constructor
+     *
+     * @param[in] __other The other @ref evolute_reverter to copy
+     */
+
+    evolute_reverter(const evolute_reverter& __other) noexcept = default;
+
+    ~evolute_reverter() = default; ///< The destructor
+  private:
+    template <
+      class U,
+
+      std::enable_if_t<
+        std::disjunction_v<
+          std::is_same<std::decay_t<U>, first_diff_type>,
+          std::is_same<std::decay_t<U>, second_diff_type>
+        >
+      >* = nullptr
+    >
+    explicit evolute_reverter(placement_grid& __placement_grid, U&& __diff)
+      : m_placement_grid(__placement_grid)
+      , m_diff(std::forward<U>(__diff))
+    {}
+  public:
+    /**
+     * The copy assignment operator
+     *
+     * @param[in] __rhs The right-hand side operand
+     * @return The assigned @ref evolute_reverter
+     */
+
+    evolute_reverter& operator=(const evolute_reverter& __rhs) = default;
+  public:
+    /**
+     * Revert the previous change
+     */
+
+    void revert();
+  private:
+    std::reference_wrapper<placement_grid> m_placement_grid;
+    diff_type m_diff;
+  };
+
   class placement_grid
     : public core::grid<
       std::unordered_set<

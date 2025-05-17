@@ -143,6 +143,21 @@ namespace rlst::core
   constexpr bool is_same_template_v = is_same_template<T, U>::value;
 
   /**
+   * A lambda wrapper
+   *
+   * This wrapper aims to provide a way to have a lambda with several overloads.
+   *
+   * @tparam Ts The lambda types
+   */
+
+  template <class... Ts>
+  struct lambda_wrapper : Ts...
+    { using Ts::operator()...; };
+
+  template <class... Ts>
+  lambda_wrapper(Ts...) -> lambda_wrapper<Ts...>;
+
+  /**
    * Choose a random element from a range
    *
    * @param[in] __begin The beginning of the range
