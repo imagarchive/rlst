@@ -32,19 +32,19 @@ namespace rlst::par
     uliteral_t max_height = 0_ul;
 
     for (auto i = __begin_cell; i != __end_cell; ++i) {
-      tr.x() += i->type->size.width;
+      tr.x() += i->type()->size.width;
 
       if (tr.x() >= __desired_row_length) {
         tl.x() = 0;
         tl.y() += max_height;
 
-        tr.x() = i->type->size.width;
+        tr.x() = i->type()->size.width;
         tr.y() += max_height;
       }
 
-      i->position = tl;
-      tl.x() += i->type->size.width;
-      max_height = std::max(max_height, i->type->size.height);
+      i->position() = tl;
+      tl.x() += i->type()->size.width;
+      max_height = std::max(max_height, i->type()->size.height);
     }
   }
 
@@ -67,7 +67,7 @@ namespace rlst::par
       auto i =
         row_to_min_max.insert(
           std::make_pair(
-            __begin->position.y(),
+            __begin->position().y(),
 
             std::make_pair(
               std::numeric_limits<literal_t>::max(),
@@ -78,13 +78,13 @@ namespace rlst::par
 
       i->second =
         std::make_pair(
-          std::min(i->second.first, __begin->position.x()),
+          std::min(i->second.first, __begin->position().x()),
 
           std::max(
             i->second.second,
 
-            __begin->position.x() +
-              static_cast<literal_t>(__begin->type->size.width)
+            __begin->position().x() +
+              static_cast<literal_t>(__begin->type()->size.width)
           )
         );
     }

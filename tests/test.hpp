@@ -66,7 +66,7 @@ namespace rlst::test
   )
   {
     return
-      par::cell::Cell {
+      par::cell::Cell(
         par::Point(__x, __y, 0),
 
         std::make_shared<par::cell::CellType>(
@@ -76,7 +76,7 @@ namespace rlst::test
             par::Size {__width, __height}
           }
         )
-      };
+      );
   }
 }
 

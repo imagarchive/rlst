@@ -46,10 +46,91 @@ namespace rlst::par::cell
    * A cell
    */
 
-  struct Cell
+  class Cell
   {
-    Point position; ///< The position of the @ref Cell
-    std::shared_ptr<const CellType> type; ///< The type of the @ref Cell
+    friend bool operator==(const Cell&, const Cell&) noexcept;
+    friend std::size_t hash_value(const Cell&);
+    friend void swap(Cell&, Cell&) noexcept;
+  public:
+    constexpr Cell() noexcept = default; ///< The defaut constructor
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The @ref Cell object to copy from
+     */
+
+    Cell(const Cell& __other) noexcept = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The @ref Cell object to move from
+     */
+
+    Cell(Cell&& __other) noexcept = default;
+
+    ~Cell() = default; ///< The destructor
+  public:
+   /**
+    * Construct a @ref Cell with its parameters
+    *
+    * @param[in] __position The position of the @ref Cell in the circuit
+    * @param[in] __type The @ref CellType "type" of the @ref Cell
+    */
+
+    explicit Cell(
+      Point __position,
+      std::shared_ptr<const CellType> __type
+    ) noexcept
+      : m_position(std::move(__position))
+      , m_type(std::move(__type))
+    {}
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __rhs The @ref Cell object to copy from
+     * @return A reference to the updated @ref Cell object
+     */
+
+    Cell& operator=(const Cell& __rhs) noexcept = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __rhs The @ref Cell object to move from
+     * @return A reference to the updated @ref Cell object
+     */
+
+    Cell& operator=(Cell&& __rhs) noexcept = default;
+  public:
+    /**
+     * Get the position of the @ref Cell
+     *
+     * @return The position of the @ref Cell
+     */
+
+    constexpr Point position() const noexcept { return m_position; }
+
+    /**
+     * Get the position of the @ref Cell
+     *
+     * @return The position of the @ref Cell
+     */
+
+    constexpr Point& position() noexcept { return m_position; }
+
+    /**
+     * Get the @ref CellType "type" of the @ref Cell
+     *
+     * @return The @ref CellType "type" of the @ref Cell
+     */
+
+    std::shared_ptr<const CellType> type() const noexcept { return m_type; }
+  private:
+    Point m_position;
+    std::shared_ptr<const CellType> m_type;
   };
 
   /**
@@ -61,8 +142,12 @@ namespace rlst::par::cell
    * @return True if both @ref Cell objects are the same, false otherwise
    */
 
-  constexpr bool operator==(const Cell& __lhs, const Cell& __rhs) noexcept
-    { return (__lhs.position == __rhs.position) && (__lhs.type == __rhs.type); }
+  inline bool operator==(const Cell& __lhs, const Cell& __rhs) noexcept
+  {
+    return
+      (__lhs.m_position == __rhs.m_position) &&
+      (__lhs.m_type == __rhs.m_type);
+  }
 
   /**
    * Compare two @ref Cell objects for inequality
@@ -73,7 +158,7 @@ namespace rlst::par::cell
    * @return True if both @ref Cell objects are not the same, false otherwise
    */
 
-  constexpr bool operator!=(const Cell& __lhs, const Cell& __rhs) noexcept
+  inline bool operator!=(const Cell& __lhs, const Cell& __rhs) noexcept
     { return !(__lhs == __rhs); }
 
   /**
@@ -94,5 +179,7 @@ namespace rlst::par::cell
 
   void swap(Cell& __lhs, Cell& __rhs) noexcept;
 }
+
+#include "Cell.ipp"
 
 #endif // RLST_RLST_PAR_CELL_CELL_HPP

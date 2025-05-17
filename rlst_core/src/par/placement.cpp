@@ -38,7 +38,7 @@ namespace rlst::par
       core::lambda_wrapper {
         [=] (first_diff_type& __diff) {
           m_placement_grid.get().erase(__diff.first);
-          __diff.first.get().position = std::move(__diff.second);
+          __diff.first.get().position() = std::move(__diff.second);
           m_placement_grid.get().insert(__diff.first);
         },
 
@@ -48,7 +48,7 @@ namespace rlst::par
           m_placement_grid.get().erase(__diff.first);
           m_placement_grid.get().erase(__diff.second);
 
-          swap(__diff.first.get().position, __diff.second.get().position);
+          swap(__diff.first.get().position(), __diff.second.get().position());
 
           m_placement_grid.get().insert(__diff.first);
           m_placement_grid.get().insert(__diff.second);

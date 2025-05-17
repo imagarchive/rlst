@@ -343,10 +343,10 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() + 1 + __cell.position.y(),
+          m_grid.begin() + 1 + __cell.position().y(),
           0,
-          static_cast<difference_type>(__cell.type->size.width),
-          __cell.position.x()
+          static_cast<difference_type>(__cell.type()->size.width),
+          __cell.position().x()
         );
     }
 
@@ -365,10 +365,10 @@ namespace rlst::par
     {
       return
         const_iterator(
-          m_grid.cbegin() + 1 + __cell.position.y(),
+          m_grid.cbegin() + 1 + __cell.position().y(),
           0,
-          static_cast<difference_type>(__cell.type->size.width),
-          __cell.position.x()
+          static_cast<difference_type>(__cell.type()->size.width),
+          __cell.position().x()
         );
     }
 
@@ -391,13 +391,13 @@ namespace rlst::par
       return
         iterator(
           m_grid.begin() +
-            __cell.position.y() +
-            static_cast<difference_type>(__cell.type->size.height)
+            __cell.position().y() +
+            static_cast<difference_type>(__cell.type()->size.height)
             + 1,
 
           0,
-          static_cast<difference_type>(__cell.type->size.width),
-          __cell.position.x()
+          static_cast<difference_type>(__cell.type()->size.width),
+          __cell.position().x()
         );
     }
 
@@ -420,13 +420,13 @@ namespace rlst::par
       return
         const_iterator(
           m_grid.cbegin() +
-            __cell.position.y() +
-            static_cast<difference_type>(__cell.type->size.height)
+            __cell.position().y() +
+            static_cast<difference_type>(__cell.type()->size.height)
             + 1,
 
           0,
-          static_cast<difference_type>(__cell.type->size.width),
-          __cell.position.x()
+          static_cast<difference_type>(__cell.type()->size.width),
+          __cell.position().x()
         );
     }
   public:
@@ -626,13 +626,13 @@ namespace rlst::par
 
         core::transformed_binop(
           [] (const std::pair<cell::PlacedPort, cell::PlacedPort>& __net) {
-            Point first = __net.first.parent.get().position;
+            Point first = __net.first.parent.get().position();
 
             first.x() += __net.first.port.position.x();
             first.y() += __net.first.port.position.y();
             first.z() += __net.first.port.position.z();
 
-            Point second = __net.second.parent.get().position;
+            Point second = __net.second.parent.get().position();
 
             second.x() += __net.second.port.position.x();
             second.y() += __net.second.port.position.y();
@@ -672,19 +672,19 @@ namespace rlst::par
         std::min(
           core::randint(
             0_l,
-            static_cast<literal_t>(__frame.width - __cell.type->size.width)
+            static_cast<literal_t>(__frame.width - __cell.type()->size.width)
           ),
 
-          static_cast<literal_t>(__cell.type->size.width) / 10_l
+          static_cast<literal_t>(__cell.type()->size.width) / 10_l
         ),
 
         std::min(
           core::randint(
             0_l,
-            static_cast<literal_t>(__frame.height - __cell.type->size.height)
+            static_cast<literal_t>(__frame.height - __cell.type()->size.height)
           ),
 
-          static_cast<literal_t>(__cell.type->size.height) / 10_l
+          static_cast<literal_t>(__cell.type()->size.height) / 10_l
         ),
 
         0_l

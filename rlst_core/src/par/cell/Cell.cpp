@@ -25,8 +25,8 @@ namespace rlst::par::cell
   {
     std::size_t seed = 0;
 
-    boost::hash_combine(seed, __input.position);
-    boost::hash_combine(seed, __input.type);
+    boost::hash_combine(seed, __input.m_position);
+    boost::hash_combine(seed, __input.m_type);
 
     return seed;
   }
@@ -35,7 +35,7 @@ namespace rlst::par::cell
   {
     using std::swap;
 
-    swap(__lhs.position, __rhs.position);
-    swap(__lhs.type, __rhs.type);
+    swap(__lhs.m_position, __rhs.m_position);
+    swap(__lhs.m_type, __rhs.m_type);
   }
 }

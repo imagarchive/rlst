@@ -73,13 +73,13 @@ namespace rlst::par::cell
   {
     return
       __placed_port.port.position.x() +
-      __placed_port.parent.get().position.x();
+      __placed_port.parent.get().position().x();
   }
 
   literal_t absolute_y(const PlacedPort& __placed_port)
   {
     return
       __placed_port.port.position.y() +
-      __placed_port.parent.get().position.y();
+      __placed_port.parent.get().position().y();
   }
 }
