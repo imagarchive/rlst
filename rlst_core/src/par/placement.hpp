@@ -188,13 +188,31 @@ namespace rlst::par
     /**
      * Constructs a placement grid with its parameters
      *
+     * @tparam InputIt0 The iterator type (enable perfect forwarding)
+     * @tparam InputIt1 The iterator type (enable perfect forwarding)
+     *
      * @param[in] __width The width of the grid
      * @param[in] __height The height of the grid
+     * @param[in, out] __begin The iterator pointing to the first cell to insert
+     * @param[in, out] __end The iterator pointing to the last cell to insert
      */
 
-    placement_grid(size_type __width, size_type __height)
+    template <class InputIt0, class InputIt1>
+    placement_grid(
+      size_type __width,
+      size_type __height,
+      InputIt0&& __begin,
+      InputIt1&& __end
+    )
       : base_type(__height, __width,  {})
-    {}
+      , m_cells(std::forward<InputIt0>(__begin), std::forward<InputIt1>(__end))
+    {
+      std::for_each(
+        m_cells.cbegin(),
+        m_cells.cend(),
+        [&] (const auto& __i) { insert(*__i); }
+      );
+    }
   public:
     /**
      * Copy assignment operator
@@ -414,6 +432,8 @@ namespace rlst::par
 
     real_t emptiness_cost() const
       { return 100._r * emptiness_penalty(); }
+  private:
+    std::vector<std::reference_wrapper<cell::Cell>> m_cells;
   };
 
   /* temperature */
