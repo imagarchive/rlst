@@ -17,6 +17,10 @@ cmake_minimum_required(VERSION 3.28)
 
 set(
     RLST_HPP
+    mca_parser/Block.hpp
+    mca_parser/Chunk.hpp
+    mca_parser/MCA.hpp
+    mca_parser/NBTChunkView.hpp
     par/cell/Cell.hpp
     par/cell/ports.hpp
     par/cell/types.hpp
@@ -36,6 +40,10 @@ set(
 
 set(
     RLST_CPP
+    mca_parser/Block.cpp
+    mca_parser/Chunk.cpp
+    mca_parser/MCA.cpp
+    mca_parser/NBTChunkView.cpp
     par/cell/Cell.cpp
     par/cell/ports.cpp
     par/cell/types.cpp
@@ -46,10 +54,19 @@ set(
     main.cpp
 )
 
+include(FetchContent)
+
+FetchContent_Declare(
+    zlib_repo
+    GIT_REPOSITORY https://github.com/madler/zlib.git
+    GIT_BRANCH main
+)
+
+FetchContent_MakeAvailable(zlib_repo)
+
 find_package(Boost REQUIRED)
 add_executable(rlst "${RLST_CPP}")
-
-target_link_libraries(rlst PRIVATE Boost::boost)
+target_link_libraries(rlst PRIVATE Boost::boost nbt zlib)
 
 target_sources(
     rlst

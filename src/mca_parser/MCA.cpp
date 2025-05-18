@@ -5,7 +5,7 @@
 
 #include <array>
 #include <iostream>
-#include <iomanip>  // Pour afficher en hexadécimal
+#include <iomanip>
 #include <zlib.h>
 #include <map>
 
@@ -201,8 +201,6 @@ void writeData(MCA& mcaFile) {
     if (!file) {
         throw std::runtime_error("Can not open the new file");
     }
-
-    // TODO : missing chunks
 
     // for each chunk in the mca file, write the compressed data into the new mca file
     std::array<Chunk, MCA::nbChunksInRegion> chunks = mcaFile.chunks();
