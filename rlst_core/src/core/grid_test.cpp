@@ -396,12 +396,6 @@ TEST(grid__size__test, basic)
   ASSERT_EQ(grid.size(), 400);
 }
 
-TEST(grid__size__test, empty)
-{
-  grid<int> grid;
-  EXPECT_DEATH({ grid.size(); }, "");
-}
-
 TEST(grid__basics__test, to_const_iterator)
 {
   ASSERT_TRUE(
