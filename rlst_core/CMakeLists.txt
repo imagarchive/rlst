@@ -26,6 +26,10 @@ project(
 set(
     RLST_CORE_HPP
     core/grid.hpp
+    mca_parser/Block.hpp
+    mca_parser/Chunk.hpp
+    mca_parser/MCA.hpp
+    mca_parser/NBTChunkView.hpp
     par/cell/Cell.hpp
     par/cell/ports.hpp
     par/cell/types.hpp
@@ -53,6 +57,10 @@ list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 set(
     RLST_CORE_CPP
+    mca_parser/Block.cpp
+    mca_parser/Chunk.cpp
+    mca_parser/MCA.cpp
+    mca_parser/NBTChunkView.cpp
     par/cell/Cell.cpp
     par/cell/ports.cpp
     par/cell/types.cpp
@@ -67,7 +75,7 @@ list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 find_package(Boost REQUIRED)
 add_library(rlst_core STATIC "${RLST_CORE_CPP}")
 
-target_link_libraries(rlst_core PRIVATE Boost::boost)
+target_link_libraries(rlst_core PUBLIC Boost::boost nbt)
 
 target_include_directories(
     rlst_core

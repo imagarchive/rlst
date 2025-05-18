@@ -15,6 +15,7 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 namespace rlst::par
 {
   constexpr Size& operator*=(Size& __this, uliteral_t __a) noexcept

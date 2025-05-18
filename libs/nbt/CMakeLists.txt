@@ -1,0 +1,35 @@
+# Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+cmake_minimum_required(VERSION 3.28)
+
+project(
+    nbt
+    DESCRIPTION "Minecraft NBT/MCA/SNBT file parser in C"
+    HOMEPAGE_URL "https://github.com/djytw/libnbt/"
+    LANGUAGES C
+)
+
+add_library(nbt STATIC nbt.c)
+target_include_directories(nbt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+
+target_sources(
+    nbt
+
+    PUBLIC
+        FILE_SET HEADERS
+        TYPE HEADERS
+        FILES nbt.h
+)

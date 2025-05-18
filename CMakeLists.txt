@@ -244,6 +244,7 @@ foreach (flag IN LISTS RLST_CXX_GNU_FLAGS)
     )
 endforeach ()
 
+add_subdirectory(libs/nbt)
 add_subdirectory(rlst_core)
 
 if (WITH_DOC)
