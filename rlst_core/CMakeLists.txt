@@ -85,6 +85,8 @@ target_sources(
 
 rlst_add_to_doc("${RLST_CORE_HPP}")
 
+rlst_add_integration_tests(EXTRA_LIBS rlst_core TESTS place)
+
 rlst_add_unit_tests(
     EXTRA_LIBS rlst_core
 
