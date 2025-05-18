@@ -75,9 +75,10 @@ set(
 list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 find_package(Boost REQUIRED)
-add_library(rlst_core STATIC "${RLST_CORE_CPP}")
+find_package(ZLIB REQUIRED)
 
-target_link_libraries(rlst_core PUBLIC Boost::boost nbt)
+add_library(rlst_core STATIC "${RLST_CORE_CPP}")
+target_link_libraries(rlst_core PUBLIC Boost::boost nbt ZLIB::ZLIB)
 
 target_include_directories(
     rlst_core
