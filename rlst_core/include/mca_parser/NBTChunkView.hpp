@@ -19,27 +19,30 @@
 #ifndef RLST_CORE_RLST_MCA_PARSER_NBT_CHUNK_VIEW_HPP
 #  define RLST_CORE_RLST_MCA_PARSER_NBT_CHUNK_VIEW_HPP
 
+#include "mca_parser/Block.hpp"
+#include "mca_parser/Chunk.hpp"
+
 #include <vector>
 #include <cstdint>
 #include <string>
-#include "mca_parser/Chunk.hpp"
-#include "nbt.h"
-#include "mca_parser/Block.hpp"
 
-class NBTChunkView {
-public:
+extern "C" {
+  #include "nbt.h"
+}
+
+namespace rlst::mca_parser
+{
+  class NBTChunkView
+  {
+  public:
     explicit NBTChunkView(Chunk& chunk);
     ~NBTChunkView();
-
     bool isValid() const;
-
     std::string getBlockName(int x, int y, int z) const;
     void setBlock(const Block& block);                  // version qui prend un block
     void setBlocks(const std::vector<Block>& blocks);   // version qui prend une liste de blocs
-
     std::vector<uint8_t> toCompressedData() const;
-
-private:
+  private:
     NBT* root = nullptr;
     Chunk& chunk;
 
@@ -47,6 +50,7 @@ private:
     NBT* getOrCreatePaletteEntry(NBT* section, const Block& block, int& outIndex); // modifié pour recevoir Block
     void setBlockStateIndex(NBT* section, int index, int value);
     int getBlockStateIndex(NBT* section, int index, int bitsPerBlock) const;
-};
+  };
+}
 
 #endif // RLST_CORE_RLST_MCA_PARSER_NBT_CHUNK_VIEW_HPP

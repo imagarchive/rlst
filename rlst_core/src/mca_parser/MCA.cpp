@@ -16,26 +16,25 @@
  */
 
 
-#include "mca_parser/Chunk.hpp"
 #include "mca_parser/MCA.hpp"
-#include "mca_parser/Block.hpp"
-#include "mca_parser/NBTChunkView.hpp"
+
+#include "mca_parser/Chunk.hpp"
 
 #include <array>
 #include <iostream>
-#include <iomanip>
-#include <zlib.h>
-#include <map>
 
+extern "C" {
+  #include <zlib.h>
+}
 
+namespace rlst::mca_parser
+{
+  MCA::MCA(): mChunks() {}
+  std::array<Chunk, MCA::nbChunksInRegion>& MCA::chunks() { return mChunks;  }
 
-MCA::MCA(): mChunks() {}
-
-std::array<Chunk, MCA::nbChunksInRegion>& MCA::chunks() { return mChunks;  }
-
-
-// Reads and uncompresses the data of the chunk corresponding to the given index
-Chunk& readChunkData(std::fstream& file, int chunkIndex) {
+  // Reads and uncompresses the data of the chunk corresponding to the given index
+  Chunk& readChunkData(std::fstream& file, int chunkIndex)
+  {
     std::size_t chunksNb = MCA::nbChunksInRegion;
     // In the header of an .mca file, a chunk location is encoded with 4 bytes.
     // The first 3 bytes for the position of the chunk's data in the file, it is
@@ -55,11 +54,11 @@ Chunk& readChunkData(std::fstream& file, int chunkIndex) {
     file.read(reinterpret_cast<char *>(chunkLocation), 4);
 
     if (chunkLocation[0] == 0 && chunkLocation[1] == 0 && chunkLocation[2] == 0 && chunkLocation[3] == 0) {
-        std::vector<Bytef> uncompressedData;
-        std::vector<unsigned char> compressedData;
-        std::cerr << "The chunk was not generated" << std::endl;
-        Chunk newChunk(chunkIndex % chunksNb, chunkIndex / chunksNb, uncompressedData, compressedData);
-        return newChunk;
+      std::vector<Bytef> uncompressedData;
+      std::vector<unsigned char> compressedData;
+      std::cerr << "The chunk was not generated" << std::endl;
+      Chunk newChunk(chunkIndex % chunksNb, chunkIndex / chunksNb, uncompressedData, compressedData);
+      return newChunk;
     }
 
     // Computes the offset (in number of sectors) and converts little endian at the same time
@@ -89,7 +88,7 @@ Chunk& readChunkData(std::fstream& file, int chunkIndex) {
 
     // Checks length is valid
     // if (chunkLength > maxChunkSize || chunkLength <= 0) {
-    //     throw std::runtime_error("Erreur : Longueur invalide du chunk");
+    //   throw std::runtime_error("Erreur : Longueur invalide du chunk");
     // }
 
     // Reads the compression type (1 byte)
@@ -114,7 +113,7 @@ Chunk& readChunkData(std::fstream& file, int chunkIndex) {
     int res = uncompress(uncompressedData.data(), &uncompressedDataSize, compressedData.data(), compressedData.size());
 
     if (res != Z_OK) {
-        throw std::runtime_error("Decompression error");
+      throw std::runtime_error("Decompression error");
     }
 
     // Creates the chunk object
@@ -123,19 +122,23 @@ Chunk& readChunkData(std::fstream& file, int chunkIndex) {
     Chunk newChunk(chunkIndex % chunksNb, chunkIndex / chunksNb, uncompressedData, compressedData);
 
     return newChunk;
-}
+  }
 
-std::array<uint8_t, 3> converts3BytesBigEndian(uint32_t value) {
+  std::array<uint8_t, 3> converts3BytesBigEndian(uint32_t value)
+  {
     if (value > 0xFFFFFF) {
-        throw std::runtime_error("Value too large");
+      throw std::runtime_error("Value too large");
     }
 
-    return {static_cast<uint8_t>((value >> 16) & 0xFF),
-        static_cast<uint8_t>((value >> 8)  & 0xFF),
-        static_cast<uint8_t>(value & 0xFF)};
-}
+    return {
+      static_cast<uint8_t>((value >> 16) & 0xFF),
+      static_cast<uint8_t>((value >> 8)  & 0xFF),
+      static_cast<uint8_t>(value & 0xFF)
+    };
+  }
 
-uint32_t writeChunkData(std::fstream& file, MCA& mcaFile, int& chunkIndex, uint32_t& chunkStart) {
+  uint32_t writeChunkData(std::fstream& file, MCA& mcaFile, int& chunkIndex, uint32_t& chunkStart)
+  {
     Chunk chunk = mcaFile.chunks()[chunkIndex];
 
     // Writes the chunk offset and size in the header :
@@ -173,10 +176,11 @@ uint32_t writeChunkData(std::fstream& file, MCA& mcaFile, int& chunkIndex, uint3
 
     // Converts size to big endian
     std::array<uint8_t, Chunk::sizeLength> chunkSizeBigEndian = {
-        static_cast<uint8_t>((chunkSize >> 24) & 0xFF),
-        static_cast<uint8_t>((chunkSize >> 16) & 0xFF),
-        static_cast<uint8_t>((chunkSize >> 8)  & 0xFF),
-        static_cast<uint8_t>(chunkSize & 0xFF)};
+      static_cast<uint8_t>((chunkSize >> 24) & 0xFF),
+      static_cast<uint8_t>((chunkSize >> 16) & 0xFF),
+      static_cast<uint8_t>((chunkSize >> 8)  & 0xFF),
+      static_cast<uint8_t>(chunkSize & 0xFF)
+    };
 
     file.write(reinterpret_cast<const char*>(chunkSizeBigEndian.data()), Chunk::sizeLength);
 
@@ -190,12 +194,13 @@ uint32_t writeChunkData(std::fstream& file, MCA& mcaFile, int& chunkIndex, uint3
 
     uint32_t newChunkStart = chunkStart + headerSize * sizeInSectors;
     return newChunkStart;
-}
+  }
 
-void writeData(MCA& mcaFile) {
+  void writeData(MCA& mcaFile)
+  {
     std::ofstream newFile("newFile.mca", std::ios::binary | std::ios::trunc);
     if (!newFile) {
-        throw std::runtime_error("Can not create the new mca file");
+      throw std::runtime_error("Can not create the new mca file");
     }
 
     // counting timestamps and offsets
@@ -217,7 +222,7 @@ void writeData(MCA& mcaFile) {
     std::fstream file("nom.mca", std::ios::in | std::ios::out | std::ios::binary);
 
     if (!file) {
-        throw std::runtime_error("Can not open the new file");
+      throw std::runtime_error("Can not open the new file");
     }
 
     // for each chunk in the mca file, write the compressed data into the new mca file
@@ -226,22 +231,23 @@ void writeData(MCA& mcaFile) {
     // where to write the first chunk
     uint32_t chunkStart = headerSize;
     for (int i = 0; i < chunks.size(); i++) {
-        // if (chunks[i].wasNotGenerated()) {
-        //     // TODO : what do we have to do ???
-        //     continue;
-        // }
-        chunkStart = writeChunkData(file, mcaFile, i, chunkStart);
+      // if (chunks[i].wasNotGenerated()) {
+      //   // TODO : what do we have to do ???
+      //   continue;
+      // }
+      chunkStart = writeChunkData(file, mcaFile, i, chunkStart);
     }
-}
+  }
 
-// Reads a .mca file and returns a MCA object containing the uncompressed data of the chunks
-// This code needs to use r.0.0.mca
-MCA readMcaFile(const std::string &filename) {
+  // Reads a .mca file and returns a MCA object containing the uncompressed data of the chunks
+  // This code needs to use r.0.0.mca
+  MCA readMcaFile(const std::string &filename)
+  {
     // Reads the file in binary mode
     std::fstream file(filename, std::ios::in | std::ios::out | std::ios::binary);
     // error if no file
     if (!file) {
-        throw std::runtime_error("Can not open the file " + filename);
+      throw std::runtime_error("Can not open the file " + filename);
     }
 
     // Creates a new MCA object
@@ -249,9 +255,10 @@ MCA readMcaFile(const std::string &filename) {
 
     std::size_t chunksNb = MCA::nbChunksInRegion;
     for (int i = 0; i < chunksNb; ++i) {
-        // fills the mca object with the chunks data
-        mcaFile.chunks()[i] = readChunkData(file, i);
+      // fills the mca object with the chunks data
+      mcaFile.chunks()[i] = readChunkData(file, i);
     }
 
     return mcaFile;
+  }
 }
