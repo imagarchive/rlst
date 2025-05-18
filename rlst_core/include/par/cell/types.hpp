@@ -19,6 +19,7 @@
 #ifndef RLST_CORE_RLST_PAR_CELL_TYPES_HPP
 #  define RLST_CORE_RLST_PAR_CELL_TYPES_HPP
 
+#include "mca_parser/Block.hpp"
 #include "par/cell/ports.hpp"
 #include "par/geometry.hpp"
 
@@ -50,6 +51,8 @@ namespace rlst::par::cell
     std::list<Port> ports; ///< The ports of the @ref CellType
     std::string name; ///< The name of the @ref CellType
     Size size; ///< The size of the @ref CellType
+    /// The blocks that the @ref CellType is made of
+    std::vector<mca_parser::Block> blocks;
   };
 
   /**

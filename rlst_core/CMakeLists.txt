@@ -25,6 +25,7 @@ project(
 
 set(
     RLST_CORE_HPP
+    cell_reader/cell_reading.hpp
     core/grid.hpp
     mca_parser/Block.hpp
     mca_parser/Chunk.hpp
@@ -57,6 +58,7 @@ list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 set(
     RLST_CORE_CPP
+    cell_reader/cell_reading.cpp
     mca_parser/Block.cpp
     mca_parser/Chunk.cpp
     mca_parser/MCA.cpp
