@@ -36,22 +36,26 @@ namespace rlst::par
   {
     std::visit(
       core::lambda_wrapper {
-        [=] (first_diff_type& __diff) {
+        [&] (first_diff_type& __diff) {
           m_placement_grid.get().erase(__diff.first);
           __diff.first.get().position() = std::move(__diff.second);
           m_placement_grid.get().insert(__diff.first);
         },
 
-        [=] (second_diff_type& __diff) {
+        [&] (second_diff_type& __diff) {
           using std::swap;
 
-          m_placement_grid.get().erase(__diff.first);
-          m_placement_grid.get().erase(__diff.second);
+          auto [from, to] = __diff.first;
 
-          swap(__diff.first.get().position(), __diff.second.get().position());
+          m_placement_grid.get().erase(from);
+          from.get().position() = std::move(to);
+          m_placement_grid.get().insert(from);
 
-          m_placement_grid.get().insert(__diff.first);
-          m_placement_grid.get().insert(__diff.second);
+          std::tie(from, to) = __diff.second;
+
+          m_placement_grid.get().erase(from);
+          from.get().position() = std::move(to);
+          m_placement_grid.get().insert(from);
         }
       },
 
@@ -126,45 +130,45 @@ namespace rlst::par
       static_cast<uliteral_t>(height())
     };
 
-    cell::Cell& from = m_cells.front();
-    Point to = from.position();
+    std::reference_wrapper<cell::Cell> from = m_cells.front();
+    Point to = from.get().position();
 
-    while (from.position() == to) {
+    while (from.get().position() == to) {
       from = *core::choice(m_cells.begin(), m_cells.end());
       to = random_neighbor(from, frame);
     }
 
     erase(from);
-    swap(from.position(), to);
+    swap(from.get().position(), to);
 
     auto [dest_begin, dest_end] = rect(from);
 
     value_type::iterator to_swap;
-    bool is_found = false;
+    bool is_not_found = true;
 
-    for (auto i = dest_begin; (i != dest_end) && !is_found; ++i) {
+    for (auto i = dest_begin; (i != dest_end) && is_not_found; ++i) {
       to_swap =
         std::find_if(
           i->begin(),
           i->end(),
 
           [&] (const cell::Cell& __c) {
-            return (&__c != &from) && __c.can_be_moved_to(to, frame);
+            return (&__c != &from.get()) && __c.can_be_moved_to(to, frame);
           }
         );
 
-      is_found = to_swap != i->end();
+      is_not_found = to_swap == i->end();
     }
 
-    if (is_found) {
+    if (is_not_found) {
       insert(from);
-      return evolve_reverter(*this, std::make_pair(std::ref(from), to));
+      return evolve_reverter(*this, std::make_pair(from, to));
     } else {
       cell::Cell& t = *to_swap;
 
       erase(t);
 
-      t.position() = to;
+      swap(t.position(), to);
 
       insert(t);
       insert(from);
@@ -172,7 +176,11 @@ namespace rlst::par
       return
         evolve_reverter(
           *this,
-          std::make_pair(std::ref(from), std::ref(t))
+
+          std::make_pair(
+            std::make_pair(from, t.position()),
+            std::make_pair(std::ref(t), to)
+          )
         );
     }
   }

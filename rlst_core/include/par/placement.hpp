@@ -79,7 +79,7 @@ namespace rlst::par
    */
 
   inline real_t accept(real_t __delta_c, real_t __t)
-    { return std::exp(-__delta_c / __t); }
+    { return std::exp(-(100._r * __delta_c) / __t); }
 
   /**
    * Normalize a value to the range @f$ (0; 100) @f$
@@ -139,7 +139,16 @@ namespace rlst::par
 
   namespace details
   {
-    struct placement_grid_hasher
+    struct equal_to
+    {
+      bool operator()(
+        std::reference_wrapper<cell::Cell> __lhs,
+        std::reference_wrapper<cell::Cell> __rhs
+      ) const
+        { return &__lhs.get() == &__rhs.get(); }
+    };
+
+    struct hash
     {
       std::size_t operator()(std::reference_wrapper<cell::Cell> __cell) const
         { return std::hash<cell::Cell*>()(&__cell.get()); }
@@ -161,8 +170,8 @@ namespace rlst::par
 
     using second_diff_type =
       std::pair<
-        std::reference_wrapper<cell::Cell>,
-        std::reference_wrapper<cell::Cell>
+        std::pair<std::reference_wrapper<cell::Cell>, Point>,
+        std::pair<std::reference_wrapper<cell::Cell>, Point>
       >;
 
     using diff_type = std::variant<first_diff_type, second_diff_type>;
@@ -205,7 +214,8 @@ namespace rlst::par
     : public core::grid<
       std::unordered_set<
         std::reference_wrapper<cell::Cell>,
-        details::placement_grid_hasher
+        details::hash,
+        details::equal_to
       >
     >
   {
@@ -214,7 +224,8 @@ namespace rlst::par
       core::grid<
         std::unordered_set<
           std::reference_wrapper<cell::Cell>,
-          details::placement_grid_hasher
+          details::hash,
+          details::equal_to
         >
       >;
   public:
@@ -247,9 +258,19 @@ namespace rlst::par
      * @param[in] __height The height of the grid
      */
 
-    placement_grid(size_type __width, size_type __height)
-      : base_type(__height, __width,  {})
+    explicit placement_grid(size_type __width, size_type __height)
+      : base_type(__width, __height,  {})
       , m_cells()
+    {}
+
+    /**
+     * Constructs a placement grid with its parameters
+     *
+     * @param[in] __frame The size of the grid
+     */
+
+    explicit placement_grid(const Size& __frame)
+      : placement_grid(__frame.width, __frame.height)
     {}
 
     /**
@@ -265,13 +286,13 @@ namespace rlst::par
      */
 
     template <class InputIt0, class InputIt1>
-    placement_grid(
+    explicit placement_grid(
       size_type __width,
       size_type __height,
       InputIt0&& __begin,
       InputIt1&& __end
     )
-      : base_type(__height, __width,  {})
+      : base_type(__width, __height,  {})
       , m_cells(std::forward<InputIt0>(__begin), std::forward<InputIt1>(__end))
     {
       std::for_each(
@@ -280,6 +301,31 @@ namespace rlst::par
         [&] (cell::Cell& __i) { insert(__i); }
       );
     }
+
+    /**
+     * Constructs a placement grid with its parameters
+     *
+     * @tparam InputIt0 The iterator type (enable perfect forwarding)
+     * @tparam InputIt1 The iterator type (enable perfect forwarding)
+     *
+     * @param[in] __frame The size of the grid
+     * @param[in, out] __begin The iterator pointing to the first cell to insert
+     * @param[in, out] __end The iterator pointing to the last cell to insert
+     */
+
+    template <class InputIt0, class InputIt1>
+    explicit placement_grid(
+      const Size& __frame,
+      InputIt0&& __begin,
+      InputIt1&& __end
+    )
+      : placement_grid(
+        __frame.width,
+        __frame.height,
+        std::forward<InputIt0>(__begin),
+        std::forward<InputIt1>(__end)
+      )
+    {}
   public:
     /**
      * Copy assignment operator
@@ -475,7 +521,7 @@ namespace rlst::par
      */
 
     real_t overlap_cost() const
-      { return 100._r * overlap_penalty(); }
+      { return 700._r * overlap_penalty(); }
 
     /**
      * Compute the emptiness penalty
@@ -701,7 +747,7 @@ namespace rlst::par
             static_cast<literal_t>(__frame.width - __cell.type()->size.width)
           ),
 
-          static_cast<literal_t>(__cell.type()->size.width) / 10_l
+          static_cast<literal_t>(__cell.type()->size.width)
         ),
 
         std::min(
@@ -710,12 +756,15 @@ namespace rlst::par
             static_cast<literal_t>(__frame.height - __cell.type()->size.height)
           ),
 
-          static_cast<literal_t>(__cell.type()->size.height) / 10_l
+          static_cast<literal_t>(__cell.type()->size.height)
         ),
 
         0_l
       );
   }
+
+  template <class InputIt>
+  Size frame_of(InputIt __begin, InputIt __end);
 }
 
 #include "placement.ipp"

@@ -46,6 +46,52 @@ namespace rlst::par
       tl.x() += i->type()->size.width;
       max_height = std::max(max_height, i->type()->size.height);
     }
+
+    Size frame = frame_of(__begin_cell, __end_cell);
+    frame.width = std::max(frame.width, __desired_row_length);
+    frame *= 2_ul;
+
+    placement_grid config(frame, __begin_cell, __end_cell);
+    row_length_cost compute_c_3(static_cast<real_t>(__desired_row_length));
+
+    real_t c_20 = 1._r;
+
+    while (c_20 != 0._r) {
+      real_t t = default_first_temperature;
+
+      c_20 = config.overlap_cost();
+
+      real_t c =
+        wire_length_cost(__begin_net, __end_net) +
+        c_20 +
+        config.emptiness_cost() +
+        compute_c_3(__begin_cell, __end_cell);
+
+      for (iteration_t i = 0_it; i != 200_it; ++i) {
+        for (iteration_t j = 0_it; j != 16_it; ++j) {
+          evolve_reverter reverter = config.evolve();
+
+          real_t new_c_20 = config.overlap_cost();
+
+          real_t new_c =
+            wire_length_cost(__begin_net, __end_net) +
+            new_c_20 +
+            config.emptiness_cost() +
+            compute_c_3(__begin_cell, __end_cell);
+
+          real_t delta_c = new_c - c;
+
+          if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
+            c_20 = new_c_20;
+            c = new_c;
+          } else {
+            reverter.revert();
+          }
+        }
+
+        t = reduce(t);
+      }
+    }
   }
 
   template <class InputIt>
@@ -101,5 +147,27 @@ namespace rlst::par
         }
       )
     ) / static_cast<real_t>(row_to_min_max.size());
+  }
+
+  template <class InputIt>
+  Size frame_of(InputIt __begin, InputIt __end)
+  {
+    Size ret { 0_ul, 0_ul };
+
+    for (; __begin != __end; ++__begin) {
+      ret.width =
+        std::max(
+          ret.width,
+          __begin->position().x() + __begin->type()->size.width
+        );
+
+      ret.height =
+        std::max(
+          ret.height,
+          __begin->position().y() + __begin->type()->size.height
+        );
+    }
+
+    return ret;
   }
 }
