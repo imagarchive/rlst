@@ -8,6 +8,7 @@
 #include <array>
 #include <fstream>
 #include <vector>
+#include <cstdint>
 
 class MCA
 {
