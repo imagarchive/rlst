@@ -16,23 +16,26 @@
  */
 
 
-#include "par/placement.hpp"
+#include "core/grid.hpp"
 #include <gtest/gtest.h>
 
-using namespace rlst::par;
+using namespace rlst::core;
 
-namespace rlst::par::details
+using rlst::par::literal_t;
+using rlst::par::uliteral_t;
+
+namespace rlst::core::details
 {
   template <class R>
   void PrintTo(
-    const overlap_grid_iterator<R>& __it,
+    const grid_iterator<R>& __it,
     std::ostream* __os
   )
   {
     auto x = &*__it.m_column_iterator;
 
     *__os
-      << "overlap_grid_iterator { "
+      << "grid_iterator { "
         << "column_iterator = " << x << " (" << *x << "), "
         << "row_iterator = " << &*__it.m_row_iterator << ", "
         << "column_index = " << __it.column_index() << ", "
@@ -42,26 +45,26 @@ namespace rlst::par::details
   }
 }
 
-TEST(overlap_grid_iterator__basics__test, is_constructible)
+TEST(grid_iterator__basics__test, is_constructible)
 {
   std::vector<std::vector<int>> grid(1);
-  details::overlap_grid_iterator(grid.begin(), 0, 0);
+  details::grid_iterator(grid.begin(), 0, 0);
 }
 
-TEST(overlap_grid_iterator__basics__test, is_default_constructible)
+TEST(grid_iterator__basics__test, is_default_constructible)
 {
   using vector = std::vector<std::vector<int>>;
-  details::overlap_grid_iterator<decltype(std::declval<vector>().begin())>();
+  details::grid_iterator<decltype(std::declval<vector>().begin())>();
 }
 
-TEST(overlap_grid_iterator__basics__test, incompatible_ne)
+TEST(grid_iterator__basics__test, incompatible_ne)
 {
   EXPECT_DEATH(
     {
       std::vector<std::vector<int>> grid(1);
 
-      details::overlap_grid_iterator lhs(grid.begin(), 0, 0);
-      details::overlap_grid_iterator rhs(grid.begin(), 0, 1);
+      details::grid_iterator lhs(grid.begin(), 0, 0);
+      details::grid_iterator rhs(grid.begin(), 0, 1);
 
       static_cast<void>(lhs != rhs);
     },
@@ -70,14 +73,14 @@ TEST(overlap_grid_iterator__basics__test, incompatible_ne)
   );
 }
 
-TEST(overlap_grid_iterator__basics__test, incompatible_sub)
+TEST(grid_iterator__basics__test, incompatible_sub)
 {
   EXPECT_DEATH(
     {
       std::vector<std::vector<int>> grid(1);
 
-      details::overlap_grid_iterator lhs(grid.begin(), 0, 0);
-      details::overlap_grid_iterator rhs(grid.begin(), 0, 1);
+      details::grid_iterator lhs(grid.begin(), 0, 0);
+      details::grid_iterator rhs(grid.begin(), 0, 1);
 
       static_cast<void>(lhs - rhs);
     },
@@ -86,32 +89,32 @@ TEST(overlap_grid_iterator__basics__test, incompatible_sub)
   );
 }
 
-class overlap_grid_iterator__multi_pass_guarantee__test
+class grid_iterator__multi_pass_guarantee__test
   : public testing::TestWithParam<int>
 {};
 
-TEST_P(overlap_grid_iterator__multi_pass_guarantee__test, increment)
+TEST_P(grid_iterator__multi_pass_guarantee__test, increment)
 {
   int row_size = GetParam();
 
   std::vector<std::vector<int>> grid(4, std::vector<int>(4));
 
-  details::overlap_grid_iterator lhs(grid.begin(), 0, row_size);
-  details::overlap_grid_iterator rhs(grid.begin(), 0, row_size);
+  details::grid_iterator lhs(grid.begin(), 0, row_size);
+  details::grid_iterator rhs(grid.begin(), 0, row_size);
 
   EXPECT_EQ(lhs, rhs);
   EXPECT_EQ(++lhs, ++rhs);
 }
 
-TEST_P(overlap_grid_iterator__multi_pass_guarantee__test, invariant)
+TEST_P(grid_iterator__multi_pass_guarantee__test, invariant)
 {
   int row_size = GetParam();
 
   std::vector<std::vector<int>> grid(4, std::vector<int>(4));
 
-  details::overlap_grid_iterator a(grid.begin(), 0, row_size);
-  details::overlap_grid_iterator c(a);
-  details::overlap_grid_iterator b(grid.begin(), 0, row_size);
+  details::grid_iterator a(grid.begin(), 0, row_size);
+  details::grid_iterator c(a);
+  details::grid_iterator b(grid.begin(), 0, row_size);
 
   ++c;
 
@@ -120,41 +123,41 @@ TEST_P(overlap_grid_iterator__multi_pass_guarantee__test, invariant)
 
 INSTANTIATE_TEST_SUITE_P(
   same_row,
-  overlap_grid_iterator__multi_pass_guarantee__test,
+  grid_iterator__multi_pass_guarantee__test,
   testing::Range(2, 5)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_row,
-  overlap_grid_iterator__multi_pass_guarantee__test,
+  grid_iterator__multi_pass_guarantee__test,
   testing::Values(1)
 );
 
-class overlap_grid_iterator__output__test
+class grid_iterator__output__test
   : public testing::TestWithParam<int>
 {
 protected:
-  overlap_grid_iterator__output__test()
+  grid_iterator__output__test()
     : grid(4, std::vector<int>(4, 0))
   {}
 protected:
   std::vector<std::vector<int>> grid;
 };
 
-TEST_P(overlap_grid_iterator__output__test, forward)
+TEST_P(grid_iterator__output__test, forward)
 {
   int index = GetParam();
-  details::overlap_grid_iterator a(grid.begin(), 0, 3);
+  details::grid_iterator a(grid.begin(), 0, 3);
 
   a[index] = 1;
 
   ASSERT_EQ(a[index], 1);
 }
 
-TEST_P(overlap_grid_iterator__output__test, backward)
+TEST_P(grid_iterator__output__test, backward)
 {
   int index = -GetParam();
-  details::overlap_grid_iterator a(grid.begin() + 2, 2, 3);
+  details::grid_iterator a(grid.begin() + 2, 2, 3);
 
   a[index] = 1;
 
@@ -163,71 +166,71 @@ TEST_P(overlap_grid_iterator__output__test, backward)
 
 INSTANTIATE_TEST_SUITE_P(
   same_row,
-  overlap_grid_iterator__output__test,
+  grid_iterator__output__test,
   testing::Range(0, 3)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_row,
-  overlap_grid_iterator__output__test,
+  grid_iterator__output__test,
   testing::Range(3, 9)
 );
 
-TEST(overlap_grid_iterator__basics__test, bidirectional)
+TEST(grid_iterator__basics__test, bidirectional)
 {
   std::vector<std::vector<int>> grid(2, std::vector<int>(2, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 1, 2);
-  details::overlap_grid_iterator b(grid.begin(), 1, 2);
+  details::grid_iterator a(grid.begin(), 1, 2);
+  details::grid_iterator b(grid.begin(), 1, 2);
 
   ASSERT_EQ(a, b);
   ASSERT_EQ(--a, --b);
 }
 
-TEST(overlap_grid_iterator__cmp__test, lt)
+TEST(grid_iterator__cmp__test, lt)
 {
   std::vector<std::vector<int>> grid(2, std::vector<int>(2, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 0, 2);
-  details::overlap_grid_iterator b(grid.begin(), 1, 2);
+  details::grid_iterator a(grid.begin(), 0, 2);
+  details::grid_iterator b(grid.begin(), 1, 2);
 
   ASSERT_LT(a, b);
 }
 
-TEST(overlap_grid_iterator__cmp__test, gt)
+TEST(grid_iterator__cmp__test, gt)
 {
   std::vector<std::vector<int>> grid(2, std::vector<int>(2, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 1, 2);
-  details::overlap_grid_iterator b(grid.begin(), 0, 2);
+  details::grid_iterator a(grid.begin(), 1, 2);
+  details::grid_iterator b(grid.begin(), 0, 2);
 
   ASSERT_GT(a, b);
 }
 
-TEST(overlap_grid_iterator__cmp__test, le)
+TEST(grid_iterator__cmp__test, le)
 {
   std::vector<std::vector<int>> grid(2, std::vector<int>(2, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 0, 2);
-  details::overlap_grid_iterator b(grid.begin(), 0, 2);
+  details::grid_iterator a(grid.begin(), 0, 2);
+  details::grid_iterator b(grid.begin(), 0, 2);
 
   ASSERT_GE(a, b);
 }
 
-TEST(overlap_grid_iterator__cmp__test, ge)
+TEST(grid_iterator__cmp__test, ge)
 {
   std::vector<std::vector<int>> grid(2, std::vector<int>(2, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 0, 2);
-  details::overlap_grid_iterator b(grid.begin(), 0, 2);
+  details::grid_iterator a(grid.begin(), 0, 2);
+  details::grid_iterator b(grid.begin(), 0, 2);
 
   ASSERT_GE(a, b);
 }
 
-class overlap_grid_iterator__select__test : public testing::TestWithParam<int>
+class grid_iterator__select__test : public testing::TestWithParam<int>
 {
 protected:
-  overlap_grid_iterator__select__test()
+  grid_iterator__select__test()
     : grid()
   {
     grid.reserve(4);
@@ -247,11 +250,11 @@ protected:
   std::vector<std::vector<int>> grid;
 };
 
-TEST_P(overlap_grid_iterator__select__test, forward)
+TEST_P(grid_iterator__select__test, forward)
 {
   int offset = GetParam();
 
-  details::overlap_grid_iterator it(grid.begin(), 0, 4 - offset, offset);
+  details::grid_iterator it(grid.begin(), 0, 4 - offset, offset);
 
   for (int i = 0; i != 4; ++i) {
     for (int j = offset; j != 4; ++j) {
@@ -261,13 +264,13 @@ TEST_P(overlap_grid_iterator__select__test, forward)
   }
 }
 
-TEST_P(overlap_grid_iterator__select__test, backward)
+TEST_P(grid_iterator__select__test, backward)
 {
   int offset = GetParam();
 
   // Force starting at the bottom right corner
 
-  details::overlap_grid_iterator it(
+  details::grid_iterator it(
     grid.begin() + 3,
     3 - offset,
     4 - offset,
@@ -284,28 +287,28 @@ TEST_P(overlap_grid_iterator__select__test, backward)
 
 INSTANTIATE_TEST_SUITE_P(
   no_offset,
-  overlap_grid_iterator__select__test,
+  grid_iterator__select__test,
   testing::Values(0)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   with_offset,
-  overlap_grid_iterator__select__test,
+  grid_iterator__select__test,
   testing::Range(1, 4)
 );
 
-class overlap_grid_iterator__increment__test
+class grid_iterator__increment__test
   : public testing::TestWithParam<int>
 {};
 
-TEST_P(overlap_grid_iterator__increment__test, forward)
+TEST_P(grid_iterator__increment__test, forward)
 {
   int n = GetParam();
 
   std::vector<std::vector<int>> grid(4, std::vector<int>(4, 0));
 
-  details::overlap_grid_iterator a(grid.begin(), 0, 4);
-  details::overlap_grid_iterator b(grid.begin(), 0, 4);
+  details::grid_iterator a(grid.begin(), 0, 4);
+  details::grid_iterator b(grid.begin(), 0, 4);
 
   a += n;
 
@@ -316,14 +319,14 @@ TEST_P(overlap_grid_iterator__increment__test, forward)
   ASSERT_EQ(a, b);
 }
 
-TEST_P(overlap_grid_iterator__increment__test, backward)
+TEST_P(grid_iterator__increment__test, backward)
 {
   int n = GetParam();
 
   std::vector<std::vector<int>> grid(4, std::vector<int>(4, 0));
 
-  details::overlap_grid_iterator a(grid.begin() + 3, 3, 4);
-  details::overlap_grid_iterator b(grid.begin() + 3, 3, 4);
+  details::grid_iterator a(grid.begin() + 3, 3, 4);
+  details::grid_iterator b(grid.begin() + 3, 3, 4);
 
   a -= n;
 
@@ -336,24 +339,86 @@ TEST_P(overlap_grid_iterator__increment__test, backward)
 
 INSTANTIATE_TEST_SUITE_P(
   same_row,
-  overlap_grid_iterator__increment__test,
+  grid_iterator__increment__test,
   testing::Range(0, 4)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_one,
-  overlap_grid_iterator__increment__test,
+  grid_iterator__increment__test,
   testing::Range(4, 8)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_two,
-  overlap_grid_iterator__increment__test,
+  grid_iterator__increment__test,
   testing::Range(8, 12)
 );
 
 INSTANTIATE_TEST_SUITE_P(
   jump_three,
-  overlap_grid_iterator__increment__test,
+  grid_iterator__increment__test,
   testing::Range(12, 16)
 );
+
+class grid__iterator__test : public testing::Test
+{
+protected:
+  grid__iterator__test()
+    : g(20, 20, 1)
+  {}
+protected:
+  grid<int> g;
+};
+
+TEST_F(grid__iterator__test, select_forward)
+{
+  for (auto i = g.begin(); i != g.end(); ++i) {
+    ASSERT_EQ(*i, 1);
+  }
+}
+
+TEST_F(grid__iterator__test, select_backward)
+{
+  for (auto i = g.rbegin(); i != g.rend(); ++i) {
+    ASSERT_EQ(*i, 1);
+  }
+}
+
+TEST_F(grid__iterator__test, distance)
+{
+  ASSERT_EQ(g.end() - g.begin(), 400);
+}
+
+TEST(grid__size__test, basic)
+{
+  grid<int> grid(20, 20);
+  ASSERT_EQ(grid.size(), 400);
+}
+
+TEST(grid__size__test, empty)
+{
+  grid<int> grid;
+  EXPECT_DEATH({ grid.size(); }, "");
+}
+
+TEST(grid__basics__test, to_const_iterator)
+{
+  ASSERT_TRUE(
+    (
+      std::is_assignable_v<
+        grid<int>::const_iterator,
+        grid<int>::iterator
+      >
+    )
+  );
+
+  ASSERT_TRUE(
+    (
+      std::is_constructible_v<
+        grid<int>::const_iterator,
+        grid<int>::iterator
+      >
+    )
+  );
+}

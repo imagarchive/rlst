@@ -89,7 +89,14 @@ CompileFlags:
 EOF
 
 		shift 2
-		[[ "$#" -eq 0 ]] || echo
+
+		if [[ "$#" -ne 0 ]]; then
+		  cat << EOF
+
+---
+
+EOF
+		fi
 	done
 }
 

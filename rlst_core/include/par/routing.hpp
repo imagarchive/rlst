@@ -12,8 +12,24 @@
 
 namespace rlst::par
 {
+
   /**
-   * Given a placement, returns routes
+   * The types of blocks that can appear on a route
+   *
+   * Added to routes by @ref route
+   */
+
+  enum class RouteElement
+  {
+      redstone,
+      northFacingRepeater,
+      eastFacingRepeater,
+      southFacingRepeater,
+      westFacingRepeater
+  };
+
+  /**
+   * Given a placement, returns routes and their composition
    *
    * The algorithm is far from optimal, but it is decent enough for small
    * circuits.
@@ -26,10 +42,11 @@ namespace rlst::par
    * the routing algorithm
    * @param[in] __size The size of the area available to the routing algorithm
    *
-   * @return The segments that represent the routes
+   * @return The routes and the blocks they are made of (oriented repeater or
+   * redstone)
    */
 
-  std::vector<std::vector<Point>> route(
+  std::vector<std::vector<std::pair<Point, RouteElement>>> route(
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size

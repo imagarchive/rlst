@@ -1,0 +1,644 @@
+/*
+ * Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
+#ifndef RLST_RLST_CORE_GRID_HPP
+#  define RLST_RLST_CORE_GRID_HPP
+
+#include "core.hpp"
+#include "par/cell/Cell.hpp"
+
+#include <boost/contract.hpp>
+#include <cstdint>
+#include <vector>
+
+namespace rlst::core
+{
+
+#ifndef RLST_DOXYGEN_SHOULD_SKIP_THIS
+
+  namespace details
+  {
+    // TODO: add `noexcept` qualifiers
+
+    template <class RowIterator>
+    class grid_iterator
+    {
+      RLST_ENFORCE_RULE_OF_FOUR(grid_iterator);
+    public:
+      using row_iterator_type = RowIterator;
+
+      /*
+       * This type is equal to
+       * - `typename std::iterator_traits<RowIterator>::value_type::iterator`, or
+       * - `typename std::iterator_traits<RowIterator>::value_type::const_iterator`.
+       *
+       * According to the constness of the `value_type` behind `RowIterator`,
+       * one is choosen over the other.
+       */
+
+      using column_iterator_type =
+        decltype(std::begin(*std::declval<RowIterator>()));
+
+      using value_type =
+        typename std::iterator_traits<column_iterator_type>::value_type;
+
+      using difference_type =
+        std::common_type_t<
+          typename std::iterator_traits<column_iterator_type>::difference_type,
+          typename std::iterator_traits<row_iterator_type>::difference_type
+        >;
+
+      using pointer =
+        typename std::iterator_traits<column_iterator_type>::pointer;
+
+      using reference =
+        typename std::iterator_traits<column_iterator_type>::reference;
+
+      using iterator_category = std::random_access_iterator_tag;
+    private:
+      template <class>
+      friend class grid_iterator;
+
+      template <class R>
+      friend bool operator==(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend bool operator!=(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend bool operator<(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend bool operator>(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend bool operator<=(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend bool operator>=(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend typename grid_iterator<R>::difference_type
+      operator-(const grid_iterator<R>&, const grid_iterator<R>&);
+
+      template <class R>
+      friend void swap(grid_iterator<R>&, grid_iterator<R>&);
+
+#ifdef RLST_WITH_TESTS
+      template <class R>
+      friend void PrintTo(
+        const grid_iterator<R>& __it,
+        std::ostream* __os
+      );
+#endif
+    public:
+      constexpr grid_iterator()
+        : m_column_iterator()
+        , m_row_iterator()
+        , m_offset(0)
+        , m_row_size(0)
+      {}
+
+      template <
+        class U,
+
+        std::enable_if_t<
+          std::conjunction_v<
+            core::is_same_template<std::decay_t<U>, grid_iterator>,
+            std::negation<std::is_same<U, grid_iterator>>,
+
+            std::is_convertible<
+              typename U::row_iterator_type,
+              row_iterator_type
+            >,
+
+            std::is_convertible<
+              typename U::column_iterator_type,
+              column_iterator_type
+            >
+          >
+        >* = nullptr
+      >
+      constexpr grid_iterator(U&& __other)
+        : m_column_iterator(std::forward<U>(__other).m_column_iterator)
+        , m_row_iterator(std::forward<U>(__other).m_row_iterator)
+        , m_offset(__other.m_offset)
+        , m_row_size(__other.m_row_size)
+      {}
+
+      template <class U>
+      explicit constexpr grid_iterator(
+        U&& __row_iterator,
+        difference_type __column_index,
+        difference_type __row_size,
+        difference_type __offset = 0
+      )
+        : m_column_iterator(__row_iterator->begin() + __offset + __column_index)
+        , m_row_iterator(std::forward<U>(__row_iterator))
+        , m_offset(__offset)
+        , m_row_size(__row_size)
+      {}
+    public:
+      template <
+        class U,
+
+        std::enable_if_t<
+          std::conjunction_v<
+            core::is_same_template<std::decay_t<U>, grid_iterator>,
+            std::negation<std::is_same<U, grid_iterator>>,
+
+            std::is_convertible<
+              typename U::row_iterator_type,
+              row_iterator_type
+            >,
+
+            std::is_convertible<
+              typename U::column_iterator_type,
+              column_iterator_type
+            >
+          >
+        >* = nullptr
+      >
+      constexpr grid_iterator& operator=(U&& __rhs)
+      {
+        m_column_iterator = std::forward<U>(__rhs).m_column_iterator;
+        m_row_iterator = std::forward<U>(__rhs).m_row_iterator;
+        m_offset = __rhs.m_offset;
+        m_row_size = __rhs.m_row_size;
+
+        return *this;
+      }
+    public:
+      constexpr reference operator*() const
+        { return *m_column_iterator; }
+
+      constexpr pointer operator->() const
+        { return m_column_iterator.operator->(); }
+
+      constexpr grid_iterator& operator++();
+      constexpr grid_iterator operator++(int);
+
+      grid_iterator operator--();
+      grid_iterator operator--(int);
+
+      constexpr grid_iterator& operator+=(difference_type __n);
+
+      constexpr grid_iterator& operator-=(difference_type __n)
+        { return *this += -__n; }
+
+      constexpr grid_iterator operator-(difference_type __n) const;
+
+      constexpr reference operator[](difference_type __n) const
+        { return *(*this + __n); }
+    public:
+      constexpr row_iterator_type row_iterator() const
+        { return m_row_iterator; }
+    public:
+      constexpr difference_type column_index() const
+        { return m_column_iterator - column_begin(); }
+
+      constexpr column_iterator_type column_begin() const
+        { return m_row_iterator->begin() + m_offset; }
+
+      constexpr column_iterator_type column_end() const
+        { return m_row_iterator->begin() + m_row_size + m_offset; }
+    private:
+      column_iterator_type m_column_iterator;
+      row_iterator_type m_row_iterator;
+
+      difference_type m_offset;
+      difference_type m_row_size;
+    };
+
+    template <class U>
+    grid_iterator(
+      U&&,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type
+    ) -> grid_iterator<U>;
+
+    template <class U>
+    grid_iterator(
+      U&&,
+      typename grid_iterator<U>::difference_type,
+      typename grid_iterator<U>::difference_type
+    ) -> grid_iterator<U>;
+
+    template <class R>
+    bool operator==(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    bool operator!=(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    bool operator<(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    bool operator>(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    bool operator<=(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    bool operator>=(
+      const grid_iterator<R>& __lhs,
+      const grid_iterator<R>& __rhs
+    );
+
+    template <class R>
+    constexpr grid_iterator<R> operator+(
+      grid_iterator<R> __lhs,
+      typename grid_iterator<R>::difference_type __n
+    )
+      { return __lhs += __n; }
+
+    template <class R>
+    typename grid_iterator<R>::difference_type
+    operator-(const grid_iterator<R>& __lhs, const grid_iterator<R>& __rhs);
+
+    template <class R>
+    void swap(grid_iterator<R>& __lhs, grid_iterator<R>& __rhs);
+  }
+
+#endif // RLST_DOXYGEN_SHOULD_SKIP_THIS
+
+  /**
+   * A grid
+   */
+
+  template <typename T>
+  class grid
+  {
+    template <typename U>
+    friend void swap(grid<U>&, grid<U>&) noexcept;
+  public:
+    /// The type of the data stored in the grid
+    using value_type = T;
+  private:
+    using line_type = std::vector<value_type>;
+    using grid_type = std::vector<line_type>;
+  public:
+    /// A reference to an element of the container
+    using reference = std::add_lvalue_reference_t<T>;
+
+    /// A constant reference to an element of the container
+    using const_reference = std::add_const_t<std::add_lvalue_reference_t<T>>;
+
+    /// The type of the iterator
+    using iterator =
+      details::grid_iterator<typename grid_type::iterator>;
+
+    /// The type of the const iterator
+    using const_iterator =
+      details::grid_iterator<typename grid_type::const_iterator>;
+
+    /// The `difference_type` of the underlying iterator types
+    using difference_type = typename iterator::difference_type;
+
+    static_assert(
+      std::is_same_v<
+        typename iterator::difference_type,
+        typename const_iterator::difference_type
+      >,
+
+      "The difference types of the iterators must be the same"
+    );
+
+    /// The type used to represent the size of the container
+    using size_type =
+      std::common_type_t<
+        typename grid_type::size_type,
+        typename grid_type::value_type::size_type
+      >;
+  public:
+    /// The type of the reverse iterator
+    using reverse_iterator = std::reverse_iterator<iterator>;
+
+    /// The type of the constant reverse iterator
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+  public:
+    /// The default constructor
+    grid() = default;
+
+    /**
+     * Copy constructor
+     *
+     * @param[in] __other The overlap grid to copy from
+     */
+
+    grid(const grid& __other) = default;
+
+    /**
+     * Move constructor
+     *
+     * @param[in, out] __other The overlap grid to move from
+     */
+
+    grid(grid&& __other) = default;
+
+    /// The destructor
+    ~grid() = default;
+  public:
+    /**
+     * Constructs an overlap grid with its parameters
+     *
+     * @param[in] __width The width of the grid
+     * @param[in] __height The height of the grid
+     * @param[in, out] __default The default value to use
+     */
+
+    grid(
+      size_type __width,
+      size_type __height,
+      T __default = {}
+    )
+      : m_grid(
+        __height + 2,
+        line_type(__width, std::move(__default))
+      )
+    {}
+  public:
+    /**
+     * Copy assignment operator
+     *
+     * @param[in] __rhs The overlap grid to copy from
+     * @return A reference to the updated overlap grid
+     */
+
+    grid& operator=(const grid& __rhs) = default;
+
+    /**
+     * Move assignment operator
+     *
+     * @param[in, out] __rhs The overlap grid to move from
+     * @return A reference to the updated overlap grid
+     */
+
+    grid& operator=(grid&& __rhs) noexcept = default;
+  public:
+    /**
+     * Get an iterator to the beginning of the grid
+     *
+     * @return An iterator to the beginning of the grid
+     */
+
+    iterator begin()
+      { return iterator(m_grid.begin() + 1, 0, width()); }
+
+    /**
+     * Get a constant iterator to the beginning of the grid
+     *
+     * @return A constant iterator to the beginning of the grid
+     */
+
+    const_iterator begin() const
+      { return const_iterator(m_grid.cbegin() + 1, 0, width()); }
+
+    /**
+     * Get a constant iterator to the beginning of the grid
+     *
+     * @return A constant iterator to the beginning of the grid
+     */
+
+    const_iterator cbegin() const
+      { return begin(); }
+
+    /**
+     * Get an iterator to the ending of the grid
+     *
+     * @return An iterator to the ending of the grid
+     */
+
+    iterator end()
+      { return iterator(m_grid.begin() + 1 + height(), 0, width()); }
+
+    /**
+     * Get a constant iterator to the ending of the grid
+     *
+     * @return A constant iterator to the ending of the grid
+     */
+
+    const_iterator end() const
+      { return const_iterator(m_grid.cbegin() + 1 + height(), 0, width()); }
+
+    /**
+     * Get a constant iterator to the ending of the grid
+     *
+     * @return A constant iterator to the ending of the grid
+     */
+
+    const_iterator cend() const
+      { return end(); }
+  public:
+    /**
+     * Get a reverse iterator to the ending of the grid
+     *
+     * @return A reverse iterator to the ending of the grid
+     */
+
+    reverse_iterator rbegin()
+      { return reverse_iterator(end()); }
+
+    /**
+     * Get a constant reverse iterator to the ending of the grid
+     *
+     * @return A constant reverse iterator to the ending of the grid
+     */
+
+    const_reverse_iterator rbegin() const
+      { return const_reverse_iterator(cend()); }
+
+    /**
+     * Get a constant reverse iterator to the ending of the grid
+     *
+     * @return A constant reverse iterator to the ending of the grid
+     */
+
+    const_reverse_iterator crbegin() const
+      { return rbegin(); }
+
+    /**
+     * Get a reverse iterator to the beginning of the grid
+     *
+     * @return A reverse iterator to the beginning of the grid
+     */
+
+    reverse_iterator rend()
+      { return reverse_iterator(begin()); }
+
+    /**
+     * Get a constant reverse iterator to the beginning of the grid
+     *
+     * @return A constant reverse iterator to the beginning of the grid
+     */
+
+    const_reverse_iterator rend() const
+      { return const_reverse_iterator(cbegin()); }
+
+    /**
+     * Get a constant reverse iterator to the beginning of the grid
+     *
+     * @return A constant reverse iterator to the beginning of the grid
+     */
+
+    const_reverse_iterator crend() const
+      { return rend(); }
+  public:
+    /**
+     * Get the number of column in the grid
+     *
+     * @return The number of column in the grid
+     */
+
+    size_type width() const noexcept
+      { return m_grid.front().size(); }
+
+    /**
+     * Get the number of row in the grid
+     *
+     * @return The number of row in the grid
+     */
+
+    size_type height() const noexcept
+      { return m_grid.size() - 2; }
+
+    /**
+     * Get the size of the container
+     *
+     * @return The size of the container
+     */
+
+    size_type size() const
+      { return width() * height(); }
+
+    /**
+     * Get the maximum size of the container
+     *
+     * @return The maximum size of the container
+     */
+
+    size_type max_size() const
+      { return m_grid.max_size() * m_grid.front().max_size(); }
+
+    /**
+     * Check if the container is empty
+     *
+     * @return `true` if the container is empty, `false` otherwise
+     */
+
+    bool empty() const noexcept
+      { return m_grid.empty(); }
+  public:
+    /**
+     * Swap the contents of this overlap grid with another
+     *
+     * This function exchanges the contents of the current overlap grid
+     * with those of the provided overlap grid. The operation is performed
+     * in constant time as it only swaps the internal data structures.
+     *
+     * @param[in, out] __rhs The overlap grid to swap with
+     */
+
+    void swap(grid& __rhs) noexcept
+      { return swap(*this, __rhs); }
+  protected:
+    grid_type m_grid;
+  };
+
+  /**
+   * Equality operator for @ref grid
+   *
+   * Compares two grid objects for equality. Two @ref grid objects are
+   * considered equal if their internal grid structures are identical.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   *
+   * @param[in] __lhs The left-hand side @ref grid to compare
+   * @param[in] __rhs The right-hand side @ref grid to compare
+   *
+   * @return `true` if the two \ref grid objects are equal, `false`
+   * otherwise
+   */
+
+  template <typename U>
+  bool operator==(const grid<U>& __lhs, const grid<U>& __rhs)
+  {
+    return
+      (__lhs.width() == __rhs.width()) &&
+      (__lhs.height() == __rhs.height()) &&
+      std::equal(__lhs.cbegin(), __lhs.cend(), __rhs.cbegin());
+  }
+
+  /**
+   * Inequality operator for @ref grid
+   *
+   * Compares two grid objects for inequality. Two @ref grid objects are
+   * considered unequal if their internal grid structures are different.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   *
+   * @param[in] __lhs The left-hand side @ref grid to compare
+   * @param[in] __rhs The right-hand side @ref grid to compare
+   *
+   * @return `true` if the two \ref grid objects are not equal, `false`
+   * otherwise
+   */
+
+  template <typename U>
+  bool operator!=(const grid<U>& __lhs, const grid<U>& __rhs)
+    { return !(__lhs == __rhs); }
+
+  /**
+   * Swap two @ref grid objects
+   *
+   * Exchanges the contents of two @ref grid objects. This operation is
+   * performed in constant time as it only swaps the internal data structures
+   * of the two objects.
+   *
+   * @tparam U The type of the data stored in the grid
+   * @tparam b The bin size of the grid
+   *
+   * @param[in, out] __lhs The first @ref grid object
+   * @param[in, out] __rhs The second @ref grid object
+   */
+
+  template <typename U>
+  void swap(grid<U>& __lhs, grid<U>& __rhs) noexcept;
+}
+
+#include "grid.ipp"
+
+#endif // RLST_RLST_CORE_GRID_HPP

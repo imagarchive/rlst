@@ -1,0 +1,187 @@
+/*
+ * Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
+#include "par/placement.hpp"
+#include <random>
+
+namespace rlst::par
+{
+  real_t uniform()
+  {
+    std::random_device device;
+    std::mt19937 generator(device());
+    std::uniform_real_distribution distribution(0._r, 1._r);
+
+    return distribution(generator);
+  }
+
+  /* placement_grid */
+
+  void evolve_reverter::revert()
+  {
+    std::visit(
+      core::lambda_wrapper {
+        [&] (first_diff_type& __diff) {
+          m_placement_grid.get().erase(__diff.first);
+          __diff.first.get().position() = std::move(__diff.second);
+          m_placement_grid.get().insert(__diff.first);
+        },
+
+        [&] (second_diff_type& __diff) {
+          using std::swap;
+
+          auto [from, to] = __diff.first;
+
+          m_placement_grid.get().erase(from);
+          from.get().position() = std::move(to);
+          m_placement_grid.get().insert(from);
+
+          std::tie(from, to) = __diff.second;
+
+          m_placement_grid.get().erase(from);
+          from.get().position() = std::move(to);
+          m_placement_grid.get().insert(from);
+        }
+      },
+
+      m_diff
+    );
+  }
+
+  std::pair<placement_grid::iterator, placement_grid::iterator>
+  placement_grid::rect(const par::cell::Cell& __cell)
+  {
+    std::pair<iterator, iterator> ret;
+
+    boost::contract::check c =
+      boost::contract::public_function(this)
+
+        .postcondition(
+          [&] { BOOST_CONTRACT_ASSERT(ret.second >= ret.first); }
+        );
+
+    ret = std::make_pair(top_left(__cell), bottom_right(__cell));
+
+    return ret;
+  }
+
+  std::pair<placement_grid::const_iterator, placement_grid::const_iterator>
+  placement_grid::rect(const par::cell::Cell& __cell) const
+  {
+    std::pair<const_iterator, const_iterator> ret;
+
+    boost::contract::check c =
+      boost::contract::public_function(this)
+
+        .postcondition(
+          [&] { BOOST_CONTRACT_ASSERT(ret.second >= ret.first); }
+        );
+
+    ret = std::make_pair(top_left(__cell), bottom_right(__cell));
+
+    return ret;
+  }
+
+  std::pair<placement_grid::iterator, placement_grid::iterator>
+  placement_grid::insert(cell::Cell& __cell)
+  {
+    auto ret = rect(__cell);
+
+    for (auto i = ret.first; i != ret.second; ++i) {
+      i->insert(__cell);
+    }
+
+    return ret;
+  }
+
+  std::pair<placement_grid::iterator, placement_grid::iterator>
+  placement_grid::erase(cell::Cell& __cell)
+  {
+    auto ret = rect(__cell);
+
+    for (auto i = ret.first; i != ret.second; ++i) {
+      i->erase(__cell);
+    }
+
+    return ret;
+  }
+
+  evolve_reverter placement_grid::evolve()
+  {
+    using std::swap;
+
+    Size frame {
+      static_cast<uliteral_t>(width()),
+      static_cast<uliteral_t>(height())
+    };
+
+    std::reference_wrapper<cell::Cell> from = m_cells.front();
+    Point to = from.get().position();
+
+    while (from.get().position() == to) {
+      from = *core::choice(m_cells.begin(), m_cells.end());
+      to = random_neighbor(from, frame);
+    }
+
+    erase(from);
+    swap(from.get().position(), to);
+
+    auto [dest_begin, dest_end] = rect(from);
+
+    value_type::iterator to_swap;
+    bool is_not_found = true;
+
+    for (auto i = dest_begin; (i != dest_end) && is_not_found; ++i) {
+      to_swap =
+        std::find_if(
+          i->begin(),
+          i->end(),
+
+          [&] (const cell::Cell& __c) {
+            return (&__c != &from.get()) && __c.can_be_moved_to(to, frame);
+          }
+        );
+
+      is_not_found = to_swap == i->end();
+    }
+
+    if (is_not_found) {
+      insert(from);
+      return evolve_reverter(*this, std::make_pair(from, to));
+    } else {
+      cell::Cell& t = *to_swap;
+
+      erase(t);
+
+      swap(t.position(), to);
+
+      insert(t);
+      insert(from);
+
+      return
+        evolve_reverter(
+          *this,
+
+          std::make_pair(
+            std::make_pair(from, t.position()),
+            std::make_pair(std::ref(t), to)
+          )
+        );
+    }
+  }
+}

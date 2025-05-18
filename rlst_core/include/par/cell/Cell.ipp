@@ -16,26 +16,20 @@
  */
 
 
-#include "par/cell/Cell.hpp"
-#include <boost/functional/hash.hpp>
-
 namespace rlst::par::cell
 {
-  std::size_t hash_value(const Cell& __input)
+  constexpr bool Cell::can_be_moved_to(
+    Point __to,
+    const Size& __frame
+  ) const noexcept
   {
-    std::size_t seed = 0;
+    if (__to.is_outside(__frame)) {
+      return false;
+    } else {
+      __to.x() += __frame.width;
+      __to.y() += __frame.height;
 
-    boost::hash_combine(seed, __input.position);
-    boost::hash_combine(seed, __input.type);
-
-    return seed;
-  }
-
-  void swap(Cell& __lhs, Cell& __rhs) noexcept
-  {
-    using std::swap;
-
-    swap(__lhs.position, __rhs.position);
-    swap(__lhs.type, __rhs.type);
+      return __to.is_outside(__frame);
+    }
   }
 }

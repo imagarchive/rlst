@@ -15,10 +15,13 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <iostream>
-
-int main()
+namespace rlst::par
 {
-    std::cout << "Hello world!" << std::endl;
+  constexpr Size& operator*=(Size& __this, uliteral_t __a) noexcept
+  {
+    __this.width *= __a;
+    __this.height *= __a;
+
+    return __this;
+  }
 }

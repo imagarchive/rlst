@@ -16,16 +16,26 @@
  */
 
 
-#include "par/placement.hpp"
-#include <random>
-
-namespace rlst::par
+namespace rlst::core
 {
-  real_t uniform()
+  template <class Iterator>
+  Iterator choice(Iterator __begin, Iterator __end)
+  {
+    using difference_type =
+      typename std::iterator_traits<Iterator>::difference_type;
+
+    difference_type n = std::distance(__begin, __end);
+    std::advance(__begin, randint(static_cast<difference_type>(0), n - 1));
+
+    return __begin;
+  }
+
+  template <typename T>
+  T randint(T __first, T __last)
   {
     std::random_device device;
     std::mt19937 generator(device());
-    std::uniform_real_distribution distribution(0._r, 1._r);
+    std::uniform_int_distribution<T> distribution(__first, __last - 1);
 
     return distribution(generator);
   }
