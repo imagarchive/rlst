@@ -71,6 +71,29 @@ namespace rlst::par
   };
 
   /**
+   * Multiply a @ref Size by a scalar in-place
+   *
+   * @param[in, out] __this The @ref Size to be scaled
+   * @param[in] __a The scalar multiplier
+   *
+   * @return A reference to the scaled @ref Size
+   */
+
+  constexpr Size& operator*=(Size& __this, uliteral_t __a) noexcept;
+
+  /**
+   * Multiply a @ref Size by a scalar
+   *
+   * @param[in] __a The scalar multiplier
+   * @param[in] __size The @ref Size to be multiplied
+   *
+   * @return A new @ref Size with dimensions scaled by the scalar
+   */
+
+  constexpr Size operator*(uliteral_t __a, Size __size) noexcept
+    { return __size *= __a; }
+
+  /**
    * Compare two @ref rlst::par::Size "sizes" for equality
    *
    * @param[in] __lhs The left hand side operand
@@ -281,5 +304,7 @@ namespace rlst::par
 
   void swap(Point& __lhs, Point& __rhs) noexcept;
 }
+
+#include "geometry.ipp"
 
 #endif // RLST_RLST_PAR_GEOMETRY_HPP

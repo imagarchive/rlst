@@ -44,6 +44,7 @@ set(
   RLST_CORE_IPP
   core/grid.ipp
   par/cell/Cell.ipp
+  par/geometry.ipp
   par/placement.ipp
   core.ipp
 )
