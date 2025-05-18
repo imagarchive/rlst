@@ -148,6 +148,69 @@ INSTANTIATE_TEST_SUITE_P(
   )
 );
 
+TEST(placement_grid__basics__test, evolve)
+{
+  std::vector cells {
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul),
+    cell_from_geometry_params(1_l, 3_l, 3_ul, 6_ul)
+  };
+
+  placement_grid origin(10_ul, 10_ul, cells.begin(), cells.end());
+  placement_grid copy = origin;
+
+  ASSERT_EQ(origin, copy);
+  evolve_reverter r = origin.evolve();
+  ASSERT_NE(origin, copy);
+  r.revert();
+  ASSERT_EQ(origin, copy);
+}
+
+TEST(placement_grid__overlap_penalty__test, no_overlap)
+{
+  std::vector cells {
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul),
+    cell_from_geometry_params(3_l, 3_l, 2_ul, 2_ul)
+  };
+
+  placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 0._r);
+}
+
+TEST(placement_grid__overlap_penalty__test, full_overlap)
+{
+  std::vector cells {
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul),
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul)
+  };
+
+  placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 2'000._r / static_cast<real_t>(g.size()));
+}
+
+TEST(placement_grid__overlap_penalty__test, partial_overlap)
+{
+  std::vector cells {
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul),
+    cell_from_geometry_params(1_l, 0_l, 2_ul, 2_ul)
+  };
+
+  placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 1'000._r / static_cast<real_t>(g.size()));
+}
+
+TEST(placement_grid__overlap_penalty__test, many)
+{
+  std::vector cells {
+    cell_from_geometry_params(0_l, 0_l, 2_ul, 2_ul),
+    cell_from_geometry_params(1_l, 0_l, 1_ul, 2_ul),
+    cell_from_geometry_params(1_l, 0_l, 1_ul, 2_ul),
+    cell_from_geometry_params(1_l, 0_l, 1_ul, 2_ul)
+  };
+
+  placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 3'000._r / static_cast<real_t>(g.size()));
+}
+
 TEST(row_length_penalty__basics__test, empty)
 {
   std::vector<Cell> cells;
