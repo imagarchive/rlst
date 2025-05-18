@@ -521,7 +521,7 @@ namespace rlst::par
      */
 
     real_t overlap_cost() const
-      { return 700._r * overlap_penalty(); }
+      { return 1'000._r * overlap_penalty(); }
 
     /**
      * Compute the emptiness penalty
