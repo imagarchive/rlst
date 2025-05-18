@@ -34,7 +34,7 @@ namespace rlst::par
     for (auto i = __begin_cell; i != __end_cell; ++i) {
       tr.x() += i->type()->size.width;
 
-      if (tr.x() >= __desired_row_length) {
+      if (tr.x() >= static_cast<literal_t>(__desired_row_length)) {
         tl.x() = 0;
         tl.y() += max_height;
 

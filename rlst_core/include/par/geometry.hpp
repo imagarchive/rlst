@@ -210,8 +210,8 @@ namespace rlst::par
       return
         (m_x < 0_l) ||
         (m_y < 0_l) ||
-        (m_x >= __frame.width) ||
-        (m_y >= __frame.height);
+        (m_x >= static_cast<literal_t>(__frame.width)) ||
+        (m_y >= static_cast<literal_t>(__frame.height));
     }
 
     /**

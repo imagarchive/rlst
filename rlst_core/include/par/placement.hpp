@@ -277,7 +277,7 @@ namespace rlst::par
       std::for_each(
         m_cells.cbegin(),
         m_cells.cend(),
-        [&] (const auto& __i) { insert(*__i); }
+        [&] (cell::Cell& __i) { insert(__i); }
       );
     }
   public:
@@ -462,10 +462,10 @@ namespace rlst::par
 
           core::transformed_binop(
             [] (const value_type& __set) {
-              return std::max(0._r, __set.size() - 1._r);
+              return std::max(0._r, static_cast<real_t>(__set.size()) - 1._r);
             }
           )
-        ) / size();
+        ) / static_cast<real_t>(size());
     }
 
     /**
@@ -496,7 +496,7 @@ namespace rlst::par
               return static_cast<real_t>(__set.empty());
             }
           )
-        ) / size();
+        ) / static_cast<real_t>(size());
     }
 
     /**
