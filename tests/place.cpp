@@ -88,5 +88,5 @@ TEST(place__test, basic)
     )
   };
 
-  place(cells.begin(), cells.end(), nets.begin(), nets.end(), 8_ul);
+  place(cells.begin(), cells.end(), nets.begin(), nets.end(), 12_ul);
 }
