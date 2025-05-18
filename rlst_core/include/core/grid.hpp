@@ -174,7 +174,15 @@ namespace rlst::core
           >
         >* = nullptr
       >
-      constexpr grid_iterator& operator=(U&& __rhs);
+      constexpr grid_iterator& operator=(U&& __rhs)
+      {
+        m_column_iterator = std::forward<U>(__rhs).m_column_iterator;
+        m_row_iterator = std::forward<U>(__rhs).m_row_iterator;
+        m_offset = __rhs.m_offset;
+        m_row_size = __rhs.m_row_size;
+
+        return *this;
+      }
     public:
       constexpr reference operator*() const
         { return *m_column_iterator; }

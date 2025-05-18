@@ -21,37 +21,6 @@ namespace rlst::core
   namespace details
   {
     template <class R>
-    template <
-      class U,
-
-      std::enable_if_t<
-        std::conjunction_v<
-          core::is_same_template<std::decay_t<U>, grid_iterator<R>>,
-          std::negation<std::is_same<U, grid_iterator<R>>>,
-
-          std::is_convertible<
-            typename U::row_iterator_type,
-            typename grid_iterator<R>::row_iterator_type
-          >,
-
-          std::is_convertible<
-            typename U::column_iterator_type,
-            typename grid_iterator<R>::column_iterator_type
-          >
-        >
-      >*
-    >
-    constexpr grid_iterator<R>& grid_iterator<R>::operator=(U&& __rhs)
-    {
-      m_column_iterator = std::forward<U>(__rhs).m_column_iterator;
-      m_row_iterator = std::forward<U>(__rhs).m_row_iterator;
-      m_offset = __rhs.m_offset;
-      m_row_size = __rhs.m_row_size;
-
-      return *this;
-    }
-
-    template <class R>
     constexpr grid_iterator<R>&
     grid_iterator<R>::operator++()
     {
