@@ -17,8 +17,28 @@
 
 
 #include <iostream>
+#include "mca_parser/MCA.hpp"
+#include "mca_parser/NBTChunkView.hpp" 
 
 int main()
 {
     std::cout << "Hello world!" << std::endl;
+
+    std::string mcaFile = "r.0.0.mca";
+
+    MCA file = readMcaFile(mcaFile);
+
+    // gets the first chunk
+    NBTChunkView view(file.chunks()[0]);
+
+    // creates a block
+    std::map<std::string, std::string> properties;
+    Block newBlock(0, 4, 0, "minecraft:redstone_block", properties);
+
+    //places a block
+    view.setBlock(newBlock);
+
+    writeData(file);
+
+    return 0;
 }
