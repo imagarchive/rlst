@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_CELL_PORTS_HPP
-#  define RLST_RLST_PAR_CELL_PORTS_HPP
+#ifndef RLST_CORE_RLST_PAR_CELL_PORTS_HPP
+#  define RLST_CORE_RLST_PAR_CELL_PORTS_HPP
 
 #include "par/geometry.hpp"
 
@@ -185,4 +185,4 @@ namespace rlst::par::cell
   literal_t absolute_y(const PlacedPort& __placed_port);
 }
 
-#endif // RLST_RLST_PAR_CELL_PORTS_HPP
+#endif // RLST_CORE_RLST_PAR_CELL_PORTS_HPP

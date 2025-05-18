@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_CELL_CELL_HPP
-#  define RLST_RLST_PAR_CELL_CELL_HPP
+#ifndef RLST_CORE_RLST_PAR_CELL_CELL_HPP
+#  define RLST_CORE_RLST_PAR_CELL_CELL_HPP
 
 #include "par/cell/types.hpp"
 #include "par/geometry.hpp"
@@ -198,4 +198,4 @@ namespace rlst::par::cell
 
 #include "Cell.ipp"
 
-#endif // RLST_RLST_PAR_CELL_CELL_HPP
+#endif // RLST_CORE_RLST_PAR_CELL_CELL_HPP

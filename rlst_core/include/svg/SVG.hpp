@@ -1,5 +1,5 @@
-#ifndef RLST_RLST_SVG_SVG
-#  define RLST_RLST_SVG_SVG
+#ifndef RLST_CORE_RLST_SVG_SVG
+#  define RLST_CORE_RLST_SVG_SVG
 
 #include "par/cell/Cell.hpp"
 #include "par/geometry.hpp"
@@ -49,4 +49,4 @@ namespace rlst::svg
   };
 }
 
-#endif // RLST_RLST_SVG_SVG
+#endif // RLST_CORE_RLST_SVG_SVG

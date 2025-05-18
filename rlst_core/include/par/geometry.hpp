@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_GEOMETRY_HPP
-#  define RLST_RLST_PAR_GEOMETRY_HPP
+#ifndef RLST_CORE_RLST_PAR_GEOMETRY_HPP
+#  define RLST_CORE_RLST_PAR_GEOMETRY_HPP
 
 #include "core.hpp"
 
@@ -307,4 +307,4 @@ namespace rlst::par
 
 #include "geometry.ipp"
 
-#endif // RLST_RLST_PAR_GEOMETRY_HPP
+#endif // RLST_CORE_RLST_PAR_GEOMETRY_HPP

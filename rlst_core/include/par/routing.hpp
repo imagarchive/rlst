@@ -1,5 +1,5 @@
-#ifndef RLST_RLST_PAR_ROUTING_HPP
-#  define RLST_RLST_PAR_ROUTING_HPP
+#ifndef RLST_CORE_RLST_PAR_ROUTING_HPP
+#  define RLST_CORE_RLST_PAR_ROUTING_HPP
 
 /**
  * This namespace describes all utilities related to Place And Route
@@ -53,4 +53,4 @@ namespace rlst::par
   );
 }
 
-#endif // RLST_RLST_PAR_ROUTING_HPP
+#endif // RLST_CORE_RLST_PAR_ROUTING_HPP

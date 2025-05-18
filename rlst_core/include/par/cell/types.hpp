@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_CELL_TYPES_HPP
-#  define RLST_RLST_PAR_CELL_TYPES_HPP
+#ifndef RLST_CORE_RLST_PAR_CELL_TYPES_HPP
+#  define RLST_CORE_RLST_PAR_CELL_TYPES_HPP
 
 #include "par/cell/ports.hpp"
 #include "par/geometry.hpp"
@@ -108,4 +108,4 @@ namespace rlst::par::cell
   void swap(CellType& __lhs, CellType& __rhs) noexcept;
 }
 
-#endif // RLST_RLST_PAR_CELL_TYPES_HPP
+#endif // RLST_CORE_RLST_PAR_CELL_TYPES_HPP

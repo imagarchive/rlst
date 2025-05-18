@@ -15,8 +15,8 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef RLST_RLST_PAR_CELL_HPP
-#  define RLST_RLST_PAR_CELL_HPP
+#ifndef RLST_CORE_RLST_PAR_CELL_HPP
+#  define RLST_CORE_RLST_PAR_CELL_HPP
 
 /**
  * @file
@@ -39,4 +39,4 @@
 
 namespace rlst::par::cell {}
 
-#endif // RLST_RLST_PAR_CELL_HPP
+#endif // RLST_CORE_RLST_PAR_CELL_HPP

@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_CORE_HPP
-#  define RLST_RLST_CORE_HPP
+#ifndef RLST_CORE_RLST_CORE_HPP
+#  define RLST_CORE_RLST_CORE_HPP
 
 #include <functional>
 #include <random>
@@ -451,4 +451,4 @@ namespace rlst::core
 
 #include "core.ipp"
 
-#endif // RLST_RLST_CORE_HPP
+#endif // RLST_CORE_RLST_CORE_HPP

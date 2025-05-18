@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_HPP
-#  define RLST_RLST_PAR_HPP
+#ifndef RLST_CORE_RLST_PAR_HPP
+#  define RLST_CORE_RLST_PAR_HPP
 
 /**
  * This namespace describes all utilities related to Place And Route
@@ -34,4 +34,4 @@ namespace rlst::par
     std::pair<rlst::par::cell::PlacedPort, rlst::par::cell::PlacedPort>;
 }
 
-#endif // RLST_RLST_PAR_HPP
+#endif // RLST_CORE_RLST_PAR_HPP

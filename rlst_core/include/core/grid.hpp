@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_CORE_GRID_HPP
-#  define RLST_RLST_CORE_GRID_HPP
+#ifndef RLST_CORE_RLST_CORE_GRID_HPP
+#  define RLST_CORE_RLST_CORE_GRID_HPP
 
 #include "core.hpp"
 #include "par/cell/Cell.hpp"
@@ -641,4 +641,4 @@ namespace rlst::core
 
 #include "grid.ipp"
 
-#endif // RLST_RLST_CORE_GRID_HPP
+#endif // RLST_CORE_RLST_CORE_GRID_HPP

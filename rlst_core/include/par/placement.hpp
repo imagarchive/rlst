@@ -16,8 +16,8 @@
  */
 
 
-#ifndef RLST_RLST_PAR_PLACEMENT_HPP
-#  define RLST_RLST_PAR_PLACEMENT_HPP
+#ifndef RLST_CORE_RLST_PAR_PLACEMENT_HPP
+#  define RLST_CORE_RLST_PAR_PLACEMENT_HPP
 
 #include "core/grid.hpp"
 #include "core.hpp"
@@ -769,4 +769,4 @@ namespace rlst::par
 
 #include "placement.ipp"
 
-#endif // RLST_RLST_PAR_PLACEMENT_HPP
+#endif // RLST_CORE_RLST_PAR_PLACEMENT_HPP
