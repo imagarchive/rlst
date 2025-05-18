@@ -1,5 +1,23 @@
-#ifndef MCA_HPP
-#define MCA_HPP
+/*
+ * Copyright (C) 2025 Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
+#ifndef RLST_CORE_RLST_MCA_PARSER_MCA_HPP
+#  define RLST_CORE_RLST_MCA_PARSER_MCA_HPP
 
 #include "mca_parser/Chunk.hpp"
 #include <iostream>
@@ -40,4 +58,4 @@ std::array<uint8_t, 3> converts3BytesBigEndian(uint32_t value);
 // This code needs to use r.0.0.mca
 MCA readMcaFile(const std::string &filename);
 
-#endif
+#endif // RLST_CORE_RLST_MCA_PARSER_MCA_HPP
