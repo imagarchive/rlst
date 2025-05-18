@@ -9,7 +9,7 @@ static constexpr int CANVAS_HEIGHT = 1024 * SIZE_FACTOR;
 
 namespace rlst::svg
 {
-  SVG::SVG(const char* __file_name)
+  SVG::SVG(const std::string __file_name)
     : m_svg_file(__file_name)
   {
     m_svg_file

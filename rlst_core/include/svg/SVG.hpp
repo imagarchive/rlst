@@ -22,7 +22,7 @@ namespace rlst::svg
   class SVG
   {
   public:
-    SVG(const char* __file_name);
+    SVG(const std::string __file_name);
 
     ~SVG();
 
