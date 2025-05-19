@@ -19,10 +19,8 @@
 #include "core/grid.hpp"
 #include <gtest/gtest.h>
 
+using namespace rlst;
 using namespace rlst::core;
-
-using rlst::par::literal_t;
-using rlst::par::uliteral_t;
 
 namespace rlst::core::details
 {

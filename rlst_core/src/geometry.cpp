@@ -16,10 +16,10 @@
  */
 
 
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 #include <boost/functional/hash.hpp>
 
-namespace rlst::par
+namespace rlst
 {
   /* Point */
 

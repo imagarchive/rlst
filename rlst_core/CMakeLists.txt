@@ -35,11 +35,11 @@ set(
     par/cell/ports.hpp
     par/cell/types.hpp
     par/cell.hpp
-    par/geometry.hpp
     par/placement.hpp
     par/routing.hpp
     svg/SVG.hpp
     core.hpp
+    geometry.hpp
     par.hpp
 )
 
@@ -49,8 +49,8 @@ set(
   RLST_CORE_IPP
   core/grid.ipp
   par/cell/Cell.ipp
-  par/geometry.ipp
   par/placement.ipp
+  geometry.ipp
   core.ipp
 )
 
@@ -66,10 +66,10 @@ set(
     par/cell/Cell.cpp
     par/cell/ports.cpp
     par/cell/types.cpp
-    par/geometry.cpp
     par/placement.cpp
     par/routing.cpp
     svg/SVG.cpp
+    geometry.cpp
 )
 
 list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")

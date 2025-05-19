@@ -21,9 +21,9 @@
 
 #include "core/grid.hpp"
 #include "core.hpp"
+#include "geometry.hpp"
 
 #include "par/cell/ports.hpp"
-#include "par/geometry.hpp"
 
 #include <numeric>
 #include <unordered_set>

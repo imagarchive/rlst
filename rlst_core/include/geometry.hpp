@@ -33,7 +33,7 @@
  * assignment operators, and utility functions.
  */
 
-namespace rlst::par
+namespace rlst
 {
   using literal_t = std::int64_t; ///< A literal
   using uliteral_t = std::uint64_t; ///< An unsigned literal

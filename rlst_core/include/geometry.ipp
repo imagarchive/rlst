@@ -16,7 +16,7 @@
  */
 
 
-namespace rlst::par
+namespace rlst
 {
   constexpr Size& operator*=(Size& __this, uliteral_t __a) noexcept
   {

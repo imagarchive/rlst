@@ -5,7 +5,7 @@
  * This namespace describes all utilities related to Place And Route
  */
 
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 #include "par.hpp"
 
 #include <vector>

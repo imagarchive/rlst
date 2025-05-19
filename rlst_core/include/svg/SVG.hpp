@@ -2,7 +2,7 @@
 #  define RLST_CORE_RLST_SVG_SVG
 
 #include "par/cell/Cell.hpp"
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 
 #include <fstream>
 
@@ -40,7 +40,7 @@ namespace rlst::svg
      * @param[in] __color The color to use
      */
     void draw_point(
-      const rlst::par::Point& __point,
+      const rlst::Point& __point,
       const std::string_view& __color
     );
 

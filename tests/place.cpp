@@ -19,6 +19,7 @@
 #include "par/placement.hpp"
 #include <gtest/gtest.h>
 
+using namespace rlst;
 using namespace rlst::par;
 
 TEST(place__test, basic)

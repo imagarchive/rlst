@@ -19,7 +19,7 @@
 #ifndef RLST_CORE_RLST_PAR_CELL_PORTS_HPP
 #  define RLST_CORE_RLST_PAR_CELL_PORTS_HPP
 
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 
 /**
  * @file

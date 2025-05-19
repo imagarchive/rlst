@@ -20,9 +20,9 @@ namespace rlst::gate_reader
     cell_type.name = std::string(gate_json["type"].as_string().c_str());
     boost::json::object size = gate_json["size"].as_object();
     cell_type.size.height =
-      static_cast<par::uliteral_t>(size["height"].as_int64());
+      static_cast<uliteral_t>(size["height"].as_int64());
     cell_type.size.width =
-      static_cast<par::uliteral_t>(size["width"].as_int64());
+      static_cast<uliteral_t>(size["width"].as_int64());
 
     // Generate and add the ports
     for (boost::json::value terminal : gate_json["terminals"].as_array()) {

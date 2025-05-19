@@ -59,21 +59,21 @@ namespace rlst::test
    */
 
   par::cell::Cell cell_from_geometry_params(
-    par::literal_t __x,
-    par::literal_t __y,
-    par::uliteral_t __width,
-    par::uliteral_t __height
+    literal_t __x,
+    literal_t __y,
+    uliteral_t __width,
+    uliteral_t __height
   )
   {
     return
       par::cell::Cell(
-        par::Point(__x, __y, 0),
+        Point(__x, __y, 0),
 
         std::make_shared<par::cell::CellType>(
           par::cell::CellType {
             std::list<par::cell::Port>(),
             std::string(),
-            par::Size {__width, __height}
+            Size {__width, __height}
           }
         )
       );

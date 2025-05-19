@@ -20,7 +20,7 @@
 #  define RLST_CORE_RLST_PAR_CELL_CELL_HPP
 
 #include "par/cell/types.hpp"
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 
 #include <memory>
 

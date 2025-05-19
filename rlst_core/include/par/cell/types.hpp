@@ -21,7 +21,7 @@
 
 #include "mca_parser/Block.hpp"
 #include "par/cell/ports.hpp"
-#include "par/geometry.hpp"
+#include "geometry.hpp"
 
 #include <boost/functional/hash.hpp>
 #include <list>

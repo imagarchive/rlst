@@ -21,6 +21,7 @@
 
 #include "test.hpp"
 
+using namespace rlst;
 using namespace rlst::par;
 using namespace rlst::test;
 
