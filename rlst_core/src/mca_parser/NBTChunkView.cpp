@@ -26,7 +26,7 @@ namespace rlst::mca_parser
 {
   NBTChunkView::NBTChunkView(Chunk& chunkRef) : chunk(chunkRef)
   {
-    const auto& data = chunk.getUncompressedData();
+    const auto& data = chunk.uncompressed_data();
     root = NBT_Parse(const_cast<uint8_t*>(data.data()), data.size());
     if (!root) {
       std::cerr << "Erreur : parsing NBT échoué." << std::endl;
@@ -135,7 +135,7 @@ namespace rlst::mca_parser
 
   void NBTChunkView::setBlock(const Block& block)
   {
-    if (this->chunk.wasNotGenerated()) {
+    if (this->chunk.is_not_generated()) {
       throw std::runtime_error(
         "The chunk was not generated, impossible to add a block");
     }
@@ -199,7 +199,7 @@ namespace rlst::mca_parser
     buffer.resize(size);
 
     std::vector<unsigned char> converted(buffer.begin(), buffer.end());
-    this->chunk.setCompressedData(buffer);
+    this->chunk.compressed_data() = buffer;
 
     return buffer;
   }

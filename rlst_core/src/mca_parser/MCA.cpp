@@ -33,7 +33,7 @@ namespace rlst::mca_parser
   std::array<Chunk, MCA::nbChunksInRegion>& MCA::chunks() { return mChunks;  }
 
   // Reads and uncompresses the data of the chunk corresponding to the given index
-  Chunk& readChunkData(std::fstream& file, int chunkIndex)
+  Chunk& readChunkData(std::fstream& file, Chunk::size_type chunkIndex)
   {
     std::size_t chunksNb = MCA::nbChunksInRegion;
     // In the header of an .mca file, a chunk location is encoded with 4 bytes.
@@ -54,10 +54,13 @@ namespace rlst::mca_parser
     file.read(reinterpret_cast<char *>(chunkLocation), 4);
 
     if (chunkLocation[0] == 0 && chunkLocation[1] == 0 && chunkLocation[2] == 0 && chunkLocation[3] == 0) {
-      std::vector<Bytef> uncompressedData;
-      std::vector<unsigned char> compressedData;
       std::cerr << "The chunk was not generated" << std::endl;
-      Chunk newChunk(chunkIndex % chunksNb, chunkIndex / chunksNb, uncompressedData, compressedData);
+
+      Chunk newChunk(
+        chunkIndex % static_cast<Chunk::size_type>(chunksNb),
+        chunkIndex / static_cast<Chunk::size_type>(chunksNb)
+      );
+
       return newChunk;
     }
 
@@ -143,8 +146,10 @@ namespace rlst::mca_parser
 
     // Writes the chunk offset and size in the header :
     // Total size of the chunk in bytes
-    size_t totalChunkSize = chunk.getCompressedData().size() + Chunk::compressionTypeLength
-    + Chunk::sizeLength;
+    Chunk::size_type totalChunkSize =
+      chunk.compressed_data().size() +
+      Chunk::compression_type_length +
+      Chunk::size_length;
 
     // not counting timestamps
     // = 4096
@@ -172,25 +177,32 @@ namespace rlst::mca_parser
     // places the cursor at chunk's position in the mca file
     file.seekp(chunkStart, std::ios::beg);
 
-    size_t chunkSize = chunk.getCompressedData().size() + Chunk::compressionTypeLength;
+    Chunk::size_type chunkSize =
+      chunk.compressed_data().size() +
+      Chunk::compression_type_length;
 
     // Converts size to big endian
-    std::array<uint8_t, Chunk::sizeLength> chunkSizeBigEndian = {
+    std::array<uint8_t, Chunk::size_length> chunkSizeBigEndian = {
       static_cast<uint8_t>((chunkSize >> 24) & 0xFF),
       static_cast<uint8_t>((chunkSize >> 16) & 0xFF),
       static_cast<uint8_t>((chunkSize >> 8)  & 0xFF),
       static_cast<uint8_t>(chunkSize & 0xFF)
     };
 
-    file.write(reinterpret_cast<const char*>(chunkSizeBigEndian.data()), Chunk::sizeLength);
+    file.write(
+      reinterpret_cast<const char*>(chunkSizeBigEndian.data()),
+      Chunk::size_length
+    );
 
     // Writes the compression type, 2 is zlib
     uint8_t compressionType = 2;
     file.write(reinterpret_cast<const char*>(&compressionType), 1);
 
     // Writes the chunk's compressed data
-    file.write(reinterpret_cast<const char*>(chunk.getCompressedData().data()),
-    chunk.getCompressedData().size());
+    file.write(
+      reinterpret_cast<const char*>(chunk.compressed_data().data()),
+      static_cast<std::streamsize>(chunk.compressed_data().size())
+    );
 
     uint32_t newChunkStart = chunkStart + headerSize * sizeInSectors;
     return newChunkStart;

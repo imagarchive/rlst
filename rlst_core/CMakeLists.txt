@@ -59,7 +59,6 @@ list(TRANSFORM RLST_CORE_IPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(
     RLST_CORE_CPP
     cell_reader/cell_reading.cpp
-    mca_parser/Chunk.cpp
     mca_parser/MCA.cpp
     mca_parser/NBTChunkView.cpp
     par/cell/Cell.cpp
