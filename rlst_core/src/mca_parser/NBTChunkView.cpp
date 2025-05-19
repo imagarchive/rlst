@@ -64,8 +64,8 @@ namespace rlst::mca_parser
 
   NBT* NBTChunkView::getOrCreatePaletteEntry(NBT* section, const Block& block, int& outIndex)
   {
-    const std::string& name = block.getName();
-    const auto& props = block.getProperties();
+    std::string_view name = block.name();
+    const auto& props = block.properties();
 
     NBT* palette = NBT_GetChild(section, "Palette");
     if (!palette || palette->type != TAG_List) return nullptr;
@@ -140,9 +140,9 @@ namespace rlst::mca_parser
         "The chunk was not generated, impossible to add a block");
     }
 
-    int x = block.getPosx();
-    int y = block.getPosy();
-    int z = block.getPosz();
+    int x = static_cast<int>(block.position().x());
+    int y = static_cast<int>(block.position().y());
+    int z = static_cast<int>(block.position().z());
 
     // checks the block's position is included into the chunk
     if (x < 0 || x >= 16 || y < 0 || y >= 256 || z < 0 || z >= 16) return;

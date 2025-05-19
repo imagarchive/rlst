@@ -19,28 +19,41 @@
 #ifndef RLST_CORE_RLST_MCA_PARSER_BLOCK_HPP
 #  define RLST_CORE_RLST_MCA_PARSER_BLOCK_HPP
 
-#include <string>
-#include <map>
+#include "geometry.hpp"
+#include <unordered_map>
 
 namespace rlst::mca_parser
 {
   class Block
   {
-  private:
-    int posx;
-    int posy;
-    int posz;
-    std::string name;
-    std::map<std::string, std::string> properties;
   public:
-    Block(int posx, int posy, int posz, std::string name, std::map<std::string, std::string> properties);
-    Block();
-    void printBlock() const;
-    int getPosx() const;
-    int getPosy() const;
-    int getPosz() const;
-    std::string getName() const;
-    std::map<std::string, std::string> getProperties() const;
+    using properties_type = std::unordered_map<std::string, std::string>;
+  public:
+    Block() = default;
+    Block(const Block& __other) = default;
+    Block(Block&& __other) = default;
+    ~Block() = default;
+  public:
+    Block& operator=(const Block& __rhs) = default;
+    Block& operator=(Block&& __rhs) noexcept = default;
+  public:
+    Block(
+      Point __position,
+      std::string __name,
+      std::unordered_map<std::string, std::string> __properties
+    )
+      : m_name(std::move(__name))
+      , m_position(std::move(__position))
+      , m_properties(std::move(__properties))
+    {}
+  public:
+    std::string_view name() const noexcept { return m_name; }
+    Point position() const noexcept { return m_position; }
+    const properties_type& properties() const noexcept { return m_properties; }
+  private:
+    std::string m_name;
+    Point m_position;
+    properties_type m_properties;
   };
 }
 

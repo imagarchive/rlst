@@ -42,7 +42,7 @@ namespace rlst::gate_reader
 
     // Generate and add the blocks
     for (boost::json::value block : gate_json["blocks"].as_array()) {
-      std::map<std::string, std::string> properties;
+      mca_parser::Block::properties_type properties;
       for (boost::json::value property :
         block.as_object()["properties"].as_array())
       {
@@ -54,9 +54,11 @@ namespace rlst::gate_reader
         block.as_object()["position"].as_object();
       cell_type.blocks.push_back(
         mca_parser::Block(
-          static_cast<int>(position["x"].as_int64()),
-          static_cast<int>(position["y"].as_int64()),
-          static_cast<int>(position["z"].as_int64()),
+          Point(
+            static_cast<literal_t>(position["x"].as_int64()),
+            static_cast<literal_t>(position["y"].as_int64()),
+            static_cast<literal_t>(position["z"].as_int64())
+          ),
           std::string(block.as_object()["name"].as_string().c_str()),
           properties
         )
