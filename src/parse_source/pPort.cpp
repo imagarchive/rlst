@@ -1,6 +1,7 @@
 #include "pTypes.hpp"
 
 pPort::pPort(std::string name, pt::ptree port_tree) {
+  this->parent = 0;
   this->name = name;
 
   // create ports
@@ -20,6 +21,7 @@ pPort::pPort(std::string name, pt::ptree port_tree) {
 }
 
 pPort::pPort(std::string name, pPortDirection direction) {
+  this->parent = 0;
   this->name = name;
   this->direction = direction;
 }

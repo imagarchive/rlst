@@ -1,4 +1,6 @@
 #include "pTypes.hpp"
+#include "par/cell/ports.hpp"
+#include <set>
 
 pModule::pModule(std::string module_name, pt::ptree module_tree) {
   this->name = module_name;
@@ -50,8 +52,30 @@ pModule::pModule(std::string module_name, pt::ptree module_tree) {
  * inoutput port
  *
  */
-void pModule::computeConnections() {
+std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+pModule::computeConnections() {
+
+  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> modNet_t;
   for (pCell cell : cells) {
-    cell.computeConnections();
+    for (pCell otherCell : cells) {
+      std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+          cellNet_t = cell.computeConnections(otherCell);
+      modNet_t.insert(cellNet_t.begin(), cellNet_t.end());
+    }
+  }
+
+  return modNet_t;
+}
+
+void pModule::placePorts() {
+  for (pCell cell : cells) {
+    // Create corresponding PlacedPort with par::cell::Cell parent and
+    // par::cell::port port (a @ref to the cell type) for each pCell
+    cell.placePorts();
+  }
+}
+
+void pModule::computeNetList() {
+  for (pCell cell : cells) {
   }
 }

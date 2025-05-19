@@ -41,26 +41,38 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
       par::cell::Cell newCell = {
           par::Point(), std::make_shared<par::cell::CellType>(cell.type)};
       cellList.push_back(newCell);
+
+      // attribute this par::cell::Cell to the pCell
+      cell.parCell = newCell;
     }
+
+    // create placedPorts
+    mod.placePorts();
   }
 
   return cellList;
 }
 
-void computeConnections(std::vector<pModule> moduleList) {
+std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+computeConnections(std::vector<pModule> moduleList) {
   // compute internal connections for each module
+  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t;
   for (pModule module : moduleList) {
-    module.computeConnections();
+    std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> modNet_t =
+        module.computeConnections();
+    net_t.insert(modNet_t.begin(), modNet_t.end());
   }
 
-  // compute connections between modules
+  // TODO : compute connections between modules (necessary?)
+  return net_t;
 }
 
 int main(int argc, char *argv[]) {
   // initialize yosys environment
   // system("source ../../oss-cad-suite/environment");
 
-  /* execute synthesis script, generating gate_data.json and
+  /**
+   * execute synthesis script, generating gate_data.json and
    * gate_metadata.json
    */
 
@@ -78,6 +90,8 @@ int main(int argc, char *argv[]) {
   // Generate ret_t
   /* NOTE : The Yosys synthesis script ideally only generates one module,
      therefore simplifying many things, among which is generation ret_t */
+  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t =
+      computeConnections(moduleList);
 
   return 0;
 }
