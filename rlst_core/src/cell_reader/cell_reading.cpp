@@ -2,7 +2,6 @@
 
 #include <boost/json/src.hpp>
 #include <fstream>
-#include <iostream>
 
 namespace rlst::gate_reader
 {
