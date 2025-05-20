@@ -70,35 +70,6 @@ namespace rlst::par
     }
 
     /**
-     * Add a reason to make the spaces north-east, south-east, south-west, and
-     * north-west of a space, but not the space itself, unavailable
-     */
-    void add_reason_hollow_x(uliteral_t __x, uliteral_t __y, uliteral_t __z)
-    {
-      assert(__x < x_length);
-      assert(__y < y_length);
-      assert(__z < z_length);
-      uliteral_t x = __x + 1;
-      uliteral_t y = __y + 1;
-      if (x < x_length && y < y_length) add_reason(x, y, __z);
-      if (__y > 0) {
-        x = __x + 1;
-        y = __y - 1;
-        if (x < x_length) add_reason(x, y, __z);
-      }
-      if (__x > 0 && __y > 0) {
-        x = __x - 1;
-        y = __y - 1;
-        add_reason(x, y, __z);
-      }
-      if (__x > 0) {
-        x = __x - 1;
-        y = __y + 1;
-        if (y < y_length) add_reason(x, y, __z);
-      }
-    }
-
-    /**
      * Add a reason to make a space and the spaces north, east, west, and south
      * of it unavailable
      */
@@ -389,8 +360,6 @@ namespace rlst::par
         // make the cross shape around ports unavailable, it will be made
         // available when the port is a source or destination
         levels.add_reason_cross(x, y, level);
-        // make the corners definitely unavailable (for better results)
-        levels.add_reason_hollow_x(x, y, level);
       }
     }
     // sort nets by increasing size (Manhattan)
