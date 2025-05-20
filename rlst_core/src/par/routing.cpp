@@ -396,7 +396,10 @@ namespace rlst::par
           best_route = std::move(route);
           best_cost = cost;
         }
-        if (best_cost < manhattan_cost(net) + LEVEL_COST * (level + 1)) {
+        // check if algorithm there is hope of finding a faster route at a
+        // higher level
+        // Manhattan - 2 because best cost does not have start and end
+        if (best_cost < manhattan_cost(net) - 2 + LEVEL_COST * (level + 1)) {
           if (level == first_empty_level) ++first_empty_level;
           break;
         }
