@@ -246,6 +246,7 @@ endforeach ()
 
 add_subdirectory(libs/nbt)
 add_subdirectory(rlst_core)
+add_subdirectory(rlst)
 
 if (WITH_DOC)
     doxygen_add_docs(
