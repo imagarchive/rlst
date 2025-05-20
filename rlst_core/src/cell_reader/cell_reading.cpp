@@ -1,11 +1,12 @@
 #include "par/cell/types.hpp"
 
 #include <boost/json/src.hpp>
+#include <filesystem>
 #include <fstream>
 
 namespace rlst::gate_reader
 {
-  par::cell::CellType generate_gate(const std::string __file_name)
+  par::cell::CellType generate_gate(const std::string& __file_name)
   {
     // Read the file
     std::ifstream gate_file(__file_name);
@@ -72,5 +73,16 @@ namespace rlst::gate_reader
     }
 
     return cell_type;
+  }
+
+  std::list<par::cell::CellType> generate_gates(const std::string& __path)
+  {
+    std::list<par::cell::CellType> cells;
+    for (const std::filesystem::directory_entry& file_name :
+      std::filesystem::recursive_directory_iterator(__path))
+    {
+      cells.push_back(generate_gate(file_name.path()));
+    }
+    return cells;
   }
 }

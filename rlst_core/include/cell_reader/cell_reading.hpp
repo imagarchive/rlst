@@ -2,28 +2,25 @@
 #  define RLST_RLST_CELL_READER_CELL_READING_HPP
 
 /**
- * This namespace describes all utilities related to generating the blocks for
- * gates from their json files
+ * This namespace describes all utilities related to generating a list of
+ * @CellType from json files
  */
 
 #include "mca_parser/Block.hpp"
 #include "par/cell/types.hpp"
 
-#include <vector>
-
 namespace rlst::gate_reader
 {
   /**
-   * Given a json file describing a logic gate, create and return its
-   * @ref par::cell::CellType
+   * Given a directory containing json files describing logic gates, create and
+   * return matching @ref par::cell::CellType
    *
-   * @param[in] __nets The name of the json file
-   * pairs
+   * @param[in] __path The path of the the directory containing the files
    *
    * @return The created @ref par::cell::CellType
    */
 
-    par::cell::CellType generate_gate(const std::string __file_name);
+  std::list<par::cell::CellType> generate_gates(const std::string& __path);
 }
 
 #endif // RLST_RLST_CELL_READER_CELL_READING_HPP
