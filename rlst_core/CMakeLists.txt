@@ -72,7 +72,9 @@ set(
 
 list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
+cmake_policy(SET CMP0167 NEW)
 find_package(Boost REQUIRED)
+
 find_package(ZLIB REQUIRED)
 
 add_library(rlst_core STATIC "${RLST_CORE_CPP}")
