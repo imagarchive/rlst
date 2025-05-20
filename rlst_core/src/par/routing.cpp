@@ -42,11 +42,7 @@ namespace rlst::par
      * Returns whether there are no reasons for a space to be unavailable
      */
     bool available(uliteral_t __x, uliteral_t __y, uliteral_t __z) const {
-      if (
-        __x < 0 || __x >= x_length
-        || __y < 0 || __y >= y_length
-        || __z < 0 || __z >= y_length
-        ) return false;
+      if (__x >= x_length || __y >= y_length || __z >= z_length) return false;
       return vec.at(__x + __y * x_length + __z * x_length * y_length) == 0;
     }
 
@@ -55,9 +51,6 @@ namespace rlst::par
      */
     void remove_reason(uliteral_t __x, uliteral_t __y, uliteral_t __z)
     {
-      assert(__x >= 0);
-      assert(__y >= 0);
-      assert(__z >= 0);
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
@@ -70,13 +63,39 @@ namespace rlst::par
      */
     void add_reason(uliteral_t __x, uliteral_t __y, uliteral_t __z)
     {
-      assert(__x >= 0);
-      assert(__y >= 0);
-      assert(__z >= 0);
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
       ++vec.at(__x + __y * x_length + __z * x_length * y_length);
+    }
+
+    /**
+     * Add a reason to make the spaces north-east, south-east, south-west, and
+     * north-west of a space, but not the space itself, unavailable
+     */
+    void add_reason_hollow_x(uliteral_t __x, uliteral_t __y, uliteral_t __z)
+    {
+      assert(__x < x_length);
+      assert(__y < y_length);
+      assert(__z < z_length);
+      uliteral_t x = __x + 1;
+      uliteral_t y = __y + 1;
+      if (x < x_length && y < y_length) add_reason(x, y, __z);
+      if (__y > 0) {
+        x = __x + 1;
+        y = __y - 1;
+        if (x < x_length) add_reason(x, y, __z);
+      }
+      if (__x > 0 && __y > 0) {
+        x = __x - 1;
+        y = __y - 1;
+        add_reason(x, y, __z);
+      }
+      if (__x > 0) {
+        x = __x - 1;
+        y = __y + 1;
+        if (y < y_length) add_reason(x, y, __z);
+      }
     }
 
     /**
@@ -85,24 +104,22 @@ namespace rlst::par
      */
     void add_reason_cross(uliteral_t __x, uliteral_t __y, uliteral_t __z)
     {
-      assert(__x >= 0);
-      assert(__y >= 0);
-      assert(__z >= 0);
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
       add_reason(__x, __y, __z);
-      ++__x;
-      if (__x < x_length) add_reason(__x, __y, __z);
-      --__x;
-      ++__y;
-      if (__y < y_length) add_reason(__x, __y, __z);
-      --__y;
-      --__x;
-      if (__x >= 0) add_reason(__x, __y, __z);
-      ++__x;
-      --__y;
-      if (__y >= 0) add_reason(__x, __y, __z);
+      uliteral_t x = __x + 1;
+      if (x < x_length) add_reason(x, __y, __z);
+      uliteral_t y = __y + 1;
+      if (y < y_length) add_reason(__x, y, __z);
+      if (__x > 0) {
+        x = __x - 1;
+        add_reason(x, __y, __z);
+      }
+      if (__y > 0) {
+        y = __y - 1;
+        add_reason(__x, y, __z);
+      }
     }
 
     /**
@@ -111,24 +128,22 @@ namespace rlst::par
      */
     void remove_reason_cross(uliteral_t __x, uliteral_t __y, uliteral_t __z)
     {
-      assert(__x >= 0);
-      assert(__y >= 0);
-      assert(__z >= 0);
       assert(__x < x_length);
       assert(__y < y_length);
       assert(__z < z_length);
       remove_reason(__x, __y, __z);
-      ++__x;
-      if (__x < x_length) remove_reason(__x, __y, __z);
-      --__x;
-      ++__y;
-      if (__y < y_length) remove_reason(__x, __y, __z);
-      --__y;
-      --__x;
-      if (__x >= 0) remove_reason(__x, __y, __z);
-      ++__x;
-      --__y;
-      if (__y >= 0) remove_reason(__x, __y, __z);
+      uliteral_t x = __x + 1;
+      if (x < x_length) remove_reason(x, __y, __z);
+      uliteral_t y = __y + 1;
+      if (y < y_length) remove_reason(__x, y, __z);
+      if (__x > 0) {
+        x = __x - 1;
+        remove_reason(x, __y, __z);
+      }
+      if (__y > 0) {
+        y = __y - 1;
+        remove_reason(__x, y, __z);
+      }
     }
   private:
     /**
@@ -375,23 +390,7 @@ namespace rlst::par
         // available when the port is a source or destination
         levels.add_reason_cross(x, y, level);
         // make the corners definitely unavailable (for better results)
-        ++x;
-        if (x < __size.width) {
-          ++y;
-          if (y < __size.height) levels.add_reason(x, y, level);
-          y -= 2;
-          if (y >= 0) levels.add_reason(x, y, level);
-          ++y;
-        }
-        x -= 2;
-        if (x >= 0) {
-          ++y;
-          if (y < __size.height) levels.add_reason(x, y, level);
-          y -= 2;
-          if (y >= 0) levels.add_reason(x, y, level);
-          ++y;
-        }
-        ++x;
+        levels.add_reason_hollow_x(x, y, level);
       }
     }
     // sort nets by increasing size (Manhattan)
