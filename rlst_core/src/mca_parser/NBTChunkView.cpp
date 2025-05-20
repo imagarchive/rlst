@@ -87,7 +87,8 @@ namespace rlst::mca_parser
     newEntry->child = nullptr;
 
     NBT* nameTag = new NBT{ TAG_String, strdup("Name") };
-    nameTag->value_a.value = strdup(name.c_str());
+    nameTag->value_a.value = new char[name.size()];
+    std::copy(name.cbegin(), name.cend(), nameTag->value_a.value);
     nameTag->value_a.len = static_cast<int32_t>(name.length()) + 1;
 
     newEntry->child = nameTag;
