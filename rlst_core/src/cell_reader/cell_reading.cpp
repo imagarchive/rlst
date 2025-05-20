@@ -25,15 +25,17 @@ namespace rlst::gate_reader
       static_cast<uliteral_t>(size["width"].as_int64());
 
     // Generate and add the ports
-    for (boost::json::value terminal : gate_json["terminals"].as_array()) {
+    for (const boost::json::value& terminal :
+      gate_json["terminals"].as_array())
+    {
       par::cell::Port port;
-      if (terminal.as_object()["type"] == "input") {
+      if (terminal.as_object().at("type") == "input") {
         port.type = par::cell::PortType::input;
-      } else if (terminal.as_object()["type"] == "output") {
+      } else if (terminal.as_object().at("type") == "output") {
         port.type = par::cell::PortType::output;
       }
       boost::json::object position =
-        terminal.as_object()["position"].as_object();
+        terminal.as_object().at("position").as_object();
       port.position.x() = position["x"].as_int64();
       port.position.y() = position["y"].as_int64();
       port.position.z() = position["z"].as_int64();
@@ -41,17 +43,21 @@ namespace rlst::gate_reader
     }
 
     // Generate and add the blocks
-    for (boost::json::value block : gate_json["blocks"].as_array()) {
+    for (const boost::json::value& block : gate_json["blocks"].as_array()) {
       mca_parser::Block::properties_type properties;
-      for (boost::json::value property :
-        block.as_object()["properties"].as_array())
+      for (const boost::json::value& property :
+        block.as_object().at("properties").as_array())
       {
-        std::string prop_name(property.as_object()["name"].as_string().c_str());
-        std::string prop_val(property.as_object()["value"].as_string().c_str());
+        std::string prop_name(
+          property.as_object().at("name").as_string().c_str()
+        );
+        std::string prop_val(
+          property.as_object().at("value").as_string().c_str()
+        );
         properties[prop_name] = prop_val;
       }
       boost::json::object position =
-        block.as_object()["position"].as_object();
+        block.as_object().at("position").as_object();
       cell_type.blocks.push_back(
         mca_parser::Block(
           Point(
@@ -59,7 +65,7 @@ namespace rlst::gate_reader
             static_cast<literal_t>(position["y"].as_int64()),
             static_cast<literal_t>(position["z"].as_int64())
           ),
-          std::string(block.as_object()["name"].as_string().c_str()),
+          std::string(block.as_object().at("name").as_string().c_str()),
           properties
         )
       );
