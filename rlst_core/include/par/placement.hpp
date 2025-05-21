@@ -141,17 +141,17 @@ namespace rlst::par
   {
     struct equal_to
     {
-      bool operator()(
-        std::reference_wrapper<cell::Cell> __lhs,
-        std::reference_wrapper<cell::Cell> __rhs
-      ) const
-        { return &__lhs.get() == &__rhs.get(); }
+      constexpr bool operator()(
+        const cell::Cell& __lhs,
+        const cell::Cell& __rhs
+      ) const noexcept
+        { return &__lhs == &__rhs; }
     };
 
     struct hash
     {
-      std::size_t operator()(std::reference_wrapper<cell::Cell> __cell) const
-        { return std::hash<cell::Cell*>()(&__cell.get()); }
+      std::size_t operator()(const cell::Cell& __cell) const
+        { return std::hash<const cell::Cell*>()(&__cell); }
     };
   }
 
@@ -521,7 +521,7 @@ namespace rlst::par
      */
 
     real_t overlap_cost() const
-      { return 1'000._r * overlap_penalty(); }
+      { return 500._r * overlap_penalty(); }
 
     /**
      * Compute the emptiness penalty

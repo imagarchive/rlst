@@ -27,12 +27,19 @@ namespace rlst::par
     uliteral_t __desired_row_length
   )
   {
+    std::unordered_map<
+      std::reference_wrapper<const cell::Cell>,
+      Point,
+      details::hash,
+      details::equal_to
+    > cell_to_position;
+
     Point tl(0, 0, 0);
     Point tr(0, 0, 0);
     uliteral_t max_height = 0_ul;
 
     for (auto i = __begin_cell; i != __end_cell; ++i) {
-      tr.x() += i->type()->size.width;
+      tr.x() += i->type()->size.width + 5_l;
 
       if (tr.x() >= static_cast<literal_t>(__desired_row_length)) {
         tl.x() = 0;
@@ -42,56 +49,63 @@ namespace rlst::par
         tr.y() += max_height;
       }
 
-      i->position() = tl;
-      tl.x() += i->type()->size.width;
-      max_height = std::max(max_height, i->type()->size.height);
+      cell_to_position[*i] = i->position() = tl;
+      tl.x() += i->type()->size.width + 5_l;
+      max_height = std::max(max_height, i->type()->size.height + 5_ul);
     }
 
     Size frame = frame_of(__begin_cell, __end_cell);
     frame.width = std::max(frame.width, __desired_row_length);
     frame *= 2_ul;
 
-    placement_grid config(frame, __begin_cell, __end_cell);
-    row_length_cost compute_c_3(static_cast<real_t>(__desired_row_length));
+    real_t c_20;
 
-    real_t c_20 = 1._r;
+    do {
+      for (auto i = __begin_cell; i != __end_cell; ++i) {
+        i->position() = cell_to_position[*i];
+      }
 
-    while (c_20 != 0._r) {
+      placement_grid config(frame, __begin_cell, __end_cell);
+      row_length_cost compute_c_3(static_cast<real_t>(__desired_row_length));
+
       real_t t = default_first_temperature;
 
       c_20 = config.overlap_cost();
 
       real_t c =
         wire_length_cost(__begin_net, __end_net) +
-        c_20 +
         config.emptiness_cost() +
         compute_c_3(__begin_cell, __end_cell);
 
-      for (iteration_t i = 0_it; i != 200_it; ++i) {
+      for (iteration_t i = 0_it; i != 140_it; ++i) {
         for (iteration_t j = 0_it; j != 16_it; ++j) {
           evolve_reverter reverter = config.evolve();
 
           real_t new_c_20 = config.overlap_cost();
+          real_t delta_c = new_c_20 - c_20;
 
-          real_t new_c =
-            wire_length_cost(__begin_net, __end_net) +
-            new_c_20 +
-            config.emptiness_cost() +
-            compute_c_3(__begin_cell, __end_cell);
+          if (delta_c < 0._r) {
+            real_t new_c =
+              wire_length_cost(__begin_net, __end_net) +
+              config.emptiness_cost() +
+              compute_c_3(__begin_cell, __end_cell);
 
-          real_t delta_c = new_c - c;
+            delta_c += new_c - c;
 
-          if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
-            c_20 = new_c_20;
-            c = new_c;
-          } else {
-            reverter.revert();
+            if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
+              c_20 = new_c_20;
+              c = new_c;
+
+              continue;
+            }
           }
+
+          reverter.revert();
         }
 
         t = reduce(t);
       }
-    }
+    } while (c_20 != 0);
   }
 
   template <class InputIt>
