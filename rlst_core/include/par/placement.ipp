@@ -76,6 +76,7 @@ namespace rlst::par
       BOOST_LOG_TRIVIAL(debug) << "overlap cost = " << c_20;
 
       real_t c =
+        height_cost(__begin_cell, __end_cell) +
         wire_length_cost(__begin_net, __end_net) +
         config.emptiness_cost() +
         compute_c_3(__begin_cell, __end_cell);
@@ -98,6 +99,7 @@ namespace rlst::par
 
           if (delta_c <= 0._r) {
             real_t new_c =
+              height_cost(__begin_cell, __end_cell) +
               wire_length_cost(__begin_net, __end_net) +
               config.emptiness_cost() +
               compute_c_3(__begin_cell, __end_cell);
@@ -136,6 +138,27 @@ namespace rlst::par
 
       BOOST_LOG_TRIVIAL(debug) << "overlap cost = " << c_20;
     } while (c_20 != 0);
+  }
+
+  template <class InputIt>
+  real_t height_penalty(InputIt __begin, InputIt __end)
+  {
+    literal_t top = std::numeric_limits<literal_t>::min();
+    literal_t bottom = std::numeric_limits<literal_t>::max();
+
+    for (; __begin != __end; ++__begin) {
+      top = std::min(top, __begin->position().y());
+
+      bottom =
+          std::max(
+            bottom,
+
+            __begin->position().y() +
+              static_cast<literal_t>(__begin->type()->size.height)
+          );
+    }
+
+    return static_cast<real_t>(top + bottom);
   }
 
   template <class InputIt>

@@ -581,6 +581,51 @@ namespace rlst::par
   constexpr real_t reduce(real_t __t) noexcept
     { return .98_r * __t; }
 
+  /* height */
+
+  /**
+   * Compute the height penalty
+   *
+   * The purpose of this function is to generate a value that penalizes the size
+   * of the space separating the abscissa axis from the highest @ref cell::Cell,
+   * as well as the overall height of the placement.
+   *
+   * @tparam InputIt The iterator type
+   *
+   * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
+   * @param[in] __end The past-the-last iterator of the @ref cell::Cell "cells"
+   *
+   * @return The height penalty
+   */
+
+  template <class InputIt>
+  real_t height_penalty(InputIt __begin, InputIt __end);
+
+  /**
+   * Compute the height cost
+   *
+   * @tparam InputIt0 The iterator type (enable perfect forwarding)
+   * @tparam InputIt1 The iterator type (enable perfect forwarding)
+   *
+   * @param[in] __begin The begin iterator of the @ref cell::Cell "cells"
+   * @param[in] __end The past-the-last iterator of the @ref cell::Cell "cells"
+   *
+   * @return The height cost
+   */
+
+  template <class InputIt0, class InputIt1>
+  real_t height_cost(InputIt0&& __begin, InputIt1&& __end)
+  {
+    return
+      5._r *
+      normalize(
+        height_penalty(
+          std::forward<InputIt0>(__begin),
+          std::forward<InputIt1>(__end)
+        )
+      );
+  }
+
   /* row length */
 
   /**
@@ -742,12 +787,16 @@ namespace rlst::par
       Point(
         core::randint(
           0_l,
+
           static_cast<literal_t>(__frame.width - __cell.type()->size.width)
+            / 2_l
         ),
 
         core::randint(
           0_l,
+
           static_cast<literal_t>(__frame.height - __cell.type()->size.height)
+            / 2_l
         ),
 
         0_l
