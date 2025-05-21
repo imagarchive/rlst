@@ -73,7 +73,7 @@ namespace rlst::gate_reader
     }
     // Add ground blocks
     for (literal_t x = 0; x < cell_type.size.width; ++x) {
-      for (literal_t y = 0; x < cell_type.size.height; ++y) {
+      for (literal_t y = 0; y < cell_type.size.height; ++y) {
         cell_type.blocks.push_back(
           mca_parser::Block(
             Point(x, y, -1),
