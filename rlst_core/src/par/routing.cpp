@@ -536,7 +536,7 @@ namespace rlst::par
     mca_parser::Block::properties_type sticky_piston_properties;
     if (__port.port.type == cell::PortType::input) {
       sticky_piston_properties["facing"] = "down";
-      for (literal_t level = 0; level < __port.max_level; ++level) {
+      for (literal_t level = 0; level <= __port.max_level; ++level) {
         literal_t z = FIRST_LEVEL_HEIGHT + level * LEVEL_HEIGHT;
         // redstone block
         __blocks.push_back(
@@ -578,7 +578,7 @@ namespace rlst::par
       }
     } else if (__port.port.type == cell::PortType::output) {
       sticky_piston_properties["facing"] = "up";
-      for (literal_t level = 0; level < __port.max_level; ++level) {
+      for (literal_t level = 0; level <= __port.max_level; ++level) {
         literal_t z = FIRST_LEVEL_HEIGHT + level * LEVEL_HEIGHT;
         // redstone block
         __blocks.push_back(
