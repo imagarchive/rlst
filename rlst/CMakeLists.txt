@@ -15,5 +15,18 @@
 
 cmake_minimum_required(VERSION 3.28)
 
+set(LINUX UNIX AND NOT APPLE)
+set(RLST_INSTALL_GATESDIR "${CMAKE_SOURCE_DIR}/share/gates/")
+
+if (LINUX)
+  include(GNUInstallDirs)
+
+  if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(RLST_INSTALL_GATESDIR "${CMAKE_INSTALL_FULL_DATADIR}/gates/")
+  endif()
+endif()
+
+configure_file(config.hpp.in config.hpp ESCAPE_QUOTES @ONLY)
+
 add_executable(rlst main.cpp)
 target_link_libraries(rlst PRIVATE rlst_core)
