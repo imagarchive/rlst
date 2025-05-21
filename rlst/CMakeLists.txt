@@ -30,3 +30,14 @@ configure_file(config.hpp.in config.hpp ESCAPE_QUOTES @ONLY)
 
 add_executable(rlst main.cpp)
 target_link_libraries(rlst PRIVATE rlst_core)
+target_include_directories(rlst PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+target_sources(
+    rlst
+
+    PRIVATE
+        FILE_SET HEADERS
+        TYPE HEADERS
+        BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}"
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/config.hpp"
+)
