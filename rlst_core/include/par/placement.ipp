@@ -27,19 +27,12 @@ namespace rlst::par
     uliteral_t __desired_row_length
   )
   {
-    std::unordered_map<
-      std::reference_wrapper<const cell::Cell>,
-      Point,
-      details::hash,
-      details::equal_to
-    > cell_to_position;
-
     Point tl(0, 0, 0);
     Point tr(0, 0, 0);
     uliteral_t max_height = 0_ul;
 
     for (auto i = __begin_cell; i != __end_cell; ++i) {
-      tr.x() += i->type()->size.width + 5_l;
+      tr.x() += i->type()->size.width;
 
       if (tr.x() >= static_cast<literal_t>(__desired_row_length)) {
         tl.x() = 0;
@@ -49,20 +42,29 @@ namespace rlst::par
         tr.y() += max_height;
       }
 
-      cell_to_position[*i] = i->position() = tl;
-      tl.x() += i->type()->size.width + 5_l;
-      max_height = std::max(max_height, i->type()->size.height + 5_ul);
+      i->position() = tl;
+      tl.x() += i->type()->size.width;
+      max_height = std::max(max_height, i->type()->size.height);
     }
 
     Size frame = frame_of(__begin_cell, __end_cell);
     frame.width = std::max(frame.width, __desired_row_length);
     frame *= 2_ul;
 
+    BOOST_LOG_TRIVIAL(debug)
+      << "`place()`: frame = { width = "
+      << frame.width
+      << ", height = "
+      << frame.height
+      << " }";
+
     real_t c_20;
 
     do {
+      BOOST_LOG_TRIVIAL(trace) << "`place()`: setting initial configuration";
+
       for (auto i = __begin_cell; i != __end_cell; ++i) {
-        i->position() = cell_to_position[*i];
+        i->position() = {};
       }
 
       placement_grid config(frame, __begin_cell, __end_cell);
@@ -71,20 +73,30 @@ namespace rlst::par
       real_t t = default_first_temperature;
 
       c_20 = config.overlap_cost();
+      BOOST_LOG_TRIVIAL(debug) << "overlap cost = " << c_20;
 
       real_t c =
         wire_length_cost(__begin_net, __end_net) +
         config.emptiness_cost() +
         compute_c_3(__begin_cell, __end_cell);
 
+      BOOST_LOG_TRIVIAL(trace) << "`place()`: initial configuration set";
+
       for (iteration_t i = 0_it; i != 140_it; ++i) {
-        for (iteration_t j = 0_it; j != 16_it; ++j) {
+        for (iteration_t j = 0_it; j != 32_it; ++j) {
+          BOOST_LOG_TRIVIAL(trace)
+            << "`place()`: computing ("
+            << static_cast<int>(i)
+            << ", "
+            << static_cast<int>(j)
+            << ')';
+
           evolve_reverter reverter = config.evolve();
 
           real_t new_c_20 = config.overlap_cost();
           real_t delta_c = new_c_20 - c_20;
 
-          if (delta_c < 0._r) {
+          if (delta_c <= 0._r) {
             real_t new_c =
               wire_length_cost(__begin_net, __end_net) +
               config.emptiness_cost() +
@@ -92,7 +104,16 @@ namespace rlst::par
 
             delta_c += new_c - c;
 
-            if ((delta_c < 0._r) || (accept(delta_c, t) > uniform())) {
+            if ((delta_c <= 0._r) || (accept(delta_c, t) >= uniform())) {
+              BOOST_LOG_TRIVIAL(trace)
+                << "`place()`: ("
+                << static_cast<int>(i)
+                << ", "
+                << static_cast<int>(j)
+                << ") is accepted ("
+                << ((delta_c <= 0._r) ? "ok" : "random")
+                << ')';
+
               c_20 = new_c_20;
               c = new_c;
 
@@ -100,11 +121,20 @@ namespace rlst::par
             }
           }
 
+          BOOST_LOG_TRIVIAL(trace)
+            << "`place()`: ("
+            << static_cast<int>(i)
+            << ", "
+            << static_cast<int>(j)
+            << ") is rejected";
+
           reverter.revert();
         }
 
         t = reduce(t);
       }
+
+      BOOST_LOG_TRIVIAL(debug) << "overlap cost = " << c_20;
     } while (c_20 != 0);
   }
 

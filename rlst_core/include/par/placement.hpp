@@ -25,6 +25,7 @@
 
 #include "par/cell/ports.hpp"
 
+#include <boost/log/trivial.hpp>
 #include <numeric>
 #include <unordered_set>
 #include <utility>
@@ -519,7 +520,7 @@ namespace rlst::par
      */
 
     real_t overlap_cost() const
-      { return 500._r * overlap_penalty(); }
+      { return 100._r * overlap_penalty(); }
 
     /**
      * Compute the emptiness penalty
@@ -739,22 +740,14 @@ namespace rlst::par
   {
     return
       Point(
-        std::min(
-          core::randint(
-            0_l,
-            static_cast<literal_t>(__frame.width - __cell.type()->size.width)
-          ),
-
-          static_cast<literal_t>(__cell.type()->size.width)
+        core::randint(
+          0_l,
+          static_cast<literal_t>(__frame.width - __cell.type()->size.width)
         ),
 
-        std::min(
-          core::randint(
-            0_l,
-            static_cast<literal_t>(__frame.height - __cell.type()->size.height)
-          ),
-
-          static_cast<literal_t>(__cell.type()->size.height)
+        core::randint(
+          0_l,
+          static_cast<literal_t>(__frame.height - __cell.type()->size.height)
         ),
 
         0_l
