@@ -67,7 +67,7 @@ namespace rlst::gate_reader
             static_cast<literal_t>(position["z"].as_int64())
           ),
           std::string(block.as_object().at("name").as_string().c_str()),
-          properties
+          std::move(properties)
         )
       );
     }
