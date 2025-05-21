@@ -19,9 +19,13 @@
  */
 constexpr uint8_t MAX_SIGNAL_LENGTH = 16;
 /* The cost of going 1 level higher */
-constexpr uint8_t LEVEL_COST = MAX_SIGNAL_LENGTH * 2; // TODO adjust
+constexpr uint8_t LEVEL_COST = MAX_SIGNAL_LENGTH * 2;
+/* The height of the first level */
+constexpr uint8_t FIRST_LEVEL_HEIGHT = 3;
+/* The height of a level */
+constexpr uint8_t LEVEL_HEIGHT = 4;
 /* The maximum number of levels */
-constexpr uint8_t MAX_LEVEL = 70; // TODO adjust
+constexpr uint8_t MAX_LEVEL = 50;
 
 namespace rlst::par
 {
