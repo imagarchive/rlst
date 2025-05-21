@@ -48,7 +48,6 @@ list(TRANSFORM RLST_CORE_HPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 set(
   RLST_CORE_IPP
   core/grid.ipp
-  par/cell/Cell.ipp
   par/placement.ipp
   geometry.ipp
   core.ipp

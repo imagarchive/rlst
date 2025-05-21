@@ -21,6 +21,18 @@
 
 namespace rlst::par::cell
 {
+  bool Cell::can_be_moved_to(Point __to, const Size& __frame) const
+  {
+    if (__to.is_outside(__frame)) {
+      return false;
+    } else {
+      __to.x() += m_type->size.width;
+      __to.y() += m_type->size.height;
+
+      return !__to.is_outside(__frame);
+    }
+  }
+
   std::size_t hash_value(const Cell& __input)
   {
     std::size_t seed = 0;

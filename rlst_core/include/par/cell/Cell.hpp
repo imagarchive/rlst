@@ -140,10 +140,7 @@ namespace rlst::par::cell
      * taking into account the given @ref Size frame
      */
 
-    constexpr bool can_be_moved_to(
-      Point __to,
-      const Size& __frame
-    ) const noexcept;
+    bool can_be_moved_to(Point __to, const Size& __frame) const;
   private:
     Point m_position;
     std::shared_ptr<const CellType> m_type;
@@ -195,7 +192,5 @@ namespace rlst::par::cell
 
   void swap(Cell& __lhs, Cell& __rhs) noexcept;
 }
-
-#include "Cell.ipp"
 
 #endif // RLST_CORE_RLST_PAR_CELL_CELL_HPP
