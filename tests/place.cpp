@@ -27,7 +27,7 @@ TEST(place__test, basic)
   auto and_type =
     std::make_shared<cell::CellType>(
       cell::CellType {
-        std::list {
+        std::vector {
           cell::Port { Point(0, 1, 0), cell::PortType::output },
           cell::Port { Point(3, 0, 0), cell::PortType::input },
           cell::Port { Point(3, 2, 0), cell::PortType::input }
@@ -41,7 +41,7 @@ TEST(place__test, basic)
   auto or_type =
     std::make_shared<cell::CellType>(
       cell::CellType {
-        std::list {
+        std::vector {
           cell::Port { Point(0, 0, 0), cell::PortType::input },
           cell::Port { Point(4, 0, 0), cell::PortType::input },
           cell::Port { Point(6, 2, 0), cell::PortType::output }
@@ -65,27 +65,13 @@ TEST(place__test, basic)
 
   std::vector<std::pair<cell::PlacedPort, cell::PlacedPort>> nets {
     std::make_pair(
-      cell::PlacedPort {
-        cells[0],
-        cell::Port { Point(0, 1, 0), cell::PortType::output }
-      },
-
-      cell::PlacedPort {
-        cells[1],
-        cell::Port { Point(0, 0, 0), cell::PortType::input }
-      }
+      cell::PlacedPort { cells[0], cells[0].type()->ports[0] },
+      cell::PlacedPort { cells[1], cells[0].type()->ports[1] }
     ),
 
     std::make_pair(
-      cell::PlacedPort {
-        cells[1],
-        cell::Port { Point(6, 2, 0), cell::PortType::output }
-      },
-
-      cell::PlacedPort {
-        cells[0],
-        cell::Port { Point(3, 2, 0), cell::PortType::input }
-      }
+      cell::PlacedPort { cells[1], cells[0].type()->ports[0] },
+      cell::PlacedPort { cells[0], cells[0].type()->ports[1] }
     )
   };
 

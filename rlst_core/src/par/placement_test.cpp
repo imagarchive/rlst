@@ -278,11 +278,11 @@ TEST(wire_length_penalty__basics__test, same_row)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
+  Port first { Point(0_l, 0_l, 0_l), PortType::output };
+  Port second { Point(10_l, 0_l, 0_l), PortType::input };
+
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(
-      PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
-      PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::input } }
-    )
+    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
   };
 
   ASSERT_EQ(
@@ -295,11 +295,11 @@ TEST(wire_length_penalty__basics__test, same_column)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
+  Port first { Point(0_l, 0_l, 0_l), PortType::output };
+  Port second { Point(0_l, 10_l, 0_l), PortType::input };
+
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(
-      PlacedPort { cell, Port { Point(0_l, 0_l, 0_l), PortType::output } },
-      PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
-    )
+    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
   };
 
   ASSERT_EQ(
@@ -312,11 +312,11 @@ TEST(wire_length_penalty__basics__test, random)
 {
   Cell cell = cell_from_geometry_params(0, 0, 10, 10);
 
+  Port first { Point(10_l, 0_l, 0_l), PortType::output };
+  Port second { Point(0_l, 10_l, 0_l), PortType::input };
+
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(
-      PlacedPort { cell, Port { Point(10_l, 0_l, 0_l), PortType::output } },
-      PlacedPort { cell, Port { Point(0_l, 10_l, 0_l), PortType::input } }
-    )
+    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
   };
 
   ASSERT_EQ(

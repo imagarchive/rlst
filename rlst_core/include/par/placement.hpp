@@ -732,15 +732,15 @@ namespace rlst::par
           [] (const std::pair<cell::PlacedPort, cell::PlacedPort>& __net) {
             Point first = __net.first.parent.get().position();
 
-            first.x() += __net.first.port.position.x();
-            first.y() += __net.first.port.position.y();
-            first.z() += __net.first.port.position.z();
+            first.x() += __net.first.port.get().position.x();
+            first.y() += __net.first.port.get().position.y();
+            first.z() += __net.first.port.get().position.z();
 
             Point second = __net.second.parent.get().position();
 
-            second.x() += __net.second.port.position.x();
-            second.y() += __net.second.port.position.y();
-            second.z() += __net.second.port.position.z();
+            second.x() += __net.second.port.get().position.x();
+            second.y() += __net.second.port.get().position.y();
+            second.z() += __net.second.port.get().position.z();
 
             return static_cast<real_t>(first.manhattan(second));
           }

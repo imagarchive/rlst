@@ -70,11 +70,7 @@ namespace rlst::test
         Point(__x, __y, 0),
 
         std::make_shared<par::cell::CellType>(
-          par::cell::CellType {
-            std::list<par::cell::Port>(),
-            std::string(),
-            Size {__width, __height}
-          }
+          par::cell::CellType { {}, {}, Size {__width, __height}, {} }
         )
       );
   }

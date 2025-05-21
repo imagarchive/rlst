@@ -48,7 +48,7 @@ namespace rlst::par::cell
 
   struct CellType
   {
-    std::list<Port> ports; ///< The ports of the @ref CellType
+    std::vector<Port> ports; ///< The ports of the @ref CellType
     std::string name; ///< The name of the @ref CellType
     Size size; ///< The size of the @ref CellType
     /// The blocks that the @ref CellType is made of
