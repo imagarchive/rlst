@@ -1,0 +1,129 @@
+{
+  "type": "AND",
+  "size": {"width": 7, "height": 4},
+  "terminals": [
+    {
+      "type": "input",
+      "position": {"x": 0, "y": 0, "z": 0}
+    },
+    {
+      "type": "input",
+      "position": {"x": 0, "y": 2, "z": 0}
+    },
+    {
+      "type": "output",
+      "position": {"x": 5, "y": 1, "z": 3}
+    }
+  ],
+  "blocks": [
+    {
+      "name": "blue_wool",
+      "position": {"x": 1, "y": 0, "z": 0},
+      "properties": []
+    },
+    {
+      "name": "redstone_wire",
+      "position": {"x": 1, "y": 0, "z": 1},
+      "properties": [
+        {
+          "name": "east",
+          "value": "up"
+        },
+        {
+          "name": "west",
+          "value": "up"
+        }
+      ]
+    },
+    {
+      "name": "blue_wool",
+      "position": {"x": 1, "y": 2, "z": 0},
+      "properties": []
+    },
+    {
+      "name": "redstone_wire",
+      "position": {"x": 1, "y": 2, "z": 1},
+      "properties": [
+        {
+          "name": "east",
+          "value": "up"
+        },
+        {
+          "name": "west",
+          "value": "up"
+        }
+      ]
+    },
+    {
+      "name": "redstone_wire",
+      "position": {"x": 2, "y": 1, "z": 0},
+      "properties": [
+        {
+          "name": "east",
+          "value": "side"
+        },
+        {
+          "name": "north",
+          "value": "up"
+        },
+        {
+          "name": "south",
+          "value": "up"
+        }
+      ]
+    },
+    {
+      "name": "redstone_wall_torch",
+      "position": {"x": 2, "y": 0, "z": 0},
+      "properties": [
+        {
+          "name": "facing",
+          "value": "east"
+        }
+      ]
+    },
+    {
+      "name": "redstone_wall_torch",
+      "position": {"x": 2, "y": 2, "z": 0},
+      "properties": [
+        {
+          "name": "facing",
+          "value": "east"
+        }
+      ]
+    },
+    {
+      "name": "blue_wool",
+      "position": {"x": 3, "y": 1, "z": 0},
+      "properties": []
+    },
+    {
+      "name": "redstone_wire",
+      "position": {"x": 3, "y": 1, "z": 1},
+      "properties": [
+        {
+          "name": "east",
+          "value": "up"
+        },
+        {
+          "name": "west",
+          "value": "up"
+        }
+      ]
+    },
+    {
+      "name": "redstone_wall_torch",
+      "position": {"x": 4, "y": 1, "z": 0},
+      "properties": [
+        {
+          "name": "facing",
+          "value": "east"
+        },
+        {
+          "name": "lit",
+          "value": "false"
+        }
+      ]
+    }
+  ]
+}

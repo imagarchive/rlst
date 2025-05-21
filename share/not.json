@@ -1,0 +1,35 @@
+{
+  "type": "NOT",
+  "size": {"width": 5, "height": 3},
+  "terminals": [
+    {
+      "type": "input",
+      "position": {"x": 0, "y": 0, "z": 0}
+    },
+    {
+      "type": "output",
+      "position": {"x": 3, "y": 0, "z": 0}
+    }
+  ],
+  "blocks": [
+    {
+      "name": "blue_wool",
+      "position": {"x": 1, "y": 0, "z": 0},
+      "properties": []
+    },
+    {
+      "name": "redstone_wire",
+      "position": {"x": 1, "y": 0, "z": 1},
+      "properties": [
+        {
+          "name": "east",
+          "value": "up"
+        },
+        {
+          "name": "west",
+          "value": "up"
+        }
+      ]
+    }
+  ]
+}
