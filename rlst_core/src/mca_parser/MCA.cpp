@@ -33,7 +33,7 @@ namespace rlst::mca_parser
   std::array<Chunk, MCA::nbChunksInRegion>& MCA::chunks() { return mChunks;  }
 
   // Reads and uncompresses the data of the chunk corresponding to the given index
-  Chunk& readChunkData(std::fstream& file, Chunk::size_type chunkIndex)
+  Chunk readChunkData(std::fstream& file, Chunk::size_type chunkIndex)
   {
     std::size_t chunksNb = MCA::nbChunksInRegion;
     // In the header of an .mca file, a chunk location is encoded with 4 bytes.
@@ -159,10 +159,11 @@ namespace rlst::mca_parser
     // rounded up to the nearest whole number
     size_t sizeInSectors = (totalChunkSize + headerSize - 1) / headerSize;
 
+
     // 4 bytes per chunk in the header
     int positionInHeader = 4 * chunkIndex;
 
-    std::array<uint8_t, 3> bigEndianChunkStart = converts3BytesBigEndian(chunkStart);
+    std::array<uint8_t, 3> bigEndianChunkStart = converts3BytesBigEndian(chunkStart / headerSize);
 
     std::array<uint8_t, 4> chunkInHeader;
     chunkInHeader[0] = bigEndianChunkStart[0];
@@ -217,7 +218,7 @@ namespace rlst::mca_parser
 
     // counting timestamps and offsets
     // = 4096 * 2
-    const size_t headerSize = MCA::nbChunksInRegion * 4;
+    const size_t headerSize = MCA::nbChunksInRegion * 8;
 
     // set the header (all the chunk's offsets) to 0
     std::array<uint8_t, headerSize / 2> offsets = {};
@@ -231,10 +232,10 @@ namespace rlst::mca_parser
     // close the file to reopen it in read-write mode
     newFile.close();
 
-    std::fstream file("nom.mca", std::ios::in | std::ios::out | std::ios::binary);
+    std::fstream f("newFile.mca", std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
 
-    if (!file) {
-      throw std::runtime_error("Can not open the new file");
+    if (!f) {
+        throw std::runtime_error("Can not open the new file");
     }
 
     // for each chunk in the mca file, write the compressed data into the new mca file
@@ -243,11 +244,11 @@ namespace rlst::mca_parser
     // where to write the first chunk
     uint32_t chunkStart = headerSize;
     for (int i = 0; i < chunks.size(); i++) {
-      // if (chunks[i].wasNotGenerated()) {
-      //   // TODO : what do we have to do ???
-      //   continue;
-      // }
-      chunkStart = writeChunkData(file, mcaFile, i, chunkStart);
+        // if (chunks[i].wasNotGenerated()) {
+        //     // TODO : what do we have to do ???
+        //     continue;
+        // }
+        chunkStart = writeChunkData(f, mcaFile, i, chunkStart);
     }
   }
 
