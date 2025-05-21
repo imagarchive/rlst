@@ -17,7 +17,7 @@ std::array<Chunk, MCA::nbChunksInRegion>& MCA::chunks() { return mChunks;  }
 
 
 // Reads and uncompresses the data of the chunk corresponding to the given index
-Chunk& readChunkData(std::fstream& file, int chunkIndex) {
+Chunk readChunkData(std::fstream& file, int chunkIndex) {
     std::size_t chunksNb = MCA::nbChunksInRegion;
     // In the header of an .mca file, a chunk location is encoded with 4 bytes. 
     // The first 3 bytes for the position of the chunk's data in the file, it is 
@@ -133,11 +133,12 @@ uint32_t writeChunkData(std::fstream& file, MCA& mcaFile, int& chunkIndex, uint3
     // rounded up to the nearest whole number
     size_t sizeInSectors = (totalChunkSize + headerSize - 1) / headerSize;
 
+    
     // 4 bytes per chunk in the header
     int positionInHeader = 4 * chunkIndex;
-
-    std::array<uint8_t, 3> bigEndianChunkStart = converts3BytesBigEndian(chunkStart);
-
+    
+    std::array<uint8_t, 3> bigEndianChunkStart = converts3BytesBigEndian(chunkStart / headerSize);
+    
     std::array<uint8_t, 4> chunkInHeader;
     chunkInHeader[0] = bigEndianChunkStart[0];
     chunkInHeader[1] = bigEndianChunkStart[1];
@@ -182,7 +183,7 @@ void writeData(MCA& mcaFile) {
 
     // counting timestamps and offsets
     // = 4096 * 2
-    const size_t headerSize = MCA::nbChunksInRegion * 4;
+    const size_t headerSize = MCA::nbChunksInRegion * 8;
 
     // set the header (all the chunk's offsets) to 0
     std::array<uint8_t, headerSize / 2> offsets = {};
@@ -196,9 +197,9 @@ void writeData(MCA& mcaFile) {
     // close the file to reopen it in read-write mode
     newFile.close();
 
-    std::fstream file("nom.mca", std::ios::in | std::ios::out | std::ios::binary);
+    std::fstream f("newFile.mca", std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc);
 
-    if (!file) {
+    if (!f) {
         throw std::runtime_error("Can not open the new file");
     }
 
@@ -212,7 +213,7 @@ void writeData(MCA& mcaFile) {
         //     // TODO : what do we have to do ???
         //     continue;
         // }
-        chunkStart = writeChunkData(file, mcaFile, i, chunkStart);
+        chunkStart = writeChunkData(f, mcaFile, i, chunkStart);
     }
 }
 

@@ -149,6 +149,8 @@ void NBTChunkView::setBlock(const Block& block) {
         longs[startLong + 1] &= ~(mask >> (bitsPerBlock - spillBits));
         longs[startLong + 1] |= ((int64_t)paletteIndex >> (bitsPerBlock - spillBits));
     }
+
+    this->toCompressedData();
 }
 
 void NBTChunkView::setBlocks(const std::vector<Block>& blocks) {

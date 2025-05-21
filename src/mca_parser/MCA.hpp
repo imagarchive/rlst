@@ -23,7 +23,7 @@ class MCA
 };
 
 // Reads and uncompresses the data of the chunk corresponding to the given index
-Chunk& readChunkData(std::fstream& file, int chunkIndex);
+Chunk readChunkData(std::fstream& file, int chunkIndex);
 
 // writes the compressed data of the chunk corresponding to the given index
 void writeData(MCA& mcaFile);
