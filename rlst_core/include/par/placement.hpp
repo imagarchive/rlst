@@ -426,10 +426,9 @@ namespace rlst::par
     {
       return
         iterator(
-          m_grid.begin() +
+          m_grid.begin() + 1 +
             __cell.position().y() +
-            static_cast<difference_type>(__cell.type()->size.height)
-            + 1,
+            static_cast<difference_type>(__cell.type()->size.height),
 
           0,
           static_cast<difference_type>(__cell.type()->size.width),
@@ -455,10 +454,9 @@ namespace rlst::par
     {
       return
         const_iterator(
-          m_grid.cbegin() +
+          m_grid.cbegin() + 1 +
             __cell.position().y() +
-            static_cast<difference_type>(__cell.type()->size.height)
-            + 1,
+            static_cast<difference_type>(__cell.type()->size.height),
 
           0,
           static_cast<difference_type>(__cell.type()->size.width),
