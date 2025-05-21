@@ -371,7 +371,7 @@ namespace rlst::par
       return manhattan_cost(__lhs) < manhattan_cost(__rhs);
       });
     // route each net (nets are not moved once routed)
-    for (const net_t& net : __nets) {
+    for (net_t& net : __nets) {
       uliteral_t best_cost = std::numeric_limits<uliteral_t>::max();
       std::vector<std::pair<Point, RouteElement>> best_route;
       for (uint8_t level = 0; level <= first_empty_level; ++level) {
@@ -411,6 +411,10 @@ namespace rlst::par
       if (best_route.size() == 0) {
         throw std::runtime_error("Could not route (space)");
       }
+      // save the level of the route for tower placement
+      net.first.max_level = std::max(
+        net.first.max_level,
+        best_route.at(0).first.z());
       // occupy the route
       for (
         size_t step_index = 1;
@@ -437,6 +441,10 @@ namespace rlst::par
           best_route[best_route.size() - 1].first.y() - __bottom_left.y()),
         static_cast<uliteral_t>(best_route[best_route.size() - 1].first.z())
         );
+      // set the real coordinates
+      for (std::pair<Point, RouteElement> block : best_route) {
+        block.first.z() = block.first.z() * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT;
+      }
       // reverse the route (A* returns it backwards) and save it
       std::reverse(best_route.begin(), best_route.end());
       routes.push_back(std::move(best_route));
@@ -446,5 +454,186 @@ namespace rlst::par
     set_route_elements(routes);
 
     return routes;
+  }
+
+  /**
+   * Add the blocks for a route to __blocks.
+   */
+
+  void add_route_blocks(
+    const std::vector<std::pair<Point, RouteElement>>& __route,
+    std::vector<mca_parser::Block>& __blocks
+  )
+  {
+    bool first_block = true;
+    for (const std::pair<Point, RouteElement>& block : __route) {
+      // the wire
+      mca_parser::Block::properties_type wire_properties;
+      std::string wire_name;
+      if (block.second == RouteElement::redstone) {
+        wire_name = "redstone_wire";
+      } else {
+        wire_name = "repeater";
+        switch (block.second) {
+          case RouteElement::eastFacingRepeater:
+            wire_properties["facing"] = "east";
+            break;
+          case RouteElement::westFacingRepeater:
+            wire_properties["facing"] = "west";
+            break;
+          case RouteElement::southFacingRepeater:
+            wire_properties["facing"] = "south";
+            break;
+          default:
+            // north facing is default
+            break;
+        }
+      }
+      __blocks.push_back(
+        mca_parser::Block(
+          Point(
+            static_cast<literal_t>(block.first.x()),
+            static_cast<literal_t>(block.first.y()),
+            static_cast<literal_t>(block.first.z())
+          ),
+          std::move(wire_name),
+          std::move(wire_properties)
+        )
+      );
+      // the block the wire is on
+      std::string support_name;
+      if (first_block) {
+        // the first and block might be next to slime
+        first_block = false;
+        support_name = "obsidian";
+      } else {
+        support_name = "lime_wool";
+      }
+      __blocks.push_back(
+        mca_parser::Block(
+          Point(
+            static_cast<literal_t>(block.first.x()),
+            static_cast<literal_t>(block.first.y()),
+            static_cast<literal_t>(block.first.z() - 1)
+          ),
+          std::move(support_name),
+          mca_parser::Block::properties_type()
+        )
+      );
+    }
+  }
+
+  /**
+   * Add the appropriate (ascending or descending) tower blocks on a port.
+   * Blocks are added to __blocks.
+   */
+
+  void add_port_blocks(
+    const cell::PlacedPort& __port,
+    std::vector<mca_parser::Block>& __blocks
+  )
+  {
+    mca_parser::Block::properties_type sticky_piston_properties;
+    if (__port.port.type == cell::PortType::input) {
+      sticky_piston_properties["facing"] = "down";
+      for (literal_t level = 0; level < __port.max_level; ++level) {
+        literal_t z = FIRST_LEVEL_HEIGHT + level * LEVEL_HEIGHT;
+        // redstone block
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z - 1)
+            ),
+            "redstone_block",
+            mca_parser::Block::properties_type()
+          )
+        );
+        // piston
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z)
+            ),
+            "sticky_piston",
+            sticky_piston_properties // copy
+                                     // (original is reused in other iterations)
+          )
+        );
+        // redstone dust
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z + 1)
+            ),
+            "redstone_wire",
+            mca_parser::Block::properties_type()
+          )
+        );
+      }
+    } else if (__port.port.type == cell::PortType::output) {
+      sticky_piston_properties["facing"] = "up";
+      for (literal_t level = 0; level < __port.max_level; ++level) {
+        literal_t z = FIRST_LEVEL_HEIGHT + level * LEVEL_HEIGHT;
+        // redstone block
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z - 1)
+            ),
+            "redstone_block",
+            mca_parser::Block::properties_type()
+          )
+        );
+        // slime block
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z - 2)
+            ),
+            "slime_block",
+            mca_parser::Block::properties_type()
+          )
+        );
+        // piston
+        __blocks.push_back(
+          mca_parser::Block(
+            Point(
+              static_cast<literal_t>(cell::absolute_x(__port)),
+              static_cast<literal_t>(cell::absolute_y(__port)),
+              static_cast<literal_t>(z - 3)
+            ),
+            "sticky_piston",
+            sticky_piston_properties // copy
+                                     // (original is reused in other iterations)
+          )
+        );
+      }
+    }
+  }
+
+  std::vector<mca_parser::Block> generate_routing_blocks(
+    const std::vector<std::vector<std::pair<Point, RouteElement>>>& __routes,
+    const std::vector<net_t>& __nets
+  )
+  {
+    std::vector<mca_parser::Block> blocks;
+    for (const std::vector<std::pair<Point, RouteElement>>& route : __routes) {
+      add_route_blocks(route, blocks);
+    }
+    for (const net_t& net : __nets) {
+      add_port_blocks(net.first, blocks);
+      add_port_blocks(net.second, blocks);
+    }
+    return blocks;
   }
 }

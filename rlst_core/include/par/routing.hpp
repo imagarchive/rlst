@@ -6,6 +6,7 @@
  */
 
 #include "geometry.hpp"
+#include "mca_parser/Block.hpp"
 #include "par.hpp"
 
 #include <vector>
@@ -29,7 +30,9 @@ namespace rlst::par
   };
 
   /**
-   * Given a placement, returns routes and their composition
+   * Given a placement, returns routes and their composition, and saves in the
+   * placed ports (in the nets) the level of the highest route that uses them
+   * (needed in @ref generate_port_tower_block_vector)
    *
    * The algorithm is far from optimal, but it is decent enough for small
    * circuits.
@@ -50,6 +53,23 @@ namespace rlst::par
     std::vector<net_t>& __nets,
     const Point& __bottom_left,
     const Size& __size
+  );
+
+  /**
+   * Given a routes and a netlist, generate the list of blocks required for the
+   * routes and for the towers that ports use to access the different levels
+   *
+   * @param[in] __nets The nets, which should have had the max level of each of
+   * their ports set by @ref route
+   * @param[in] __routes The nets, which should have had the max level of each
+   * of their ports set by @ref route
+   *
+   * @return The blocks for all the routes and towers
+   */
+
+  std::vector<mca_parser::Block> generate_routing_blocks(
+    const std::vector<std::vector<std::pair<Point, RouteElement>>>& __routes,
+    const std::vector<net_t>& __nets
   );
 }
 

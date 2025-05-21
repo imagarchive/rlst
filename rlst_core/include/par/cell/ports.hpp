@@ -122,6 +122,8 @@ namespace rlst::par::cell
     std::reference_wrapper<const Cell> parent;
 
     Port port; ///< The corresponding @ref Port
+
+    literal_t max_level = 0; ///< The highest level route that uses this port
   };
 
   /**
