@@ -435,7 +435,7 @@ namespace rlst::par
         );
       // reverse the route (A* returns it backwards) and save it
       std::reverse(best_route.begin(), best_route.end());
-      routes.push_back(best_route);
+      routes.push_back(std::move(best_route));
     }
 
     // set the RouteElements
