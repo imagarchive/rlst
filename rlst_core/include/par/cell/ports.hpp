@@ -52,7 +52,6 @@ namespace rlst::par::cell
   {
     input, ///< The port is an input
     output, ///< The port is an output
-    inout ///< The port is an input and output
   };
 
   /* Port */
