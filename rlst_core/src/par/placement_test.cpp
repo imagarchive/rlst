@@ -185,7 +185,7 @@ TEST(placement_grid__overlap_penalty__test, full_overlap)
   };
 
   placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
-  ASSERT_DOUBLE_EQ(g.overlap_cost(), 4'000._r / static_cast<real_t>(g.size()));
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 2'000._r / static_cast<real_t>(g.size()));
 }
 
 TEST(placement_grid__overlap_penalty__test, partial_overlap)
@@ -196,7 +196,7 @@ TEST(placement_grid__overlap_penalty__test, partial_overlap)
   };
 
   placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
-  ASSERT_DOUBLE_EQ(g.overlap_cost(), 2'000._r / static_cast<real_t>(g.size()));
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 1'000._r / static_cast<real_t>(g.size()));
 }
 
 TEST(placement_grid__overlap_penalty__test, many)
@@ -209,7 +209,7 @@ TEST(placement_grid__overlap_penalty__test, many)
   };
 
   placement_grid g(10_ul, 10_ul, cells.begin(), cells.end());
-  ASSERT_DOUBLE_EQ(g.overlap_cost(), 6'000._r / static_cast<real_t>(g.size()));
+  ASSERT_DOUBLE_EQ(g.overlap_cost(), 3'000._r / static_cast<real_t>(g.size()));
 }
 
 TEST(row_length_penalty__basics__test, empty)
