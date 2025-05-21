@@ -35,7 +35,7 @@ namespace rlst::core
   {
     std::random_device device;
     std::mt19937 generator(device());
-    std::uniform_int_distribution<T> distribution(__first, __last - 1);
+    std::uniform_int_distribution<T> distribution(__first, __last);
 
     return distribution(generator);
   }
