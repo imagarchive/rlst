@@ -1,5 +1,4 @@
-# Redstone Logic Synthesis Tool
-# Rapport de Projet
+# Redstone Logic Synthesis Tool - Rapport de Projet
 
 ## Introduction
 
