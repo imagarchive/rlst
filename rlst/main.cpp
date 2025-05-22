@@ -15,18 +15,56 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 #include "cell_reader/cell_reading.hpp"
-#include "config.hpp"
+#include "par/placement.hpp"
+#include "par/routing.hpp"
 #include "parse_source/Parse.hpp"
 #include "parse_source/pTypes.hpp"
+#include "svg/SVG.hpp"
+#include "config.hpp"
+#include "par.hpp"
 
-#include <iostream>
+int main(int __argc, char *__argv[])
+{
+  using namespace rlst;
 
-int main(int __argc, char *__argv[]) {
-  auto types = rlst::cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
+  auto types = cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
   initCellTypes(std::move(types));
 
-  auto [net_t, cellList] = parse_v(__argc, __argv);
+  auto [net, cell_list] = parse_v(__argc, __argv);
 
-  std::cout << "Hello world!" << std::endl;
+  std::vector<par::net_t> net_vec;
+  net_vec.reserve(net.size());
+
+  for (par::net_t n : net) {
+    net_vec.push_back(std::move(n));
+  }
+
+  par::place(
+    cell_list.begin(),
+    cell_list.end(),
+    net.cbegin(),
+    net.cend(),
+    12_ul
+  );
+
+  auto route =
+    par::route(
+      net_vec,
+      Point(),
+      par::frame_of(cell_list.cbegin(), cell_list.cend())
+    );
+
+  svg::SVG s("output.svg");
+
+  for (const par::cell::Cell& c : cell_list) {
+    s.draw_cell(c);
+  }
+
+  for (const auto& a : route) {
+    for (const auto& b : a) {
+      s.draw_point(b.first, "green");
+    }
+  }
 }
