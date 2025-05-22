@@ -44,8 +44,7 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
     std::cout << "THESE ARE THE " << mod.cells.size()
               << " PCELLS: " << std::endl;
     for (pCell &cell : mod.cells) {
-      par::cell::Cell newCell(Point(),
-                              std::make_shared<par::cell::CellType>(cell.type));
+      par::cell::Cell newCell(Point(), cell.type);
       cellList.push_back(newCell);
 
       std::cout << &cell << " | " << newCell.type() << " | "
