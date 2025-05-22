@@ -23,6 +23,6 @@
 
 int main()
 {
-  rlst::gate_reader::generate_gates(RLST_INSTALL_GATESDIR);
+  rlst::cell_reading::generate_gates(RLST_INSTALL_GATESDIR);
   std::cout << "Hello world!" << std::endl;
 }

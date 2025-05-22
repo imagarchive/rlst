@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <fstream>
 
-namespace rlst::gate_reader
+namespace rlst::cell_reading
 {
   par::cell::CellType generate_gate(const std::string& __file_name)
   {
