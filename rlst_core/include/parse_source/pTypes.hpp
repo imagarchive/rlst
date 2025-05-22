@@ -39,8 +39,8 @@ public:
   std::vector<std::shared_ptr<pPort>> inoutPorts;
   std::unordered_map<int, par::cell::PlacedPort> parInoutPorts;
 
-  // std::shared_ptr<par::cell::Cell> parCell;
-  par::cell::Cell parCell;
+  std::shared_ptr<par::cell::Cell> parCell;
+  // par::cell::Cell parCell;
 
   // extract the Cell from the gate_data.json
   pCell(std::string cell_name, pt::ptree cell_tree);
