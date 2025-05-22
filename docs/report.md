@@ -10,6 +10,7 @@ Le projet est composé d'une bibliothèque, codée dans `rlst_core`, et d'un lan
 Le lanceur contient juste un `main`.
 
 La bibliothèque est divisé en différents packages:
+
 - `cell_reader`: lecture des fichiers décrivant les gates
 - `par`: placement et routage
 - `svg`: représentation en svg des cellules et des routes
@@ -19,6 +20,7 @@ La bibliothèque est divisé en différents packages:
 ### Portes logiques disponibles
 
 Les portes logiques sont définies dans des fichiers json (un par porte) qui décrivent:
+
 - leur taille
 - la position dans la porte des ports entrants et sortants
 - les blocs qui les composent (utile plus tard pour l'édition du monde Minecraft)
@@ -49,6 +51,7 @@ Pour éviter ces problèmes les portes sont artificiellement agrandies (+3 de ha
 Ceci garantit qu'elles n'ont pas de ports adjacents (aucune rotation n'est effectuée sur les portes lors du placement) et qu'il y a la place entre les cellules pour router si elles sont trop petites pour router par dessus.
 
 L'algorithme de routage est le suivant
+
 ```
 pour chaque route
     meilleur_chemin = NULL
