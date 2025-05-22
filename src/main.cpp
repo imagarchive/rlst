@@ -29,20 +29,21 @@ int main()
     MCA file = readMcaFile(mcaFile);
 
     // gets the first chunk
-    NBTChunkView view(file.chunks()[0]);
+    // NBTChunkView view(file.chunks()[0]);
 
     std::map<std::string, std::string> properties;
     std::map<std::string, std::string> properties2;
     properties2["facing"] = "south";
-    Block newBlock(0, 4, 0, "minecraft:redstone_block", properties);
-    Block newBlock2(0, 5, 0, "minecraft:blue_wool", properties);
-    Block newBlock3(1, 4, 0, "minecraft:redstone_block", properties);
-    Block newBlock4(0, 4, 1, "redstone_wall_torch", properties2);
-    std::vector<Block> blocks = {newBlock, newBlock2, newBlock3, newBlock4};
+    Block newBlock(0, 0, 4, "minecraft:redstone_block", properties);
+    Block newBlock2(0, 0, 5, "minecraft:blue_wool", properties);
+    Block newBlock3(1, 0, 4, "minecraft:redstone_block", properties);
+    Block newBlock4(0, 1, 4, "redstone_wall_torch", properties2);
+    // std::vector<Block> blocks = {newBlock, newBlock2, newBlock3, newBlock4};
 
-    view.setBlocks(blocks);
+    // view.setBlock(newBlock);
 
     // //places a block
+    placeBlock(file, newBlock);
     // view.setBlock(newBlock);
 
     writeData(file);

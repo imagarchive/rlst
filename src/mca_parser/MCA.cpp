@@ -1,6 +1,5 @@
 #include "Chunk.hpp"
 #include "MCA.hpp"
-#include "Block.hpp"
 #include "NBTChunkView.hpp"
 
 #include <array>
@@ -237,5 +236,42 @@ MCA readMcaFile(const std::string &filename) {
     }
 
     return mcaFile;
+}
+
+// The coordinated of the block have to be relative to the minecraft map,
+// not a chunk
+void placeBlock(MCA& mcaFile, Block& block) {
+    int x = block.getPosx();
+    // z and y are inverted
+    int y = block.getPosz();
+    int z = block.getPosy();
+
+    // find the chunk where the block has to be placed
+    int chunkX = x / 16;
+    int chunkZ = z / 16;
+
+    if (chunkX > 32 || chunkZ > 32) {
+        std::cerr << "The block is not in this region" << std::endl;
+        return;
+    }
+
+    // Get the corresponding chunk
+    int chunkIndex = (chunkX) + (chunkZ) * 32;
+
+    Chunk chunk = mcaFile.chunks()[chunkIndex];
+
+    NBTChunkView view(chunk);
+
+    // Computes the position of the block in the chunk
+    int xInChunk = x % 16;
+    int yInChunk = y;
+    int zInChunk = z % 16;
+
+    block.setPosX(xInChunk);
+    block.setPosY(yInChunk);
+    block.setPosZ(zInChunk);
+
+    // places the block
+    view.setBlock(block);
 }
 

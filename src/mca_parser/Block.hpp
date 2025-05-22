@@ -7,6 +7,9 @@
 class Block
 {
     private:
+        // x -> east
+        // z -> south
+        // y -> up
         int posx;
         int posy;
         int posz;
@@ -21,9 +24,15 @@ class Block
 
         int getPosx() const;
 
+        void setPosX(int x);
+
         int getPosy() const;
 
+        void setPosY(int y);
+
         int getPosz() const;
+
+        void setPosZ(int z);
 
         std::string getName() const;
 

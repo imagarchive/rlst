@@ -37,6 +37,18 @@ int Block::getPosz() const
     return posz;
 }
 
+void Block::setPosX(int x) {
+    posx = x;
+}
+
+void Block::setPosY(int y) {
+    posy = y;
+}
+
+void Block::setPosZ(int z) {
+    posz = z;
+}
+
 std::string Block::getName() const
 {
     return name;

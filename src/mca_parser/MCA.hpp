@@ -2,6 +2,7 @@
 #define MCA_HPP
 
 #include "Chunk.hpp"
+#include "Block.hpp"
 #include <iostream>
 #include <memory>
 
@@ -38,6 +39,9 @@ std::array<uint8_t, 3> converts3BytesBigEndian(uint32_t value);
 
 // Reads a .mca file and returns a MCA object containing the uncompressed data of the chunks
 // This code needs to use r.0.0.mca
-MCA readMcaFile(const std::string &filename);
+MCA readMcaFile(const std::string& filename);
+
+// places a block in the chunk corresponding to the chunk's coordinates.
+void placeBlock(MCA& mcaFile, Block& block);
 
 #endif
