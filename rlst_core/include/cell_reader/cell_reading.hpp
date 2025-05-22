@@ -9,7 +9,7 @@
 #include "mca_parser/Block.hpp"
 #include "par/cell/types.hpp"
 
-namespace rlst::cell_reading
+namespace rlst::cell_reader
 {
   /**
    * Given a directory containing json files describing logic gates, create and
