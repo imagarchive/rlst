@@ -1,6 +1,6 @@
 {
   "type": "NOT",
-  "size": {"width": 5, "height": 3},
+  "size": {"width": 7, "height": 4},
   "terminals": [
     {
       "type": "input",

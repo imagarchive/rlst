@@ -1,6 +1,6 @@
 {
   "type": "AND",
-  "size": {"width": 7, "height": 4},
+  "size": {"width": 9, "height": 6},
   "terminals": [
     {
       "type": "input",
