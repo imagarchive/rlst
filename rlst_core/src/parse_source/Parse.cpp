@@ -5,6 +5,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "par/cell/Cell.hpp"
@@ -79,7 +80,9 @@ computeConnections(std::vector<pModule> &moduleList) {
   return net_t;
 }
 
-int parse_v(int argc, char *argv[]) {
+std::pair<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
+          std::list<par::cell::Cell>>
+parse_v(int argc, char *argv[]) {
   // initialize yosys environment
   // system("source ../../oss-cad-suite/environment");
 
@@ -117,5 +120,5 @@ int parse_v(int argc, char *argv[]) {
     std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
 
-  return 0;
+  return std::make_pair(net_t, cellList);
 }

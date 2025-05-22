@@ -15,18 +15,18 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "cell_reader/cell_reading.hpp"
-#include "parse_source/Parse.hpp"
 #include "config.hpp"
+#include "parse_source/Parse.hpp"
 #include "parse_source/pTypes.hpp"
 
 #include <iostream>
 
-int main(int __argc, char* __argv[])
-{
+int main(int __argc, char *__argv[]) {
   auto types = rlst::cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
   initCellTypes(std::move(types));
-  parse_v(__argc, __argv);
+
+  auto [net_t, cellList] = parse_v(__argc, __argv);
+
   std::cout << "Hello world!" << std::endl;
 }
