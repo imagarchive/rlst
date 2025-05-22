@@ -56,11 +56,15 @@ namespace rlst::mca_parser
     file.read(reinterpret_cast<char *>(chunkLocation), 4);
 
     if (chunkLocation[0] == 0 && chunkLocation[1] == 0 && chunkLocation[2] == 0 && chunkLocation[3] == 0) {
-      std::cerr << "The chunk was not generated" << std::endl;
+      std::vector<Bytef> uncompressedData;
+      std::vector<unsigned char> compressedData;
+      // std::cerr << "The chunk was not generated" << std::endl;
 
       Chunk newChunk(
         chunkIndex % static_cast<Chunk::size_type>(chunksNb),
-        chunkIndex / static_cast<Chunk::size_type>(chunksNb)
+        chunkIndex / static_cast<Chunk::size_type>(chunksNb),
+        uncompressedData,
+        compressedData
       );
 
       return newChunk;
