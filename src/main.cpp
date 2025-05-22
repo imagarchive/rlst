@@ -15,10 +15,10 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
+#include "parse_source/Parse.hpp"
 #include <iostream>
 
-int main()
-{
-    std::cout << "Hello world!" << std::endl;
+int main(int argc, char *argv[]) {
+  std::cout << "Hello world!" << std::endl;
+  parse_v(argc, argv);
 }

@@ -1,8 +1,10 @@
+#include <iostream>
+
 #include "pTypes.hpp"
 #include "par/cell/ports.hpp"
-#include <set>
 
 pModule::pModule(std::string module_name, pt::ptree module_tree) {
+  std::cout << "CREATING MODULE : " << module_name << std::endl;
   this->name = module_name;
 
   // access ports attribute
@@ -36,6 +38,8 @@ pModule::pModule(std::string module_name, pt::ptree module_tree) {
 
   // initialize cells
   for (const auto &cell : cells_subtree) {
+    std::cout << "HERE BRO HEEEERE" << std::endl;
+    std::cout << cell.first << std::endl;
     this->cells.push_back(pCell(cell.first, cell.second));
   }
 }
@@ -52,15 +56,15 @@ pModule::pModule(std::string module_name, pt::ptree module_tree) {
  * inoutput port
  *
  */
-std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
 pModule::computeConnections() {
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> modNet_t;
 
-  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> modNet_t;
   for (pCell cell : cells) {
     for (pCell otherCell : cells) {
-      std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+      std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
           cellNet_t = cell.computeConnections(otherCell);
-      modNet_t.insert(cellNet_t.begin(), cellNet_t.end());
+      modNet_t.splice(modNet_t.end(), cellNet_t);
     }
   }
 
@@ -72,10 +76,5 @@ void pModule::placePorts() {
     // Create corresponding PlacedPort with par::cell::Cell parent and
     // par::cell::port port (a @ref to the cell type) for each pCell
     cell.placePorts();
-  }
-}
-
-void pModule::computeNetList() {
-  for (pCell cell : cells) {
   }
 }

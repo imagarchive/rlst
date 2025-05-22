@@ -24,6 +24,8 @@ set(
     par/geometry.hpp
     par/placement.hpp
     par/routing.hpp
+    parse_source/pTypes.hpp
+    parse_source/Parse.hpp
     svg/SVG.hpp
     core.hpp
     par.hpp
@@ -42,6 +44,12 @@ set(
     par/geometry.cpp
     par/placement.cpp
     par/routing.cpp
+    parse_source/Parse.cpp
+    parse_source/pCell.cpp
+    parse_source/pInit.cpp
+    parse_source/pModule.cpp
+    parse_source/pPort.cpp
+    parse_source/pPort.cpp
     svg/SVG.cpp
     main.cpp
 )

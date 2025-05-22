@@ -5,9 +5,9 @@
 #include "par/cell/Cell.hpp"
 #include "par/cell/ports.hpp"
 #include "par/cell/types.hpp"
+#include <memory>
 #include <unordered_map>
 #include <vector>
-#include <set>
 
 namespace pt = boost::property_tree;
 namespace par = rlst::par;
@@ -28,15 +28,15 @@ public:
   par::cell::CellType type;
 
   int inputNb = 0;
-  std::vector<pPort> inputPorts;
+  std::vector<std::shared_ptr<pPort>> inputPorts;
   std::unordered_map<int, par::cell::PlacedPort> parInputPorts;
 
   int outputNb = 0;
-  std::vector<pPort> outputPorts;
+  std::vector<std::shared_ptr<pPort>> outputPorts;
   std::unordered_map<int, par::cell::PlacedPort> parOutputPorts;
 
   int inoutNb = 0;
-  std::vector<pPort> inoutPorts;
+  std::vector<std::shared_ptr<pPort>> inoutPorts;
   std::unordered_map<int, par::cell::PlacedPort> parInoutPorts;
 
   par::cell::Cell parCell;
@@ -48,10 +48,7 @@ public:
   void placePorts();
 
   // compute this cell's connections
-  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections(pCell otherCell);
-
-  // compute this cell's netlist (compatible with the placing and routing steps)
-  void computeNetList();
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections(pCell otherCell);
 };
 
 /**
@@ -63,8 +60,7 @@ public:
   std::string name;
   pPortDirection direction;
   int bitVector;
-  std::set<pPort> connections;
-  int parent;
+  std::list<std::shared_ptr<pPort>> connections;
 
   // extract the Port from the gate_data.json
   pPort(std::string name, pt::ptree port_tree);
@@ -99,10 +95,7 @@ public:
   void placePorts();
 
   // compute this module's connections
-  std::set<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections();
-
-  // compute this module's netlist (compatible with the placing and routing steps)
-  void computeNetList();
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections();
 };
 
 
