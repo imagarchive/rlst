@@ -304,10 +304,11 @@ namespace rlst::par
         Point next_block_pos = route[block_index + 1].first;
         if (previous_block_pos.x() == next_block_pos.x()) {
           last_candidate_index = block_index;
+          // the y axis goes south
           if (previous_block_pos.y() < next_block_pos.y()) {
-            last_candidate_repeater = RouteElement::northFacingRepeater;
-          } else {
             last_candidate_repeater = RouteElement::southFacingRepeater;
+          } else {
+            last_candidate_repeater = RouteElement::northFacingRepeater;
           }
         } else if (previous_block_pos.y() == next_block_pos.y()) {
           last_candidate_index = block_index;
