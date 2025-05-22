@@ -187,7 +187,7 @@ pour chaque route
         et destination
 ```
 
-Les blocs indisponibles sont rangés dans une matrice en 3 dimensions.
+Les blocs indisponibles sont rangés dans un vecteur à 3 dimensions.
 
 Les routes sont triés par distance de Manhattan, de la moins longue à la plus longue, placer les plus courtes en premier donne de meilleurs résultats.
 
