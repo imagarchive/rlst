@@ -40,7 +40,7 @@ namespace rlst::cell_reader
       port.position.x() = position["x"].as_int64();
       port.position.y() = position["y"].as_int64();
       port.position.z() = position["z"].as_int64();
-      cell_type.ports.push_back(port);
+      cell_type.ports.push_back(std::make_shared<par::cell::Port>(port));
     }
 
     // Generate and add the blocks
