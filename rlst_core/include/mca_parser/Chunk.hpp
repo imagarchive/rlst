@@ -48,7 +48,7 @@ namespace rlst::mca_parser
       , m_y(0)
       , m_compressed_data()
       , m_uncompressed_data()
-      , m_is_not_generated(true)
+      , m_is_not_generated(false)
     {}
 
     Chunk(const Chunk& __other) = default;
@@ -60,7 +60,7 @@ namespace rlst::mca_parser
       , m_y(__y)
       , m_compressed_data()
       , m_uncompressed_data()
-      , m_is_not_generated(true)
+      , m_is_not_generated(false)
     {}
 
     Chunk(
@@ -73,8 +73,24 @@ namespace rlst::mca_parser
       , m_y(__y)
       , m_compressed_data(std::move(__compressed_data))
       , m_uncompressed_data(std::move(__uncompressed_data))
-      , m_is_not_generated(true)
+      , m_is_not_generated(false)
     {}
+
+    Chunk(
+      size_type __x,
+      size_type __y,
+      data_type __compressed_data,
+      data_type __uncompressed_data,
+      bool is_not_generated
+
+    ) noexcept
+      : m_x(__x)
+      , m_y(__y)
+      , m_compressed_data(std::move(__compressed_data))
+      , m_uncompressed_data(std::move(__uncompressed_data))
+      , m_is_not_generated(is_not_generated)
+    {}
+
   public:
     Chunk& operator=(const Chunk& __rhs) = default;
     Chunk& operator=(Chunk&& __rhs) noexcept = default;

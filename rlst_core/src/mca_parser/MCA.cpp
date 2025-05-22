@@ -60,11 +60,14 @@ namespace rlst::mca_parser
       std::vector<unsigned char> compressedData;
       // std::cerr << "The chunk was not generated" << std::endl;
 
+      std::cout << "chunkindex " << chunkIndex << std::endl;
+
       Chunk newChunk(
         chunkIndex % static_cast<Chunk::size_type>(chunksNb),
         chunkIndex / static_cast<Chunk::size_type>(chunksNb),
         uncompressedData,
-        compressedData
+        compressedData,
+        true
       );
 
       return newChunk;
@@ -286,8 +289,8 @@ namespace rlst::mca_parser
   void placeBlock(MCA& mcaFile, Block& block) {
       literal_t x = block.position().x();
       // z and y are inverted
-      literal_t y = block.position().y();
-      literal_t z = block.position().z();
+      literal_t y = block.position().z();
+      literal_t z = block.position().y();
 
       // find the chunk where the block has to be placed
       int chunkX = x / 16;
