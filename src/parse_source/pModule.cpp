@@ -60,8 +60,8 @@ std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
 pModule::computeConnections() {
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> modNet_t;
 
-  for (pCell cell : cells) {
-    for (pCell otherCell : cells) {
+  for (pCell &cell : cells) {
+    for (pCell &otherCell : cells) {
       std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
           cellNet_t = cell.computeConnections(otherCell);
       modNet_t.splice(modNet_t.end(), cellNet_t);
@@ -72,7 +72,7 @@ pModule::computeConnections() {
 }
 
 void pModule::placePorts() {
-  for (pCell cell : cells) {
+  for (pCell &cell : cells) {
     // Create corresponding PlacedPort with par::cell::Cell parent and
     // par::cell::port port (a @ref to the cell type) for each pCell
     cell.placePorts();

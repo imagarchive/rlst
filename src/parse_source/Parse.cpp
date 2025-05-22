@@ -34,7 +34,7 @@ std::vector<pModule> parse_data_json() {
   return modules_list;
 }
 
-std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
+std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
   std::list<par::cell::Cell> cellList = {};
 
   for (pModule &mod : moduleList) {
@@ -60,12 +60,12 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-computeConnections(std::vector<pModule> moduleList) {
+computeConnections(std::vector<pModule>& moduleList) {
   // compute internal connections for each module
   std::cout << "\n --- COMPUTING CONNECTIONS" << std::endl;
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t;
 
-  for (pModule module : moduleList) {
+  for (pModule &module : moduleList) {
     std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
         modNet_t = module.computeConnections();
     net_t.splice(net_t.end(), modNet_t);

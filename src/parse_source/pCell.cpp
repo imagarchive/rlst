@@ -154,7 +154,7 @@ void pCell::placePorts() {
   for (const auto &outputPort : outputPorts) {
     parOutputPorts[outputPort->bitVector] = *outputParPortsIt;
   }
-  for (const auto &inoutPort : outputPorts) {
+  for (const auto &inoutPort : inoutPorts) {
     parInoutPorts[inoutPort->bitVector] = *inoutParPortsIt;
   }
 }
