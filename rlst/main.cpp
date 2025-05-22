@@ -17,12 +17,16 @@
 
 
 #include "cell_reader/cell_reading.hpp"
+#include "parse_source/Parse.hpp"
 #include "config.hpp"
+#include "parse_source/pTypes.hpp"
 
 #include <iostream>
 
-int main()
+int main(int __argc, char* __argv[])
 {
-  rlst::cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
+  auto types = rlst::cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
+  initCellTypes(std::move(types));
+  parse_v(__argc, __argv);
   std::cout << "Hello world!" << std::endl;
 }
