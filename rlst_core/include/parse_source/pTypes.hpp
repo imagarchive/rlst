@@ -29,15 +29,15 @@ public:
 
   int inputNb = 0;
   std::vector<std::shared_ptr<pPort>> inputPorts;
-  std::unordered_map<int, par::cell::PlacedPort> parInputPorts;
+  std::unordered_map<int, std::optional<par::cell::PlacedPort>> parInputPorts;
 
   int outputNb = 0;
   std::vector<std::shared_ptr<pPort>> outputPorts;
-  std::unordered_map<int, par::cell::PlacedPort> parOutputPorts;
+  std::unordered_map<int, std::optional<par::cell::PlacedPort>> parOutputPorts;
 
   int inoutNb = 0;
   std::vector<std::shared_ptr<pPort>> inoutPorts;
-  std::unordered_map<int, par::cell::PlacedPort> parInoutPorts;
+  std::unordered_map<int, std::optional<par::cell::PlacedPort>> parInoutPorts;
 
   par::cell::Cell parCell;
 

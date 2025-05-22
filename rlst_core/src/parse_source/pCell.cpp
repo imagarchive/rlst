@@ -151,13 +151,13 @@ void pCell::placePorts() {
       inoutParPorts.begin();
 
   for (const auto &inputPort : inputPorts) {
-    parInputPorts.insert(std::make_pair(inputPort->bitVector, *inputParPortsIt));
+    parInputPorts[inputPort->bitVector] = *inputParPortsIt;
   }
   for (const auto &outputPort : outputPorts) {
-    parOutputPorts.insert(std::make_pair(outputPort->bitVector, *outputParPortsIt));
+    parOutputPorts[outputPort->bitVector] = *outputParPortsIt;
   }
   for (const auto &inoutPort : outputPorts) {
-    parInoutPorts.insert(std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
+    parInoutPorts[inoutPort->bitVector] = *inoutParPortsIt;
   }
 }
 
@@ -175,9 +175,9 @@ pCell::computeConnections(pCell otherCell) {
         inputPort->connections.push_back(outputPort);
 
         par::cell::PlacedPort parOutputPort =
-            parOutputPorts.at(outputPort->bitVector);
+            *parOutputPorts[outputPort->bitVector];
         par::cell::PlacedPort parInputPort =
-            otherCell.parInputPorts.at(inputPort->bitVector);
+            *otherCell.parInputPorts[inputPort->bitVector];
 
         cellNet_t.push_back(std::make_pair(parOutputPort, parInputPort));
         std::cout << outputPort->name << ", " << outputPort->bitVector
@@ -193,9 +193,9 @@ pCell::computeConnections(pCell otherCell) {
         inoutPort->connections.push_back(outputPort);
 
         par::cell::PlacedPort parOutputPort =
-            parOutputPorts.at(outputPort->bitVector);
+            *parOutputPorts[outputPort->bitVector];
         par::cell::PlacedPort parInoutPort =
-            otherCell.parInputPorts.at(inoutPort->bitVector);
+            *otherCell.parInputPorts[inoutPort->bitVector];
 
         cellNet_t.push_back(std::make_pair(parOutputPort, parInoutPort));
         std::cout << outputPort->name << ", " << outputPort->bitVector
@@ -213,9 +213,9 @@ pCell::computeConnections(pCell otherCell) {
         inoutPort->connections.push_back(inputPort);
 
         par::cell::PlacedPort parInputPort =
-            parOutputPorts.at(inputPort->bitVector);
+            *parOutputPorts[inputPort->bitVector];
         par::cell::PlacedPort parInoutPort =
-            otherCell.parInputPorts.at(inoutPort->bitVector);
+            *otherCell.parInputPorts[inoutPort->bitVector];
 
         cellNet_t.push_back(std::make_pair(parInputPort, parInoutPort));
         std::cout << inputPort->name << ", " << inputPort->bitVector << " --> "
