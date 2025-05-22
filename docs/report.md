@@ -1,3 +1,10 @@
+---
+header-includes: |
+  \usepackage{nicefrac}
+  \usepackage{physics}
+  \DeclareMathOperator{\sign}{sign}
+---
+
 # Redstone Logic Synthesis Tool - Rapport de Projet
 
 ## Introduction
@@ -30,6 +37,113 @@ Les fichiers sont lus un par la fonction `generate_gate` dans le package `cell_r
 Elle est appelée dans `main`.
 
 ## Placement
+
+### Avant-propos
+
+L'algorithme de placement repose sur plusieurs structure de données dont on détaillera l'utilité ultérieurement.
+En particulier, on a :
+
+- `rlst::core::grid`,
+- `rlst::core::details::grid_iterator`, et
+- `rlst::par::placement_grid`.
+
+`rlst::core::grid` est un type _template_ dont l'objectif est de fournir une interface pratique pour une matrice à deux dimensions.
+Ce type est donc un conteneur au sens du C++ : il respecte les _named requierements_ `Container` and `ReversibleContainer`.
+
+Un itérateur `rlst::core::details::grid_iterator` a été implémenté afin de simplifier l'itération sur une sous-matrice, c'est-à-dire que pour n'importe quelle sous-matrice d'une `rlst::core::grid`, il est capable de fournir une manière séquentielle d'itérer dessus.
+Il respecte les _named requierements_ `LegacyIterator`, `LegacyInputIterator`, `LegacyOutputIterator`, `LegacyForwardIterator`, `LegacyBidirectionalIterator` et `LegacyRandomAccessIterator`.
+
+`rlst::par::placement_grid` est une matrice de dimension trois représentant les recouvrements de cellules pour chaque point du plan.
+Cette classe implémente `rlst::core::grid` et suit les mêmes _named requierements_ que cette dernière.
+
+En s'appuyant sur les fonctionnalités offertes par `rlst::core::grid`, on est capable de récupérer la sous-matrice correspondant à une cellule (en prenant en considération sa taille ainsi que sa position).
+On implémente également la méthode `insert()` (resp. `erase()`) dont l'objectif est d'ajouter (resp. de supprimer) une cellule sur la surface correspondante.
+On a ainsi une classe qui nous permet d'obtenir pour chaque point du plan l'ensemble des cellules (potentiellement plusieurs ou aucune) qui se trouve à cet emplacement.
+
+### Recuit simulé
+
+Le principe de fonctionnement de l'algorithme de placement repose sur le [recuit simulé](https://fr.wikipedia.org/wiki/Recuit_simulé).
+Au cours de l'étude bibliographique, on s'est appuyé sur les écrits de K. Shahookar et P. Mazumder[^1] et sur la page Wikipédia précédemment citée.
+On a légérement modifié cet algorithme afin de donner une importance prépondérante au coût associé à la proportion de chevauchement.
+
+```
+PROCÉDURE recuit simulé;
+    estimation de la taille de l'espace de travail;
+
+    FAIRE
+        initialisations;
+        génération de la configuration initiale;
+
+        POUR i de 0 à 140 FAIRE
+            POUR j de 0 à 32 FAIRE
+                génération d'une nouvelle configuration;
+                évaluation de la nouvelle configuration;
+
+                calcul du coût de superposition de la nouvelle
+                configuration;
+
+                SI le coût est plus faible ALORS
+                    calcul des autres coûts pour la nouvelle
+                    configuration;
+
+                    SI le coût est plus faible ALORS
+                        on sauvegarde la nouvelle configuration;
+                        on continue;
+                    SINON SI accepte(coût, température) > uniform() ALORS
+                        on sauvegarde la nouvelle configuration;
+                        on continue;
+                    FIN SI
+                FIN SI
+
+                on restaure l'ancienne configuration;
+            FIN POUR
+        FIN POUR
+    TANT QUE le coût de chevauchement n'est pas nul
+FIN PROCÉDURE
+```
+
+On a empiriquement observé que ne pas rejeter précocement les configurations avec un surcoût de chevauchement induisait un bouclage infini.
+
+La **fonction d'acceptation** est
+
+\begin{align}
+\exp \biggl( \frac{100 \cdot \Delta C}{T} \biggr)
+\end{align}
+
+La **température initiale** est
+
+\begin{align}
+T = 500
+\end{align}
+
+Empiriquement, on a montré que $\Delta C \simeq 1$ et $T \simeq 100$ ; ainsi pour que ces deux grandeurs est le même ordre de grandeur on multiplie $\Delta C$ par un facteur 100.
+
+### Évaluation du coût d'une configuration
+
+Certains coût ont le mauvais goût de ne pas être bornée ; cela pose problème car certains coût pourrait écraser totalement les autres.
+Pour éviter cela, on a proposé d'utilisé une fonction de normalisation afin d'avoir des valeurs restreinte dans $[0 ; 100]$.
+
+La **fonction de normalisation** a la forme suivante
+
+\begin{align}
+\nicefrac{100}{\pi} \cdot \sign x \cdot \atan \Bigl( \log \bigl( \abs{x} + 1 \bigr) \Bigr) + 50
+\end{align}
+
+Cette fonction a en effet le bon goût d'être
+
+- bornée,
+- symétrique,
+- a une croissance relativement faible, et
+- coupe l'axe des ordonnées à 50 pour $x = 0$.
+
+Les coûts évaluent
+
+- la proportion de chevauchements (bornée naturellement),
+- la longueur estimée des fils (normalisée),
+- la proportion de cases vides (bornée naturellement),
+- l'écart relatif séparant la moyenne de la longueur des lignes de celle désirée (normalisée),
+- la hauteur de la configuration (normalisée), et
+- l'espace séparant l'axe des abscisses de la cellule la plus haute (normalisée).
 
 ## Routage
 
@@ -106,3 +220,5 @@ Une fonction permet de dessiner des points, sous forme de rectangle d'une couleu
 ## Edition du monde Minecraft
 
 ## Conclusion
+
+[^1]: VLSI cell placement techniques (https://doi.org/10.1145/103724.103725)
