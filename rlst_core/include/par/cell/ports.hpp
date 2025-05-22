@@ -20,6 +20,7 @@
 #  define RLST_CORE_RLST_PAR_CELL_PORTS_HPP
 
 #include "geometry.hpp"
+#include <memory>
 
 /**
  * @file
@@ -119,9 +120,9 @@ namespace rlst::par::cell
   struct PlacedPort
   {
     /// The parent of the @ref PlacedPort
-    std::reference_wrapper<const Cell> parent;
+    std::shared_ptr<const Cell> parent;
 
-    std::reference_wrapper<const Port> port; ///< The corresponding @ref Port
+    std::shared_ptr<const Port> port; ///< The corresponding @ref Port
     literal_t max_level = 0; ///< The highest level route that uses this port
   };
 
