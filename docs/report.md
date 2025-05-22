@@ -52,7 +52,10 @@ L'algorithme de routage est le suivant
 ```
 pour chaque route
     meilleur_chemin = NULL
-    rendre accessibles les blocs adjacents aux ports source et destination
+
+    rendre accessibles les blocs adjacents aux ports source \
+        et destination
+
     pour chaque niveau
         A_star pour trouver un chemin entre les deux ports
         si le chemin est meilleur que meilleur_chemin
@@ -60,8 +63,12 @@ pour chaque route
         si il est impossible de trouver une meilleur chemin
             break
     sauvegarder le meilleur chemin
-    rendre les blocs du meilleur chemin indisponibles aux chemins suivants
-    rendre inaccessibles les blocs adjacents aux ports source et destination
+
+    rendre les blocs du meilleur chemin indisponibles aux \
+        chemins suivants
+
+    rendre inaccessibles les blocs adjacents aux ports source \
+        et destination
 ```
 
 Les blocs indisponibles sont rangés dans une matrice en 3 dimensions.
