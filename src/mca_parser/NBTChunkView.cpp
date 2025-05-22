@@ -20,16 +20,22 @@ bool NBTChunkView::isValid() const {
 }
 
 NBT* NBTChunkView::findSection(int y) const {
-    NBT* level = NBT_GetChild(root, "Level");
-    if (!level) return nullptr;
+    // NBT* level = NBT_GetChild(root, "Level");
+    // if (!level) return nullptr;
 
-    NBT* sections = NBT_GetChild(level, "Sections");
+    NBT* sections = NBT_GetChild(root, "sections");
     if (!sections || sections->type != TAG_List) return nullptr;
 
     NBT* section = sections->child;
+    // because sections start with Y=-4
+    int64_t neededY = (y / 16) - 4;
+    if (neededY < 0) {
+        // fix a problem with negative integers
+        neededY += 256;
+    }
     while (section) {
         NBT* yTag = NBT_GetChild(section, "Y");
-        if (yTag && yTag->type == TAG_Byte && yTag->value_i == (y / 16)) {
+        if (yTag && yTag->type == TAG_Byte && yTag->value_i == neededY) {
             return section;
         }
         section = section->next;
@@ -41,7 +47,9 @@ NBT* NBTChunkView::getOrCreatePaletteEntry(NBT* section, const Block& block, int
     const std::string& name = block.getName();
     const auto& props = block.getProperties();
 
-    NBT* palette = NBT_GetChild(section, "Palette");
+    NBT* blockStates = NBT_GetChild(section, "block_states");
+    NBT* palette = NBT_GetChild(blockStates, "palette");
+
     if (!palette || palette->type != TAG_List) return nullptr;
 
     int index = 0;
@@ -121,14 +129,16 @@ void NBTChunkView::setBlock(const Block& block) {
     if (x < 0 || x >= 16 || y < 0 || y >= 256 || z < 0 || z >= 16) return;
 
     NBT* section = findSection(y);
+    
     if (!section) return;
 
     int paletteIndex = -1;
+
     NBT* palette = getOrCreatePaletteEntry(section, block, paletteIndex);
     if (!palette || paletteIndex < 0) return;
 
-    NBT* blockStates = NBT_GetChild(section, "BlockStates");
-    if (!blockStates || blockStates->type != TAG_Long_Array) return;
+    NBT* blockStates = NBT_GetChild(section, "block_states");
+    NBT* data = NBT_GetChild(blockStates, "data");
 
     int bitsPerBlock = std::ceil(std::log2(paletteIndex + 1));
     if (bitsPerBlock < 4) bitsPerBlock = 4;
@@ -138,7 +148,8 @@ void NBTChunkView::setBlock(const Block& block) {
     int startLong = startBit / 64;
     int bitOffset = startBit % 64;
 
-    int64_t* longs = (int64_t*)blockStates->value_a.value;
+    int64_t* longs = (int64_t*)data->value_a.value;
+
     int64_t mask = ((1LL << bitsPerBlock) - 1);
 
     longs[startLong] &= ~(mask << bitOffset);

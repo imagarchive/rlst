@@ -39,7 +39,7 @@ Chunk readChunkData(std::fstream& file, int chunkIndex) {
     if (chunkLocation[0] == 0 && chunkLocation[1] == 0 && chunkLocation[2] == 0 && chunkLocation[3] == 0) {
         std::vector<Bytef> uncompressedData;
         std::vector<unsigned char> compressedData;
-        std::cerr << "The chunk was not generated" << std::endl;
+        // std::cerr << "The chunk was not generated" << std::endl;
         Chunk newChunk(chunkIndex % chunksNb, chunkIndex / chunksNb, uncompressedData, compressedData);
         return newChunk;
     }

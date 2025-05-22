@@ -31,12 +31,17 @@ int main()
     // gets the first chunk
     NBTChunkView view(file.chunks()[0]);
 
-    // creates a block
+    // creates blocks
     std::map<std::string, std::string> properties;
     Block newBlock(0, 4, 0, "minecraft:redstone_block", properties);
+    Block newBlock2(0, 4, 1, "minecraft:redstone_block", properties);
+    Block newBlock3(1, 4, 0, "minecraft:redstone_block", properties);
+    std::vector<Block> blocks = {newBlock, newBlock2, newBlock3};
 
-    //places a block
-    view.setBlock(newBlock);
+    view.setBlocks(blocks);
+
+    // //places a block
+    // view.setBlock(newBlock);
 
     writeData(file);
 
