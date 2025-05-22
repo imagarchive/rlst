@@ -68,35 +68,78 @@ TEST(place__test, basic)
       }
     );
 
+  auto node_type =
+    std::make_shared<cell::CellType>(
+      cell::CellType {
+        std::vector {
+          cell::Port { Point(0, 0, 0), cell::PortType::input },
+          cell::Port { Point(2, 0, 0), cell::PortType::output }
+        },
+
+        "NODE",
+        Size { 3_l, 1_l },
+        {}
+      }
+    );
+
   std::vector cells {
+    cell::Cell(Point(), node_type),
+    cell::Cell(Point(), node_type),
+
     cell::Cell(Point(), not_type),
+    cell::Cell(Point(), not_type),
+
+    cell::Cell(Point(), and_type),
     cell::Cell(Point(), and_type),
 
     cell::Cell(Point(), or_type),
-
-    cell::Cell(Point(), not_type),
-    cell::Cell(Point(), and_type)
+    cell::Cell(Point(), node_type)
   };
 
   std::vector<std::pair<cell::PlacedPort, cell::PlacedPort>> nets {
     std::make_pair(
       cell::PlacedPort { cells[0], cells[0].type()->ports[1] },
-      cell::PlacedPort { cells[1], cells[1].type()->ports[0] }
-    ),
-
-    std::make_pair(
-      cell::PlacedPort { cells[3], cells[3].type()->ports[1] },
-      cell::PlacedPort { cells[4], cells[4].type()->ports[0] }
-    ),
-
-    std::make_pair(
-      cell::PlacedPort { cells[1], cells[1].type()->ports[2] },
       cell::PlacedPort { cells[2], cells[2].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { cells[3], cells[3].type()->ports[2] },
-      cell::PlacedPort { cells[2], cells[2].type()->ports[1] }
+      cell::PlacedPort { cells[0], cells[0].type()->ports[1] },
+      cell::PlacedPort { cells[4], cells[4].type()->ports[0] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[1], cells[1].type()->ports[1] },
+      cell::PlacedPort { cells[3], cells[3].type()->ports[0] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[1], cells[1].type()->ports[1] },
+      cell::PlacedPort { cells[5], cells[5].type()->ports[1] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[2], cells[2].type()->ports[1] },
+      cell::PlacedPort { cells[5], cells[5].type()->ports[0] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[3], cells[3].type()->ports[1] },
+      cell::PlacedPort { cells[4], cells[4].type()->ports[1] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[4], cells[4].type()->ports[2] },
+      cell::PlacedPort { cells[6], cells[6].type()->ports[0] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[5], cells[5].type()->ports[2] },
+      cell::PlacedPort { cells[6], cells[6].type()->ports[1] }
+    ),
+
+    std::make_pair(
+      cell::PlacedPort { cells[6], cells[6].type()->ports[2] },
+      cell::PlacedPort { cells[7], cells[7].type()->ports[0] }
     )
   };
 
