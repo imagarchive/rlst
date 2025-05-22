@@ -16,9 +16,13 @@
  */
 
 
+#include "cell_reader/cell_reading.hpp"
+#include "config.hpp"
+
 #include <iostream>
 
 int main()
 {
+  rlst::gate_reader::generate_gates(RLST_INSTALL_GATESDIR);
   std::cout << "Hello world!" << std::endl;
 }
