@@ -130,8 +130,6 @@ void pCell::placePorts() {
 
   for (par::cell::Port &parPort : type.ports) {
     // create the PlacedPort
-    // par::cell::PlacedPort placed = {
-    //     std::make_shared<const par::cell::Cell>(parCell), parPort};
     par::cell::PlacedPort placed { parCell, parPort };
     if (parPort.type == par::cell::PortType(input)) {
       inputParPorts.push_back(placed);
@@ -162,7 +160,7 @@ void pCell::placePorts() {
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-pCell::computeConnections(pCell otherCell) {
+pCell::computeConnections(pCell& otherCell) {
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> cellNet_t;
 
   // std::cout << "COMPUTING CELL CONNECTIONS" << std::endl;

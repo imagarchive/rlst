@@ -7,10 +7,10 @@
 #include <memory>
 #include <vector>
 
-#include "parse_source/Parse.hpp"
-#include "parse_source/pTypes.hpp"
 #include "par/cell/Cell.hpp"
 #include "par/cell/types.hpp"
+#include "parse_source/Parse.hpp"
+#include "parse_source/pTypes.hpp"
 
 std::vector<pModule> parse_data_json() {
   std::vector<pModule> modules_list;
@@ -34,7 +34,7 @@ std::vector<pModule> parse_data_json() {
   return modules_list;
 }
 
-std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
+std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
   using namespace rlst;
 
   std::list<par::cell::Cell> cellList = {};
@@ -43,11 +43,12 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
     std::cout << "THESE ARE THE " << mod.cells.size()
               << " PCELLS: " << std::endl;
     for (pCell &cell : mod.cells) {
-      par::cell::Cell newCell(Point(), std::make_shared<par::cell::CellType>(cell.type));
+      par::cell::Cell newCell(Point(),
+                              std::make_shared<par::cell::CellType>(cell.type));
       cellList.push_back(newCell);
 
-      std::cout << &cell << " | " << newCell.type() << " | " << newCell.type()->name
-                << std::endl;
+      std::cout << &cell << " | " << newCell.type() << " | "
+                << newCell.type()->name << std::endl;
 
       // attribute this par::cell::Cell to the pCell
       cell.parCell = newCell;
@@ -61,12 +62,12 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> moduleList) {
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-computeConnections(std::vector<pModule> moduleList) {
+computeConnections(std::vector<pModule> &moduleList) {
   // compute internal connections for each module
   std::cout << "\n --- COMPUTING CONNECTIONS" << std::endl;
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t;
 
-  for (pModule module : moduleList) {
+  for (pModule &module : moduleList) {
     std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
         modNet_t = module.computeConnections();
     net_t.splice(net_t.end(), modNet_t);
@@ -113,8 +114,7 @@ int parse_v(int argc, char *argv[]) {
   // Print ret_t
   std::cout << "\n --- NET_T" << std::endl;
   for (const auto &[p1, p2] : net_t) {
-    std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")"
-              << std::endl;
+    std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
 
   return 0;

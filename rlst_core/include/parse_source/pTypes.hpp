@@ -48,7 +48,7 @@ public:
   void placePorts();
 
   // compute this cell's connections
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections(pCell otherCell);
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections(pCell &otherCell);
 };
 
 /**

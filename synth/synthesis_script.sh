@@ -1,5 +1,5 @@
 # read the verilog file
-read_verilog source2.v
+read_verilog xor_source.v
 
 # elaborate design hierarchy (verifies completeness of all modules and sets the top module).
 # If top module is not specified, yosys tries to infer it automatically
@@ -36,7 +36,8 @@ simplemap
 opt
 
 # force use of only specific gates
-abc -g AND,OR,XOR,NAND,NOR,OAI3,AOI3,OAI4,AOI4,MUX,XNOR
+# abc -g AND,OR,XOR,NAND,NOR,OAI3,AOI3,OAI4,AOI4,MUX,XNOR
+abc -g AND,OR
 
 # reduce bit vectors to one dimension
 splitnets -ports
