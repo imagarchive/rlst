@@ -19,7 +19,7 @@
  */
 constexpr uint8_t MAX_SIGNAL_LENGTH = 16;
 /* The cost of going 1 level higher */
-constexpr uint8_t LEVEL_COST = MAX_SIGNAL_LENGTH * 2;
+constexpr uint8_t LEVEL_COST = MAX_SIGNAL_LENGTH * 4;
 /* The height of the first level */
 constexpr uint8_t FIRST_LEVEL_HEIGHT = 3;
 /* The height of a level */
