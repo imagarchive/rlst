@@ -18,7 +18,9 @@
 
 #include "mca_parser/MCA.hpp"
 
+#include "mca_parser/Block.hpp"
 #include "mca_parser/Chunk.hpp"
+#include "mca_parser/NBTChunkView.hpp"
 
 #include <array>
 #include <iostream>
@@ -273,5 +275,42 @@ namespace rlst::mca_parser
     }
 
     return mcaFile;
+  }
+
+  // The coordinated of the block have to be relative to the minecraft map,
+  // not a chunk
+  void placeBlock(MCA& mcaFile, Block& block) {
+      literal_t x = block.position().x();
+      // z and y are inverted
+      literal_t y = block.position().y();
+      literal_t z = block.position().z();
+
+      // find the chunk where the block has to be placed
+      int chunkX = x / 16;
+      int chunkZ = z / 16;
+
+      if (chunkX > 32 || chunkZ > 32) {
+          std::cerr << "The block is not in this region" << std::endl;
+          return;
+      }
+
+      // Get the corresponding chunk
+      int chunkIndex = (chunkX) + (chunkZ) * 32;
+
+      Chunk chunk = mcaFile.chunks()[chunkIndex];
+
+      NBTChunkView view(chunk);
+
+      // Computes the position of the block in the chunk
+      int xInChunk = x % 16;
+      int yInChunk = y;
+      int zInChunk = z % 16;
+
+      block.position().x() = xInChunk;
+      block.position().y() = yInChunk;
+      block.position().z() = zInChunk;
+
+      // places the block
+      view.setBlock(block);
   }
 }
