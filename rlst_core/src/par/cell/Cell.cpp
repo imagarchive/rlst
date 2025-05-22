@@ -33,6 +33,20 @@ namespace rlst::par::cell
     }
   }
 
+  std::vector<mca_parser::Block> Cell::generate_blocks() const
+  {
+    std::vector<mca_parser::Block> blocks;
+    blocks.reserve(this->type()->blocks.size());
+    for (mca_parser::Block block : this->type()->blocks) {
+      mca_parser::Block new_block = block;
+      new_block.position().x() += this->position().x();
+      new_block.position().y() += this->position().y();
+      new_block.position().z() += this->position().z();
+      blocks.push_back(std::move(new_block));
+    }
+    return blocks;
+  }
+
   std::size_t hash_value(const Cell& __input)
   {
     std::size_t seed = 0;

@@ -141,6 +141,13 @@ namespace rlst::par::cell
      */
 
     bool can_be_moved_to(Point __to, const Size& __frame) const;
+
+    /**
+     * Generate the @ref mca_parser::Block list for this cell.
+     * Uses the cells's type and position.
+     */
+
+    std::vector<mca_parser::Block> generate_blocks() const;
   private:
     Point m_position;
     std::shared_ptr<const CellType> m_type;
