@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <fstream>
 
+namespace rlst::mca_parser { class Block; }
+
 namespace rlst::mca_parser
 {
   class MCA
@@ -40,7 +42,7 @@ namespace rlst::mca_parser
   };
 
   // Reads and uncompresses the data of the chunk corresponding to the given index
-  Chunk& readChunkData(std::fstream& file, int chunkIndex);
+  Chunk readChunkData(std::fstream& file, Chunk::size_type chunkIndex);
 
   // writes the compressed data of the chunk corresponding to the given index
   void writeData(MCA& mcaFile);
@@ -56,6 +58,8 @@ namespace rlst::mca_parser
   // Reads a .mca file and returns a MCA object containing the uncompressed data of the chunks
   // This code needs to use r.0.0.mca
   MCA readMcaFile(const std::string &filename);
+
+  void placeBlock(MCA& mcaFile, Block& block);
 }
 
 #endif // RLST_CORE_RLST_MCA_PARSER_MCA_HPP

@@ -301,9 +301,9 @@ namespace rlst::mca_parser
       // Get the corresponding chunk
       int chunkIndex = (chunkX) + (chunkZ) * 32;
 
-      Chunk chunk = mcaFile.chunks()[chunkIndex];
+      // Chunk chunk = mcaFile.chunks()[chunkIndex];
 
-      NBTChunkView view(chunk);
+      NBTChunkView view(mcaFile.chunks()[chunkIndex]);
 
       // Computes the position of the block in the chunk
       int xInChunk = x % 16;

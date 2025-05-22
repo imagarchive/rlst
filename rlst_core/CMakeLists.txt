@@ -77,7 +77,7 @@ set(
 
 list(TRANSFORM RLST_CORE_CPP PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
-cmake_policy(SET CMP0167 NEW)
+# cmake_policy(SET CMP0167 NEW)
 find_package(Boost REQUIRED COMPONENTS headers log)
 
 find_package(ZLIB REQUIRED)

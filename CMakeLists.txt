@@ -236,6 +236,7 @@ list(
         -Wsuggest-override
         -Wundef
         -Wuninitialized
+        -g
 )
 
 foreach (flag IN LISTS RLST_CXX_GNU_FLAGS)

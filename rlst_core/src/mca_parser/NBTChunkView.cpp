@@ -136,8 +136,8 @@ namespace rlst::mca_parser
   void NBTChunkView::setBlock(const Block& block)
   {
     if (this->chunk.is_not_generated()) {
-      throw std::runtime_error(
-        "The chunk was not generated, impossible to add a block");
+      // throw std::runtime_error(
+      //   "The chunk was not generated, impossible to add a block");
     }
 
     int x = static_cast<int>(block.position().x());
