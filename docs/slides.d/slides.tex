@@ -1,0 +1,354 @@
+\documentclass[aspectratio = 1610, french]{beamer}
+
+\usetheme{Madrid}
+
+\setbeamercovered{transparent}
+\setbeamertemplate{caption}[numbered]
+
+% Packages
+
+%% Font configuration
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+%% i18n packages
+
+\usepackage[main = french, english]{babel}
+\usepackage{fvextra} % needed to be loaded before `csquotes`
+\usepackage[autostyle = true]{csquotes} % for `\enquote` command
+\usepackage[useregional]{datetime2} % better date formatting
+\usepackage{icomma} % fix comma space
+
+%% Main packages
+
+\usepackage[french]{cleveref}
+
+\usepackage[
+    type = {CC},
+    modifier = {by-nc},
+    version = {4.0},
+]{doclicense}
+
+\usepackage{nicefrac}
+\usepackage{physics}
+\usepackage{siunitx}
+\usepackage[most]{tcolorbox}
+\usepackage{wrapfig}
+
+
+%% `tabular` packages
+
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+%% Drawing packages
+
+\usepackage{svg}
+\usepackage{tikz}
+
+% Some command overrides
+
+\renewcommand{\arraystretch}{1.5}
+
+%% Patch cleveref
+
+%%% See https://tex.stackexchange.com/a/670393.
+
+\makeatletter
+\patchcmd\@cref{\begingroup}{\begingroup\@safe@activestrue}{}{\fail}
+\patchcmd\@cref{\cref@isstackfull{\@refsubstack}}{\cref@isstackfull{\@refsubstack}\@safe@activesfalse}{}{\fail}
+\makeatother
+
+%% Section headers
+
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\alph{subsubsection}}
+
+% New commands
+
+\DeclareMathOperator{\sign}{sign}
+
+%% Text commands
+
+\newcommand{\textdef}[1]{\textcolor{red}{\text{#1}}}
+\newcommand{\textimp}[1]{\textcolor{teal}{\text{#1}}}
+
+% `tabularx`
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% Some `tcolorbox` definitions
+
+%% Styles
+
+\tcbset{
+    tab/.style = {
+        center title,
+        colback = white!10!white,
+        colbacktitle = Salmon!40!white,
+        colframe = red!50!black,
+        coltitle = black,
+        enhanced,
+        fonttitle = \bfseries,
+        fontupper = \normalsize \sffamily
+    }
+}
+
+%% Environments
+
+\newtcolorbox{tcbtabular}[2]{
+    tab,
+    tabularx = {#1},
+    #2
+}
+
+% General setup
+
+\author[]{
+    Otman BENJELLOUN (\href{https://github.com/otman-benjelloun/}{@otman-benjelloun}) \and
+    Emilia FER (\href{https://github.com/emilia-fer/}{@emilia-fer}) \and
+    Eline GEORGE (\href{https://github.com/elinegeorge/}{@elinegeorge}) \and
+    Mattéo ROSSILLOL-{}-LARUELLE (\href{https://github.com/beatussum/}{@beatussum}) \and
+    \href{https://github.com/tvidon/}{@tvidon}
+}
+
+\title[4MMPSPE -- RLST]{
+    Projet de spécialité -- RLST \\
+    \small{4MMPSPE}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+
+\frametitle{Sommaire}
+\tableofcontents[pausesections, pausesubsections]
+
+\end{frame}
+
+\section{Avant-propos}
+
+\begin{frame}
+
+\frametitle{Avant-propos}
+
+Ce projet spécialité portait sur la réalisation d'un outil de synthèse logique permettant la compilation d'un code Verilog en circuit \emph{Redstone} Minecraft. De manière plus factuelle, l'objectif était donc
+
+\begin{enumerate}
+    \item<+-> de lancer YOSYS à partir d'un fichier Verilog,
+    \item<+-> associer les portes avec leur représentation dans \emph{Minecraft},
+    \item<+-> de placer les portes logiques récupérées,
+    \item<+-> de router les portes, et
+    \item<+-> de les placer dans un fichier MCA.
+\end{enumerate}
+
+\end{frame}
+
+\section{Structure du projet}
+
+\begin{frame}
+
+\frametitle{Structure du projet}
+
+\begin{actionenv}<+->
+
+Le projet se décompose en deux parties principales :
+
+\begin{itemize}
+    \item<+-> \texttt{rlst\_core}, une bibliothèque statique qui implémente l'essentielle de l'\emph{API} ;
+    \item<+-> \texttt{rlst}, un exécutable servant de lanceur.
+\end{itemize}
+
+\end{actionenv}
+
+\begin{actionenv}<+->
+
+La bibliothèque est plusieurs en trois \emph{packages} :
+
+\begin{itemize}
+    \item<+-> \texttt{cell\_reader} : lecture des fichiers décrivant les portes logiques ;
+    \item<+-> \texttt{par} (\foreignlanguage{english}{Place And Route}) ;
+    \item<+-> \texttt{svg} : utilitaire permettant de faire du dessin vectoriel (utilisé pour le débogage).
+\end{itemize}
+
+\end{actionenv}
+
+\end{frame}
+
+\subsection{Lecture du VHDL avec YOSYS}
+
+\begin{frame}
+
+\frametitle{Les portes logiques}
+
+Les portes logiques se caractérisent par
+
+\begin{itemize}
+    \item<+-> leur taille,
+    \item<+-> la position relative des ports au sein de la portes,
+    \item<+-> les blocs qui la composent.
+\end{itemize}
+
+\end{frame}
+
+\subsection{Placement}
+
+\begin{frame}
+
+\frametitle{Recuit simulé}
+
+L'algorithme de placement repose sur du recuit simulé.
+
+\begin{actionenv}<+->
+
+Les coûts évaluent
+
+\begin{itemize}
+    \item<+-> la proportion des chevauchements (\textimp{bornée naturellement}),
+    \item<+-> la longueur estimée des fils (\textimp{normalisée}),
+    \item<+-> la proportion de cases vides (\textimp{bornée naturellement}),
+    \item<+-> l'écart relatif séparant la moyenne de la longueur des lignes de celle désirée (\textimp{normalisée}),
+    \item<+-> la hauteur de la configuration (\textimp{normalisée}), et
+    \item<+-> l'espace séparant l'axe des abscisses de la cellule la plus haute (\textimp{normalisée}).
+\end{itemize}
+
+\end{actionenv}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Fonction d'acceptation et température initiale}
+
+La \textimp{fonction d'acceptation} et la \textimp{température initiale} sont de
+
+\begin{align}
+\exp \biggl( \frac{100 \Delta C}{T} \biggr) && T_0 = 500
+\end{align}
+
+Empiriquement, on a montré que \( \Delta C \simeq 1 \) et \( T \simeq 100 \) ; ainsi pour que ces deux grandeurs est le même ordre de grandeur on multiplie \( \Delta C \) par un facteur 100.
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Fonction de normalisation}
+
+Afin d'avoir des coûts avec des valeurs bornées dans \( [0 ; 100] \), il a fallu utilisé une \textimp{fonction de normalisation} :
+
+\begin{align}
+\nicefrac{100}{\pi} \cdot \sign x \cdot \atan \Bigl( \log \abs{x} + 1 \Bigr) + 50
+\end{align}
+
+Cette fonction a le bon goût
+
+\begin{itemize}
+    \item<+-> d'être bornée,
+    \item<+-> symétrique,
+    \item<+-> d'avoir une croissance relativement faible, et
+    \item<+-> coupe l'axe des ordonnées à 50 en \( x = 0 \).
+\end{itemize}
+
+\end{frame}
+
+\subsection{Routage}
+
+\begin{frame}
+
+\frametitle{Principe de base}
+
+\begin{actionenv}<+->
+Pour router les cellules, on s'appuie sur le fait que \textimp{Minecraft} permette d'établir des structures \emph{électrique} en jouant sur la \textimp{verticalité}.
+\end{actionenv}
+
+\begin{actionenv}<+->
+Ainsi, les routes se situent à plusieurs niveaux différents de telle manière à ce que les tracés d'un même niveau ne s'intersecte pas.
+\end{actionenv}
+
+\begin{actionenv}<+->
+Cependant, on note qu'il existe une petite subtilité afin d'éviter que les routes viennent interagir avec des portes alors qu'elles ne devraient pas : \textimp{on dilate virtuellement les portes}.
+\end{actionenv}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Point sur les répéteurs}
+
+Un signal de \emph{Redstone} sous Minecraft est caractérisé par
+
+\begin{itemize}
+    \item<+-> une puissance variant entre 0 et 15,
+    \item<+-> cette puissance se dissipe d'une unité pour chaque bloc parcouru,
+    \item<+-> la puissance peut être re-maximiser avec un bloc particulier, le \emph{repeter}.
+\end{itemize}
+
+\end{frame}
+
+\subsection{Édition du monde Minecraft}
+
+\begin{frame}
+
+\frametitle{Format du monde}
+
+Un \textimp{monde \emph{Minecraft}} est divisé en plusieurs
+
+\begin{itemize}
+    \item<+-> \textimp{régions} de \( 32 \times 32 = \num{1024} \) \textimp{chunks},
+    \item<+-> une portion de région de 16 blocs de longueur, 16 blocs de largeur et 256 blocs de hauteur.
+\end{itemize}
+
+\begin{actionenv}<+->
+
+Pour utiliser ce format, il a fallu veiller
+
+\begin{itemize}
+    \item<+-> au boutisme, et
+    \item<+-> au format de compression (\textimp{ZLIB}) des \emph{chunks}.
+\end{itemize}
+
+\end{actionenv}
+
+\end{frame}
+
+\section{Synthèse}
+
+\begin{frame}
+
+\frametitle{Synthèse}
+
+Ainsi, on a pu implémenter un programme permettant
+
+\begin{enumerate}
+    \item<+-> de lancer YOSYS à partir d'un fichier Verilog (\textimp{bogué}),
+    \item<+-> associer les portes avec leur représentation dans \emph{Minecraft},
+    \item<+-> de placer les portes logiques récupérées,
+    \item<+-> de router les portes, et
+    \item<+-> de les placer dans un fichier MCA (\textimp{bogué}).
+\end{enumerate}
+
+\begin{actionenv}<+->
+Bien que le projet ne soit pas parfaitement fini, on a pu montrer que l'objectif visé était réalisable, et on a pu montrer une première esquisse du résultat attendu.
+\end{actionenv}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{figure}[t]
+\centering\Large
+Merci pour votre écoute.
+\end{figure}
+
+\begin{figure}[b]
+\doclicenseThis
+\end{figure}
+
+\end{frame}
+
+\end{document}
