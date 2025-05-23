@@ -28,12 +28,9 @@ TEST(place__test, basic)
     std::make_shared<cell::CellType>(
       cell::CellType {
         std::vector {
-          std::make_shared<cell::Port>(
-            cell::Port { Point(0, 0, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(0, 4, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(1, 2, 0), cell::PortType::output })
+          cell::Port { Point(0, 0, 0), cell::PortType::input },
+          cell::Port { Point(0, 4, 0), cell::PortType::input },
+          cell::Port { Point(1, 2, 0), cell::PortType::output }
         },
 
         "AND",
@@ -46,12 +43,9 @@ TEST(place__test, basic)
     std::make_shared<cell::CellType>(
       cell::CellType {
         std::vector {
-          std::make_shared<cell::Port>(
-            cell::Port { Point(0, 0, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(8, 0, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(4, 1, 0), cell::PortType::output })
+          cell::Port { Point(0, 0, 0), cell::PortType::input },
+          cell::Port { Point(8, 0, 0), cell::PortType::input },
+          cell::Port { Point(4, 1, 0), cell::PortType::output }
         },
 
         "OR",
@@ -64,10 +58,8 @@ TEST(place__test, basic)
     std::make_shared<cell::CellType>(
       cell::CellType {
         std::vector {
-          std::make_shared<cell::Port>(
-            cell::Port { Point(0, 0, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(2, 0, 0), cell::PortType::output })
+          cell::Port { Point(0, 0, 0), cell::PortType::input },
+          cell::Port { Point(2, 0, 0), cell::PortType::output }
         },
 
         "NOT",
@@ -80,10 +72,8 @@ TEST(place__test, basic)
     std::make_shared<cell::CellType>(
       cell::CellType {
         std::vector {
-          std::make_shared<cell::Port>(
-            cell::Port { Point(0, 0, 0), cell::PortType::input }),
-          std::make_shared<cell::Port>(
-            cell::Port { Point(2, 0, 0), cell::PortType::output })
+          cell::Port { Point(0, 0, 0), cell::PortType::input },
+          cell::Port { Point(2, 0, 0), cell::PortType::output }
         },
 
         "NODE",
@@ -108,66 +98,48 @@ TEST(place__test, basic)
 
   std::vector<std::pair<cell::PlacedPort, cell::PlacedPort>> nets {
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[0]), cells[0].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[2]), cells[2].type()->ports[0] }
+      cell::PlacedPort { cells[0], cells[0].type()->ports[1] },
+      cell::PlacedPort { cells[2], cells[2].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[0]), cells[0].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[4]), cells[4].type()->ports[0] }
+      cell::PlacedPort { cells[0], cells[0].type()->ports[1] },
+      cell::PlacedPort { cells[4], cells[4].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[1]), cells[1].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[3]), cells[3].type()->ports[0] }
+      cell::PlacedPort { cells[1], cells[1].type()->ports[1] },
+      cell::PlacedPort { cells[3], cells[3].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[1]), cells[1].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[5]), cells[5].type()->ports[1] }
+      cell::PlacedPort { cells[1], cells[1].type()->ports[1] },
+      cell::PlacedPort { cells[5], cells[5].type()->ports[1] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[2]), cells[2].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[5]), cells[5].type()->ports[0] }
+      cell::PlacedPort { cells[2], cells[2].type()->ports[1] },
+      cell::PlacedPort { cells[5], cells[5].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[3]), cells[3].type()->ports[1] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[4]), cells[4].type()->ports[1] }
+      cell::PlacedPort { cells[3], cells[3].type()->ports[1] },
+      cell::PlacedPort { cells[4], cells[4].type()->ports[1] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[4]), cells[4].type()->ports[2] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[6]), cells[6].type()->ports[0] }
+      cell::PlacedPort { cells[4], cells[4].type()->ports[2] },
+      cell::PlacedPort { cells[6], cells[6].type()->ports[0] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[5]), cells[5].type()->ports[2] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[6]), cells[6].type()->ports[1] }
+      cell::PlacedPort { cells[5], cells[5].type()->ports[2] },
+      cell::PlacedPort { cells[6], cells[6].type()->ports[1] }
     ),
 
     std::make_pair(
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[6]), cells[6].type()->ports[2] },
-      cell::PlacedPort { std::make_shared<const cell::Cell>(
-        cells[7]), cells[7].type()->ports[0] }
+      cell::PlacedPort { cells[6], cells[6].type()->ports[2] },
+      cell::PlacedPort { cells[7], cells[7].type()->ports[0] }
     )
   };
 
