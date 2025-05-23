@@ -63,8 +63,8 @@ int main(int __argc, char *__argv[])
 
   svg::SVG s("output.svg");
 
-  for (const par::cell::Cell& c : cell_list) {
-    s.draw_cell(c);
+  for (const std::shared_ptr<par::cell::Cell> &c : cell_list) {
+    s.draw_cell(*c);
   }
 
   for (const auto& a : route) {
