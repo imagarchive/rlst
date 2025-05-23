@@ -51,7 +51,7 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
                 << newCell.type()->name << std::endl;
 
       // attribute this par::cell::Cell to the pCell
-      cell.parCell = std::make_shared<par::cell::Cell>(newCell);
+      cell.parCell = newCell;
     }
 
     // create placedPorts

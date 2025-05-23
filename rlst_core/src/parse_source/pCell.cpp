@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <utility>
 
 #include "parse_source/pTypes.hpp"
@@ -10,14 +9,9 @@
 
 // List of all CellTypes
 std::list<par::cell::CellType> CellTypes;
-std::unordered_map<std::string, std::shared_ptr<par::cell::CellType>> sharedCellTypes;
 
-void initCellTypes(std::list<par::cell::CellType> __cell_types) { 
-  CellTypes = std::move(__cell_types);
-  for (auto &cellType : CellTypes) {
-    sharedCellTypes[cellType.name] = std::make_shared<par::cell::CellType>(cellType);
-  }
-}
+void initCellTypes(std::list<par::cell::CellType> __cell_types)
+  { CellTypes = std::move(__cell_types); }
 
 std::string to_uppercase(const std::string &str) {
   std::string result = str;
@@ -33,14 +27,12 @@ std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
 
   std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
 
-
   for (std::list<par::cell::CellType>::iterator it = CellTypes.begin();
        it != CellTypes.end(); it++) {
     std::string typeName = it->name;
 
     if (rawTypeStringUpper == typeName) {
-      return sharedCellTypes[it->name];
-      // return std::make_shared<par::cell::CellType>(*it);
+      return std::make_shared<par::cell::CellType>(*it);
     }
   }
 
@@ -135,7 +127,7 @@ void pCell::placePorts() {
 
   for (par::cell::Port &parPort : type->ports) {
     // create the PlacedPort
-    par::cell::PlacedPort placed { *parCell, parPort };
+    par::cell::PlacedPort placed { parCell, parPort };
     if (parPort.type == par::cell::PortType(input)) {
       inputParPorts.push_back(placed);
     } else if (parPort.type == par::cell::PortType(output)) {
