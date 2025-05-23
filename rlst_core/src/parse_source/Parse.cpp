@@ -9,9 +9,9 @@
 #include <vector>
 
 #include "par/cell/Cell.hpp"
+#include "par/cell/types.hpp"
 #include "parse_source/Parse.hpp"
 #include "parse_source/pTypes.hpp"
-#include "include/geometry.hpp"
 
 std::vector<pModule> parse_data_json() {
   std::vector<pModule> modules_list;
@@ -118,34 +118,6 @@ parse_v(int argc, char *argv[]) {
   for (const auto &[p1, p2] : net_t) {
     std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
-
-  // Print all initial positions
-  std::cout << "\n --- INITIAL POSITIONS" << std::endl;
-  for (par::cell::Cell &cell : cellList) {
-    rlst::Point bruh = (cell).position();
-    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z() << std::endl;
-  }
-
-  for (const auto &[p1, p2] : net_t) {
-    rlst::Point bruh = (&(p1.parent))->get()->position();
-    rlst::Point bruh2 = (&(p2.parent))->get()->position();
-    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z() << std::endl;
-    std::cout << bruh2.x() << " | " << bruh2.y() << " | " << bruh2.z() << std::endl;
-  }
-
-  // Print all Cells' CellTypes addresses
-  std::cout << "\n --- CELL CELLTYPES ADDRESSES" << std::endl;
-  for (par::cell::Cell &cell : cellList) {
-    std::cout << (cell.type()) << std::endl;
-  }
-
-  // Print initial addresses of CellTypes
-  std::cout << "\n --- CELLTYPES ADDRESSES" << std::endl;
-  for (const auto &pair : sharedCellTypes ) {
-    std::cout << pair.second << std::endl;
-  }
-
-
 
   return std::make_pair(std::move(net_t), std::move(cellList));
 }

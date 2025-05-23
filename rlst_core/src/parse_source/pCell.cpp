@@ -4,20 +4,18 @@
 #include <unordered_map>
 #include <utility>
 
+#include "parse_source/pTypes.hpp"
 #include "par/cell/ports.hpp"
 #include "par/cell/types.hpp"
-#include "parse_source/pTypes.hpp"
 
 // List of all CellTypes
 std::list<par::cell::CellType> CellTypes;
-std::unordered_map<std::string, std::shared_ptr<par::cell::CellType>>
-    sharedCellTypes;
+std::unordered_map<std::string, std::shared_ptr<par::cell::CellType>> sharedCellTypes;
 
-void initCellTypes(std::list<par::cell::CellType> __cell_types) {
+void initCellTypes(std::list<par::cell::CellType> __cell_types) { 
   CellTypes = std::move(__cell_types);
   for (auto &cellType : CellTypes) {
-    sharedCellTypes[cellType.name] =
-        std::make_shared<par::cell::CellType>(cellType);
+    sharedCellTypes[cellType.name] = std::make_shared<par::cell::CellType>(cellType);
   }
 }
 
@@ -34,6 +32,7 @@ std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
       to_uppercase(rawTypeString.substr(2, rawTypeString.size() - 3));
 
   std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
+
 
   for (std::list<par::cell::CellType>::iterator it = CellTypes.begin();
        it != CellTypes.end(); it++) {
@@ -136,8 +135,7 @@ void pCell::placePorts() {
 
   for (par::cell::Port &parPort : type->ports) {
     // create the PlacedPort
-    par::cell::PlacedPort placed{parCell,
-                                 std::make_shared<par::cell::Port>(parPort)};
+    par::cell::PlacedPort placed { *parCell, parPort };
     if (parPort.type == par::cell::PortType(input)) {
       inputParPorts.push_back(placed);
     } else if (parPort.type == par::cell::PortType(output)) {
@@ -156,21 +154,18 @@ void pCell::placePorts() {
       inoutParPorts.begin();
 
   for (const auto &inputPort : inputPorts) {
-    parInputPorts.insert(
-        std::make_pair(inputPort->bitVector, *inputParPortsIt));
+    parInputPorts.insert(std::make_pair(inputPort->bitVector, *inputParPortsIt));
   }
   for (const auto &outputPort : outputPorts) {
-    parOutputPorts.insert(
-        std::make_pair(outputPort->bitVector, *outputParPortsIt));
+    parOutputPorts.insert(std::make_pair(outputPort->bitVector, *outputParPortsIt));
   }
   for (const auto &inoutPort : outputPorts) {
-    parInoutPorts.insert(
-        std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
+    parInoutPorts.insert(std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
   }
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-pCell::computeConnections(pCell &otherCell) {
+pCell::computeConnections(pCell& otherCell) {
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> cellNet_t;
 
   // std::cout << "COMPUTING CELL CONNECTIONS" << std::endl;

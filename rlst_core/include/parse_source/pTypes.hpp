@@ -16,8 +16,6 @@ class pModule;
 class pLogicGate;
 class pPort;
 
-extern std::unordered_map<std::string, std::shared_ptr<par::cell::CellType>> sharedCellTypes;
-
 enum pPortDirection { input, output, inout };
 
 /**
