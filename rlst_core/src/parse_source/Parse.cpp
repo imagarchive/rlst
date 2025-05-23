@@ -119,5 +119,5 @@ parse_v(int argc, char *argv[]) {
     std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
 
-  return std::make_pair(std::move(net_t), std::move(cellList));
+  return std::make_pair(net_t, cellList);
 }
