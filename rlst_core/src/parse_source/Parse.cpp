@@ -63,7 +63,7 @@ std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
 
   // std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
 
-  return mapCellTypes[rawTypeString];
+  return mapCellTypes[rawTypeStringUpper];
 }
 
 // Map each pCell to a Cell
@@ -83,7 +83,7 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
 
   std::list<par::cell::Cell> cellList = {};
   for (pCell &cell : pCellList) {
-    par::cell::Cell newCell = par::cell::Cell(Point(), findCellType(cell.name));
+    par::cell::Cell newCell = par::cell::Cell(Point(), findCellType(cell.pType));
     cellList.push_back(newCell);
 
     // Correspondance between pPorts and Ports (key will be name of the cell + name of the parent)
