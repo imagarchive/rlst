@@ -20,7 +20,7 @@ std::string to_uppercase(const std::string &str) {
   return result;
 }
 
-std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
+par::cell::CellType findCellType(std::string rawTypeString) {
   // Get exact name from rawTypeString
   std::string rawTypeStringUpper =
       to_uppercase(rawTypeString.substr(2, rawTypeString.size() - 3));
@@ -30,9 +30,12 @@ std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
   for (std::list<par::cell::CellType>::iterator it = CellTypes.begin();
        it != CellTypes.end(); it++) {
     std::string typeName = it->name;
+    // if (rawTypeStringUpper.find(typeName) != std::string::npos) {
+    //   return *it;
+    // }
 
     if (rawTypeStringUpper == typeName) {
-      return std::make_shared<par::cell::CellType>(*it);
+      return *it;
     }
   }
 
@@ -51,7 +54,7 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
   std::cout << "Cell is of type : " << parsed_type << std::endl;
 
   this->type = findCellType(parsed_type);
-  std::cout << "Computed type is : " << this->type->name << std::endl;
+  std::cout << "Computed type is : " << this->type.name << std::endl;
 
   // list of all ports, which will then be assigned to the current module
   // instance depending on whether they're inputs, outputs, or inoutputs
@@ -125,7 +128,7 @@ void pCell::placePorts() {
   std::list<par::cell::PlacedPort> outputParPorts;
   std::list<par::cell::PlacedPort> inoutParPorts;
 
-  for (par::cell::Port &parPort : type->ports) {
+  for (par::cell::Port &parPort : type.ports) {
     // create the PlacedPort
     par::cell::PlacedPort placed { parCell, parPort };
     if (parPort.type == par::cell::PortType(input)) {

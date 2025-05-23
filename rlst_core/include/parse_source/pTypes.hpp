@@ -25,7 +25,7 @@ enum pPortDirection { input, output, inout };
 class pCell {
 public:
   std::string name;
-  std::shared_ptr<par::cell::CellType> type;
+  par::cell::CellType type;
 
   int inputNb = 0;
   std::vector<std::shared_ptr<pPort>> inputPorts;
@@ -39,7 +39,6 @@ public:
   std::vector<std::shared_ptr<pPort>> inoutPorts;
   std::unordered_map<int, par::cell::PlacedPort> parInoutPorts;
 
-  // std::shared_ptr<par::cell::Cell> parCell;
   par::cell::Cell parCell;
 
   // extract the Cell from the gate_data.json
