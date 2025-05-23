@@ -282,7 +282,11 @@ TEST(wire_length_penalty__basics__test, same_row)
   Port second { Point(10_l, 0_l, 0_l), PortType::input };
 
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
+    std::make_pair(
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(first) },
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(second) })
   };
 
   ASSERT_EQ(
@@ -299,7 +303,11 @@ TEST(wire_length_penalty__basics__test, same_column)
   Port second { Point(0_l, 10_l, 0_l), PortType::input };
 
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
+    std::make_pair(
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(first) },
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(second) })
   };
 
   ASSERT_EQ(
@@ -316,7 +324,11 @@ TEST(wire_length_penalty__basics__test, random)
   Port second { Point(0_l, 10_l, 0_l), PortType::input };
 
   std::vector<std::pair<PlacedPort, PlacedPort>> net = {
-    std::make_pair(PlacedPort { cell, first }, PlacedPort { cell, second })
+    std::make_pair(
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(first) },
+      PlacedPort {
+        std::make_shared<Cell>(cell), std::make_shared<Port>(second) })
   };
 
   ASSERT_EQ(
