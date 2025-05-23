@@ -219,6 +219,31 @@ Une fonction permet de dessiner des points, sous forme de rectangle d'une couleu
 
 ## Edition du monde Minecraft
 
+Un monde minecraft est divsié en plusieurs régions de 32 * 32 = 1024 chunks.
+Un chunk est une portion de région qui peut contenir jusqu'à 16 blocs en largeur, 16 blocs en longueur et 256 blocs de hauteur.
+Les données de chaque région sont répertoriées dans des fichiers dont le nom est de type r.x.z.mca, avec x et z des entiers relatifs correspondant aux coordonnées de la région dans le monde.
+Pour ce projet, nous nous limitons à la région r.0.0.mca, cependant, elle est suffisemment large pour nous permettre de réaliser nos objectifs.
+
+L'édition du monde Minecraft a consisté en plusieurs étapes.
+Tout d'abord, nous avons lu l'intégralité du fichier mca. Pour chaque chunk, il nous a fallu trouver où se trouvaient ses données dans le fichier à partir du header. Ce dernier contenait 4 octets par chunk, 3 pour encoder la position de ce dernier dans le fichier et 1 pour sa taille.
+Nous avons notamment dû passer par certaines conversions, les fichiers de Minecraft étant en big endian.
+Nous avons ensuite décompressé les données de chaque chunk à l'aide de la bibliothèque zlib et nous les avons placées dans une classe nommée "Chunk".
+N'ayant aucun moyen de connaître à l'avance la taille des données décompressées, nous avons légèrement surestimé cette taille.
+Nous avons également stocké les données compressées dans les objets chunk, cela nous a permis d'éviter une recompression future des données des chunks que nous n'avions pas modifiés.
+
+Chaque chunk était accessible à partir de son indice, calculé en fonction de ses coordonnées, depuis un objet que nous avons nommé MCA.
+
+Les données des chunks sont composées de structures NBT.
+Il s'agit d'un format binaire hiérarchique sous forme de paires clé-valeur typées, organisées en arbres de tags imbriqués.
+Pour les modifier, nous nous sommes aidés de la bibliothèque [lib nbt](https://github.com/djytw/libnbt). 
+
+Pour modifier les blocs, il nous a fallu parcourir la structure arborescente jusqu'à trouver les noeuds "palette" et "blockstates" que nous avons modifié en prêtant notamment attention au boutisme.
+
+Une fois les données modifiées, nous avons implémenté une fonction qui les recompresse sous le format zlib. Elle s'appuie notamment sur une fonction qui nous était fournie dans libnbt. Nous avons ensuite stocké les données compressées des chunks modifiés dans les objets chunks correspondants.
+
+La dernière étape a été d'écrire toutes ces données dans un nouveau fichier d'extension .mca que crée notre programme. Pour cela, nous avons dû être particulièrement vigilants face au format strict de minecraft, que ce soit pour le header ou les données. Ces dernières devaient notamment être précédées de la taille des données compressées et du type de compression et devaient être alignées dans des blocs de 4096 octets appelés secteurs.
+
+
 ## Conclusion
 
 [^1]: VLSI cell placement techniques (https://doi.org/10.1145/103724.103725)
