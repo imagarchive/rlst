@@ -120,9 +120,9 @@ namespace rlst::par::cell
   struct PlacedPort
   {
     /// The parent of the @ref PlacedPort
-    std::shared_ptr<const Cell> parent = nullptr;
+    std::shared_ptr<const Cell> parent;
 
-    std::shared_ptr<const Port> port = nullptr; ///< The corresponding @ref Port
+    std::shared_ptr<const Port> port; ///< The corresponding @ref Port
     literal_t max_level = 0; ///< The highest level route that uses this port
   };
 
