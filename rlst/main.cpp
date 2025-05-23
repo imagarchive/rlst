@@ -31,59 +31,59 @@
 
 int main(int __argc, char *__argv[])
 {
-  using namespace rlst;
-  // using namespace rlst::mca_parser;
+  // using namespace rlst;
+  using namespace rlst::mca_parser;
 
-  auto types = cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
-  initCellTypes(std::move(types));
+  // auto types = cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
+  // initCellTypes(std::move(types));
 
-  auto [net, cell_list] = parse_v(__argc, __argv);
+  // auto [net, cell_list] = parse_v(__argc, __argv);
 
-  std::vector<par::net_t> net_vec;
-  net_vec.reserve(net.size());
+  // std::vector<par::net_t> net_vec;
+  // net_vec.reserve(net.size());
 
-  for (par::net_t n : net) {
-    net_vec.push_back(std::move(n));
-  }
+  // for (par::net_t n : net) {
+  //   net_vec.push_back(std::move(n));
+  // }
 
-  par::place(
-    cell_list.begin(),
-    cell_list.end(),
-    net.cbegin(),
-    net.cend(),
-    12_ul
-  );
+  // par::place(
+  //   cell_list.begin(),
+  //   cell_list.end(),
+  //   net.cbegin(),
+  //   net.cend(),
+  //   12_ul
+  // );
 
-  auto route =
-    par::route(
-      net_vec,
-      Point(),
-      par::frame_of(cell_list.cbegin(), cell_list.cend())
-    );
+  // auto route =
+  //   par::route(
+  //     net_vec,
+  //     Point(),
+  //     par::frame_of(cell_list.cbegin(), cell_list.cend())
+  //   );
 
-  svg::SVG s("output.svg");
+  // svg::SVG s("output.svg");
 
   for (const par::cell::Cell& c : cell_list) {
     s.draw_cell(c);
   }
 
-  for (const auto& a : route) {
-    for (const auto& b : a) {
-      s.draw_point(b.first, "green");
-    }
-  }
+  // for (const auto& a : route) {
+  //   for (const auto& b : a) {
+  //     s.draw_point(b.first, "green");
+  //   }
+  // }
 
-  // std::string mcaFile = "r.0.0.mca";
+  std::string mcaFile = "r.0.0.mca";
 
-  // MCA file = readMcaFile(mcaFile);
+  MCA file = readMcaFile(mcaFile);
 
-  // std::unordered_map<std::string, std::string> properties;
-  // std::unordered_map<std::string, std::string> properties2;
+  std::unordered_map<std::string, std::string> properties;
+  std::unordered_map<std::string, std::string> properties2;
 
-  // Block newBlock(rlst::Point(0, 0, 4), "minecraft:redstone_block", properties);
+  Block newBlock(rlst::Point(0, 0, 4), "minecraft:redstone_block", properties);
 
-  // // //places a block
-  // placeBlock(file, newBlock);
-  // // view.setBlock(newBlock);
-  // writeData(file);
+  // //places a block
+  placeBlock(file, newBlock);
+  // view.setBlock(newBlock);
+  writeData(file);
 }
