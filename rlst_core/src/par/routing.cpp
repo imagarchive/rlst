@@ -443,7 +443,7 @@ namespace rlst::par
         static_cast<uliteral_t>(best_route[best_route.size() - 1].first.z())
         );
       // set the real coordinates
-      for (std::pair<Point, RouteElement> block : best_route) {
+      for (std::pair<Point, RouteElement>& block : best_route) {
         block.first.z() = block.first.z() * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT;
       }
       // reverse the route (A* returns it backwards) and save it
