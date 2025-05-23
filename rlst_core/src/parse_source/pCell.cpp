@@ -134,17 +134,23 @@ void pCell::placePorts() {
   std::list<par::cell::PlacedPort> outputParPorts;
   std::list<par::cell::PlacedPort> inoutParPorts;
 
+  std::cout << "1" << std::endl;
   for (std::shared_ptr<par::cell::Port> &parPort : type->ports) {
     // create the PlacedPort
     par::cell::PlacedPort placed{parCell, parPort};
     if (parPort->type == par::cell::PortType(input)) {
+      std::cout << "haha welcome to the list bitch" << std::endl;
       inputParPorts.push_back(placed);
     } else if (parPort->type == par::cell::PortType(output)) {
-      outputParPorts.push_back(placed);
+      std::cout << "haha welcome to the list bitch" << std::endl;
+      inputParPorts.push_back(placed);
     } else if (parPort->type == par::cell::PortType(inout)) {
-      inoutParPorts.push_back(placed);
+      std::cout << "haha welcome to the list bitch" << std::endl;
+      inputParPorts.push_back(placed);
     }
   }
+
+  std::cout << "2" << std::endl;
 
   // parPort lists iterators
   std::list<par::cell::PlacedPort>::iterator inputParPortsIt =
@@ -154,18 +160,45 @@ void pCell::placePorts() {
   std::list<par::cell::PlacedPort>::iterator inoutParPortsIt =
       inoutParPorts.begin();
 
+  std::cout << "3" << std::endl;
+
   for (const auto &inputPort : inputPorts) {
+    if (inputPort == nullptr) {
+      std::cout << "life is suffering" << std::endl;
+    }
+
+    if (inputParPortsIt == inputParPorts.end()) {
+      std::cout << "life is misery" << std::endl;
+    }
+
     parInputPorts.insert(
         std::make_pair(inputPort->bitVector, *inputParPortsIt));
   }
   for (const auto &outputPort : outputPorts) {
+    if (outputPort == nullptr) {
+      std::cout << "life is suffering" << std::endl;
+    }
+
+    if (outputParPortsIt == outputParPorts.end()) {
+      std::cout << "life is misery" << std::endl;
+    }
+
     parOutputPorts.insert(
         std::make_pair(outputPort->bitVector, *outputParPortsIt));
   }
   for (const auto &inoutPort : outputPorts) {
+    if (inoutPort == nullptr) {
+      std::cout << "life is suffering" << std::endl;
+    }
+
+    if (inoutParPortsIt == inoutParPorts.end()) {
+      std::cout << "life is misery" << std::endl;
+    }
     parInoutPorts.insert(
         std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
   }
+
+  std::cout << "4" << std::endl;
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
