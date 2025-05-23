@@ -45,10 +45,10 @@ namespace rlst::svg
 
       << " fill='" << CELL_TEXT_COLOR << "'"
       << ">" << __cell.type()->name << "</text>\n";
-    for (std::shared_ptr<par::cell::Port> port : __cell.type()->ports) {
+    for (par::cell::Port port : __cell.type()->ports) {
       Point port_point;
-      port_point.x() = __cell.position().x() + port->position.x();
-      port_point.y() = __cell.position().y() + port->position.y();
+      port_point.x() = __cell.position().x() + port.position.x();
+      port_point.y() = __cell.position().y() + port.position.y();
       draw_point(port_point, PORT_BACKGROUND_COLOR);
     }
   }

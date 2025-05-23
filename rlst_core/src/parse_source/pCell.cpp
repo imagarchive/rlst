@@ -134,14 +134,15 @@ void pCell::placePorts() {
   std::list<par::cell::PlacedPort> outputParPorts;
   std::list<par::cell::PlacedPort> inoutParPorts;
 
-  for (std::shared_ptr<par::cell::Port> &parPort : type->ports) {
+  for (par::cell::Port &parPort : type->ports) {
     // create the PlacedPort
-    par::cell::PlacedPort placed{parCell, parPort};
-    if (parPort->type == par::cell::PortType(input)) {
+    par::cell::PlacedPort placed{parCell,
+                                 std::make_shared<par::cell::Port>(parPort)};
+    if (parPort.type == par::cell::PortType(input)) {
       inputParPorts.push_back(placed);
-    } else if (parPort->type == par::cell::PortType(output)) {
+    } else if (parPort.type == par::cell::PortType(output)) {
       outputParPorts.push_back(placed);
-    } else if (parPort->type == par::cell::PortType(inout)) {
+    } else if (parPort.type == par::cell::PortType(inout)) {
       inoutParPorts.push_back(placed);
     }
   }
