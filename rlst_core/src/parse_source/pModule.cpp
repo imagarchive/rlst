@@ -71,6 +71,16 @@ pModule::computeConnections() {
   return modNet_t;
 }
 
+std::list<std::pair<pPort, pPort>> pModule::computePConnections() {
+  std::list<std::pair<pPort, pPort>> pConnections;
+  for (auto &cell : cells) {
+    for (auto &otherCell : cells) {
+      pConnections.splice(pConnections.end(), cell.computePConnections(otherCell));
+    }
+  }
+  return pConnections;
+}
+
 void pModule::placePorts() {
   for (pCell &cell : cells) {
     // Create corresponding PlacedPort with par::cell::Cell parent and

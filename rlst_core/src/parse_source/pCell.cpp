@@ -3,46 +3,10 @@
 #include <string>
 #include <utility>
 
-#include "parse_source/pTypes.hpp"
 #include "par/cell/ports.hpp"
 #include "par/cell/types.hpp"
+#include "parse_source/pTypes.hpp"
 
-// List of all CellTypes
-std::list<par::cell::CellType> CellTypes;
-
-void initCellTypes(std::list<par::cell::CellType> __cell_types)
-  { CellTypes = std::move(__cell_types); }
-
-std::string to_uppercase(const std::string &str) {
-  std::string result = str;
-  std::transform(result.begin(), result.end(), result.begin(),
-                 [](unsigned char c) { return std::toupper(c); });
-  return result;
-}
-
-par::cell::CellType findCellType(std::string rawTypeString) {
-  // Get exact name from rawTypeString
-  std::string rawTypeStringUpper =
-      to_uppercase(rawTypeString.substr(2, rawTypeString.size() - 3));
-
-  std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
-
-  for (std::list<par::cell::CellType>::iterator it = CellTypes.begin();
-       it != CellTypes.end(); it++) {
-    std::string typeName = it->name;
-    // if (rawTypeStringUpper.find(typeName) != std::string::npos) {
-    //   return *it;
-    // }
-
-    if (rawTypeStringUpper == typeName) {
-      return *it;
-    }
-  }
-
-  // Fail when no corresponding CellType is found
-  perror("Missing cell type\n");
-  exit(-1);
-}
 
 pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
   std::cout << "\n----------------------------------------" << std::endl;
@@ -50,14 +14,13 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
   this->name = cell_name;
 
   // initialize cell type
-  std::string parsed_type = cell_tree.get<std::string>("type");
-  std::cout << "Cell is of type : " << parsed_type << std::endl;
+  pType = cell_tree.get<std::string>("type");
+  std::cout << "Cell is of type : " << pType << std::endl;
 
-  this->type = findCellType(parsed_type);
-  std::cout << "Computed type is : " << this->type.name << std::endl;
+  // type placeholder
+  type = par::cell::CellType();
 
-  // list of all ports, which will then be assigned to the current module
-  // instance depending on whether they're inputs, outputs, or inoutputs
+  // list of all ports
   std::vector<std::shared_ptr<pPort>> ports_list;
 
   // access directions attribute
@@ -78,7 +41,7 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
       portDirection = inout;
     }
     std::shared_ptr<pPort> newPort =
-        std::make_shared<pPort>(direction.first, portDirection);
+        std::make_shared<pPort>(direction.first, portDirection, this);
     ports_list.push_back(newPort);
 
     if (directionName == "input") {
@@ -119,6 +82,61 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
   std::cout << "----------------------------------------\n" << std::endl;
 }
 
+std::list<std::pair<pPort, pPort>> pCell::computePConnections(pCell &otherCell) {
+  std::cout << "COMPUTING CELL PCONNECTIONS" << std::endl;
+
+  std::list<std::pair<pPort, pPort>> pConnections;
+
+  // output -> input/inoutput
+  for (const auto &outputPort : outputPorts) {
+    // Find connections with input ports
+    for (const auto &inputPort : otherCell.inputPorts) {
+      if (outputPort->bitVector == inputPort->bitVector) {
+        outputPort->connections.push_back(inputPort);
+        inputPort->connections.push_back(outputPort);
+
+        pConnections.push_back(std::make_pair(*outputPort, *inputPort));
+
+        std::cout << outputPort->name << ", " << outputPort->bitVector
+                  << " --> " << inputPort->name << ", " << inputPort->bitVector
+                  << std::endl;
+      }
+    }
+
+    // Find connections with inoutput ports
+    for (const auto &inoutPort : otherCell.inoutPorts) {
+      if (outputPort->bitVector == inoutPort->bitVector) {
+        outputPort->connections.push_back(inoutPort);
+        inoutPort->connections.push_back(outputPort);
+
+        pConnections.push_back(std::make_pair(*outputPort, *inoutPort));
+
+        std::cout << outputPort->name << ", " << outputPort->bitVector
+                  << " --> " << inoutPort->name << ", " << inoutPort->bitVector
+                  << std::endl;
+      }
+    }
+  }
+
+  // input -> inoutput
+  for (const auto &inputPort : inputPorts) {
+    for (const auto &inoutPort : otherCell.inoutPorts) {
+      if (inputPort->bitVector == inoutPort->bitVector) {
+        inputPort->connections.push_back(inoutPort);
+        inoutPort->connections.push_back(inputPort);
+
+        pConnections.push_back(std::make_pair(*inputPort, *inoutPort));
+
+        std::cout << inputPort->name << ", " << inputPort->bitVector << " --> "
+                  << inoutPort->name << ", " << inoutPort->bitVector
+                  << std::endl;
+      }
+    }
+  }
+
+  return pConnections;
+}
+
 /**
  * Create a correspondance between every pPort to a unique PlacedPort
  */
@@ -130,7 +148,7 @@ void pCell::placePorts() {
 
   for (par::cell::Port &parPort : type.ports) {
     // create the PlacedPort
-    par::cell::PlacedPort placed { parCell, parPort };
+    par::cell::PlacedPort placed{parCell, parPort};
     if (parPort.type == par::cell::PortType(input)) {
       inputParPorts.push_back(placed);
     } else if (parPort.type == par::cell::PortType(output)) {
@@ -149,18 +167,21 @@ void pCell::placePorts() {
       inoutParPorts.begin();
 
   for (const auto &inputPort : inputPorts) {
-    parInputPorts.insert(std::make_pair(inputPort->bitVector, *inputParPortsIt));
+    parInputPorts.insert(
+        std::make_pair(inputPort->bitVector, *inputParPortsIt));
   }
   for (const auto &outputPort : outputPorts) {
-    parOutputPorts.insert(std::make_pair(outputPort->bitVector, *outputParPortsIt));
+    parOutputPorts.insert(
+        std::make_pair(outputPort->bitVector, *outputParPortsIt));
   }
   for (const auto &inoutPort : outputPorts) {
-    parInoutPorts.insert(std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
+    parInoutPorts.insert(
+        std::make_pair(inoutPort->bitVector, *inoutParPortsIt));
   }
 }
 
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-pCell::computeConnections(pCell& otherCell) {
+pCell::computeConnections(pCell &otherCell) {
   std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> cellNet_t;
 
   // std::cout << "COMPUTING CELL CONNECTIONS" << std::endl;

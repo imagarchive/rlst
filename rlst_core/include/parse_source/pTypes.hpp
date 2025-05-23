@@ -1,10 +1,10 @@
 #pragma once
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include "par/cell/Cell.hpp"
 #include "par/cell/ports.hpp"
 #include "par/cell/types.hpp"
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -25,30 +25,37 @@ enum pPortDirection { input, output, inout };
 class pCell {
 public:
   std::string name;
+  std::string pType;
+
   par::cell::CellType type;
 
   int inputNb = 0;
-  std::vector<std::shared_ptr<pPort>> inputPorts;
-  std::unordered_map<int, par::cell::PlacedPort> parInputPorts;
-
   int outputNb = 0;
-  std::vector<std::shared_ptr<pPort>> outputPorts;
-  std::unordered_map<int, par::cell::PlacedPort> parOutputPorts;
-
   int inoutNb = 0;
+
+  std::vector<std::shared_ptr<pPort>> inputPorts;
+  std::vector<std::shared_ptr<pPort>> outputPorts;
   std::vector<std::shared_ptr<pPort>> inoutPorts;
+
+  std::unordered_map<int, par::cell::PlacedPort> parInputPorts;
+  std::unordered_map<int, par::cell::PlacedPort> parOutputPorts;
   std::unordered_map<int, par::cell::PlacedPort> parInoutPorts;
 
   par::cell::Cell parCell;
 
   // extract the Cell from the gate_data.json
   pCell(std::string cell_name, pt::ptree cell_tree);
+  pCell() = default;
+
+  // compute pConnections
+  std::list<std::pair<pPort, pPort>> computePConnections(pCell &otherCell);
 
   // create PlacedPorts
   void placePorts();
 
   // compute this cell's connections
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections(pCell &otherCell);
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+  computeConnections(pCell &otherCell);
 };
 
 /**
@@ -58,13 +65,18 @@ public:
 class pPort {
 public:
   std::string name;
+  pCell *parent;
+
   pPortDirection direction;
   int bitVector;
   std::list<std::shared_ptr<pPort>> connections;
 
   // extract the Port from the gate_data.json
+  pPort(std::string name, pt::ptree port_tree, pCell &parent);
   pPort(std::string name, pt::ptree port_tree);
-  pPort(std::string name, pPortDirection direction);
+  pPort(std::string name, pPortDirection direction, pCell &parent);
+  pPort(const pPort &other) = default;
+  pPort &operator=(const pPort &other) = default;
 
   void setBitVector(int bitVector);
 };
@@ -85,18 +97,21 @@ public:
   int inoutNb = 0;
   std::vector<pPort> inoutPorts;
 
-  std::vector<pCell> cells;
+  std::list<pCell> cells;
 
   // extract the Module from the gate_data.json
   pModule(std::string module_name, pt::ptree module_tree);
+
+  // compute pConnections
+  std::list<std::pair<pPort, pPort>> computePConnections();
 
   // create PlacedPorts
   // TODO : check if actual creation is needed for modules
   void placePorts();
 
   // compute this module's connections
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> computeConnections();
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+  computeConnections();
 };
-
 
 void initCellTypes(std::list<par::cell::CellType> __cell_types);

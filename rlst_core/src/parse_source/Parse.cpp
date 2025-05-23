@@ -3,13 +3,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <cstdlib>
 #include <exception>
+#include <functional>
 #include <iostream>
-#include <memory>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "include/geometry.hpp"
 #include "par/cell/Cell.hpp"
-#include "par/cell/types.hpp"
 #include "parse_source/Parse.hpp"
 #include "parse_source/pTypes.hpp"
 
@@ -35,48 +36,113 @@ std::vector<pModule> parse_data_json() {
   return modules_list;
 }
 
+// List of all CellTypes
+std::list<par::cell::CellType> CellTypes;
+std::unordered_map<std::string, std::shared_ptr<par::cell::CellType>>
+    mapCellTypes;
+
+void initCellTypes(std::list<par::cell::CellType> __cell_types) {
+  CellTypes = std::move(__cell_types);
+
+  for (auto &type : CellTypes) {
+    mapCellTypes[type.name] = std::make_shared<par::cell::CellType>(type);
+  }
+}
+
+std::string to_uppercase(const std::string &str) {
+  std::string result = str;
+  std::transform(result.begin(), result.end(), result.begin(),
+                 [](unsigned char c) { return std::toupper(c); });
+  return result;
+}
+
+std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
+  // Get exact name from rawTypeString
+  std::string rawTypeStringUpper =
+      to_uppercase(rawTypeString.substr(2, rawTypeString.size() - 3));
+
+  // std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
+
+  return mapCellTypes[rawTypeString];
+}
+
+// Map each pCell to a Cell
+std::unordered_map<std::string, std::shared_ptr<par::cell::Cell>> cellMap;
+
+// Map each pPort to a Port
+std::unordered_map<std::string, std::shared_ptr<par::cell::Port>> portMap;
+
 std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
   using namespace rlst;
 
-  std::list<par::cell::Cell> cellList = {};
-
+  // Get all pCells
+  std::list<pCell> pCellList = {};
   for (pModule &mod : moduleList) {
-    std::cout << "THESE ARE THE " << mod.cells.size()
-              << " PCELLS: " << std::endl;
-    for (pCell &cell : mod.cells) {
-      par::cell::Cell newCell(Point(),
-                              std::make_shared<par::cell::CellType>(cell.type));
-      cellList.push_back(newCell);
+    pCellList.splice(pCellList.end(), mod.cells);
+  }
 
-      std::cout << &cell << " | " << newCell.type() << " | "
-                << newCell.type()->name << std::endl;
+  std::list<par::cell::Cell> cellList = {};
+  for (pCell &cell : pCellList) {
+    par::cell::Cell newCell = par::cell::Cell(Point(), findCellType(cell.name));
+    cellList.push_back(newCell);
 
-      // attribute this par::cell::Cell to the pCell
-      cell.parCell = newCell;
+    // Correspondance between pPorts and Ports (key will be name of the cell + name of the parent)
+    // get an iterator for each of the pCell's three pPort lists
+    std::vector<std::shared_ptr<pPort>>::iterator inputIt = cell.inputPorts.begin();
+    std::vector<std::shared_ptr<pPort>>::iterator outputIt = cell.outputPorts.begin();
+    // std::vector<std::shared_ptr<pPort>>::iterator inoutIt = cell.inoutPorts.begin();
+
+    for (auto &port : newCell.type()->ports) {
+      if (port.type == par::cell::PortType(input)) {
+        portMap[(*inputIt)->parent->name + (*inputIt)->name] = std::make_shared<par::cell::Port>(port);
+        inputIt++;
+      } else if (port.type == par::cell::PortType(output)) {
+        portMap[(*outputIt)->parent->name + (*inputIt)->name] = std::make_shared<par::cell::Port>(port);
+        outputIt++;
+      }
     }
 
-    // create placedPorts
-    mod.placePorts();
+    // map each pCell to a Cell
+    cellMap[cell.name] = std::make_shared<par::cell::Cell>(newCell);
   }
 
   return cellList;
 }
 
-std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-computeConnections(std::vector<pModule> &moduleList) {
-  // compute internal connections for each module
-  std::cout << "\n --- COMPUTING CONNECTIONS" << std::endl;
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t;
-
-  for (pModule &module : moduleList) {
-    std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-        modNet_t = module.computeConnections();
-    net_t.splice(net_t.end(), modNet_t);
+std::list<std::pair<pPort, pPort>>
+computePConnections(std::vector<pModule> &moduleList) {
+  std::list<std::pair<pPort, pPort>> pConnections;
+  for (auto &mod : moduleList) {
+    pConnections.splice(pConnections.end(), mod.computePConnections());
   }
 
-  // TODO : compute connections between modules (necessary?):
-  // add module ports the same way we do cell ports, and when computing
-  // connections, also take into account module ports
+  return pConnections;
+}
+
+std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+computeConnections(std::list<std::pair<pPort, pPort>> &pConnections,
+                   std::list<par::cell::Cell> &cellList) {
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+      net_t;
+  
+  // Reminder: placedPort contains:
+  // - std::reference_wrapper<const Cell> parent;
+  // - std::reference_wrapper<const Port> port;
+
+  for (auto &pConnection : pConnections) {
+    pPort lhsPort = pConnection.first;
+    pPort rhsPort = pConnection.second;
+
+    // Get lhs Cell, make PlacedPort
+    par::cell::Cell lhsCell = *cellMap[lhsPort.parent->name];
+    par::cell::Cell rhsCell = *cellMap[rhsPort.parent->name];
+
+    par::cell::PlacedPort lhsPlacedPort = {std::ref(lhsCell), std::ref(*portMap[lhsPort.parent->name + lhsPort.name])};
+    par::cell::PlacedPort rhsPlacedPort = {std::ref(rhsCell), std::ref(*portMap[rhsPort.parent->name + rhsPort.name])};
+
+    net_t.push_back(std::make_pair(lhsPlacedPort, rhsPlacedPort));
+  }
+
   return net_t;
 }
 
@@ -99,14 +165,32 @@ parse_v(int argc, char *argv[]) {
   // Parse gate_data.json, generation the list of modules
   std::vector<pModule> moduleList = parse_data_json();
 
-  // Generate par::cell:Cell list
+  // // Generate par::cell:Cell list
+  // std::list<par::cell::Cell> cellList = getCells(moduleList);
+  //
+  // // Generate ret_t
+  // std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t =
+  //     computeConnections(moduleList);
+
+  // ---------------------------------------------------------------------
+  // TODO : New workflow:
+  // - compute pConnections for pModule, pCell and pPort classes
+  // - create std::list<Cell>, and a correspondance between pCells and Cells (a
+  //   Cell needs shared_ptr<CellType>, which NEEDS to be unique, we have a map
+  //   for that) (Any reference_wrapper fuckery would doom us)
+  // - create connections: for each pConnection, get corresponding Port and
+  //   corresping Cell, that makes a PlacedPort, but would the Port survive?
+
+  // Compute pConnections
+  std::list<std::pair<pPort, pPort>> pConnections =
+      computePConnections(moduleList);
+
+  // Compute cellList and get correspondance between pCells and Cells
   std::list<par::cell::Cell> cellList = getCells(moduleList);
 
-  // Generate ret_t
-  /* NOTE : The Yosys synthesis script ideally only generates one module,
-     therefore simplifying many things, among which is generation ret_t */
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t =
-      computeConnections(moduleList);
+  // Compute final connectionx
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
+      net_t = computeConnections(pConnections, cellList);
 
   // Print cellList
   std::cout << "\n --- CELL LIST" << std::endl;
@@ -120,5 +204,6 @@ parse_v(int argc, char *argv[]) {
     std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
 
-  return std::make_pair(net_t, cellList);
+  return std::make_pair(std::move(net_t), std::move(cellList));
+  // ---------------------------------------------------------------------
 }
