@@ -56,11 +56,18 @@ namespace rlst::mca_parser
     file.read(reinterpret_cast<char *>(chunkLocation), 4);
 
     if (chunkLocation[0] == 0 && chunkLocation[1] == 0 && chunkLocation[2] == 0 && chunkLocation[3] == 0) {
-      std::cerr << "The chunk was not generated" << std::endl;
+      std::vector<Bytef> uncompressedData;
+      std::vector<unsigned char> compressedData;
+      // std::cerr << "The chunk was not generated" << std::endl;
+
+      std::cout << "chunkindex " << chunkIndex << std::endl;
 
       Chunk newChunk(
         chunkIndex % static_cast<Chunk::size_type>(chunksNb),
-        chunkIndex / static_cast<Chunk::size_type>(chunksNb)
+        chunkIndex / static_cast<Chunk::size_type>(chunksNb),
+        uncompressedData,
+        compressedData,
+        true
       );
 
       return newChunk;
@@ -282,8 +289,8 @@ namespace rlst::mca_parser
   void placeBlock(MCA& mcaFile, Block& block) {
       literal_t x = block.position().x();
       // z and y are inverted
-      literal_t y = block.position().y();
-      literal_t z = block.position().z();
+      literal_t y = block.position().z();
+      literal_t z = block.position().y();
 
       // find the chunk where the block has to be placed
       int chunkX = x / 16;
@@ -297,9 +304,9 @@ namespace rlst::mca_parser
       // Get the corresponding chunk
       int chunkIndex = (chunkX) + (chunkZ) * 32;
 
-      Chunk chunk = mcaFile.chunks()[chunkIndex];
+      // Chunk chunk = mcaFile.chunks()[chunkIndex];
 
-      NBTChunkView view(chunk);
+      NBTChunkView view(mcaFile.chunks()[chunkIndex]);
 
       // Computes the position of the block in the chunk
       int xInChunk = x % 16;

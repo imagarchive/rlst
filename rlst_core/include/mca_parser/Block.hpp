@@ -49,6 +49,7 @@ namespace rlst::mca_parser
   public:
     std::string_view name() const noexcept { return m_name; }
     Point position() const noexcept { return m_position; }
+    Point& position() noexcept { return m_position; }
     const properties_type& properties() const noexcept { return m_properties; }
   private:
     std::string m_name;

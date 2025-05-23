@@ -17,6 +17,7 @@
 
 
 #include "cell_reader/cell_reading.hpp"
+
 #include "par/placement.hpp"
 #include "par/routing.hpp"
 #include "parse_source/Parse.hpp"
@@ -24,10 +25,14 @@
 #include "svg/SVG.hpp"
 #include "config.hpp"
 #include "par.hpp"
+#include "geometry.hpp"
+
+#include "mca_parser/MCA.hpp"
 
 int main(int __argc, char *__argv[])
 {
   using namespace rlst;
+  // using namespace rlst::mca_parser;
 
   auto types = cell_reader::generate_gates(RLST_INSTALL_GATESDIR);
   initCellTypes(std::move(types));
@@ -67,4 +72,18 @@ int main(int __argc, char *__argv[])
       s.draw_point(b.first, "green");
     }
   }
+
+  // std::string mcaFile = "r.0.0.mca";
+
+  // MCA file = readMcaFile(mcaFile);
+
+  // std::unordered_map<std::string, std::string> properties;
+  // std::unordered_map<std::string, std::string> properties2;
+
+  // Block newBlock(rlst::Point(0, 0, 4), "minecraft:redstone_block", properties);
+
+  // // //places a block
+  // placeBlock(file, newBlock);
+  // // view.setBlock(newBlock);
+  // writeData(file);
 }
