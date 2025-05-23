@@ -75,6 +75,7 @@ void pModule::placePorts() {
   for (pCell &cell : cells) {
     // Create corresponding PlacedPort with par::cell::Cell parent and
     // par::cell::port port (a @ref to the cell type) for each pCell
+    std::cout << "CC ZBI" << std::endl;
     cell.placePorts();
   }
 }

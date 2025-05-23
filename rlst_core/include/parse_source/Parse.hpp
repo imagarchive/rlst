@@ -10,5 +10,5 @@ namespace par = rlst::par;
 
 // int parse_v(int argc, char *argv[]);
 std::pair<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
-          std::list<std::shared_ptr<par::cell::Cell>>>
+          std::list<par::cell::Cell>>
 parse_v(int argc, char *argv[]);

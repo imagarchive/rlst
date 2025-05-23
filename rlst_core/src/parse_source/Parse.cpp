@@ -8,10 +8,10 @@
 #include <utility>
 #include <vector>
 
-#include "include/geometry.hpp"
 #include "par/cell/Cell.hpp"
 #include "parse_source/Parse.hpp"
 #include "parse_source/pTypes.hpp"
+#include "include/geometry.hpp"
 
 std::vector<pModule> parse_data_json() {
   std::vector<pModule> modules_list;
@@ -35,25 +35,23 @@ std::vector<pModule> parse_data_json() {
   return modules_list;
 }
 
-std::list<std::shared_ptr<par::cell::Cell>>
-getCells(std::vector<pModule> &moduleList) {
+std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
   using namespace rlst;
 
-  std::list<std::shared_ptr<par::cell::Cell>> cellList = {};
+  std::list<par::cell::Cell> cellList = {};
 
   for (pModule &mod : moduleList) {
     std::cout << "THESE ARE THE " << mod.cells.size()
               << " PCELLS: " << std::endl;
     for (pCell &cell : mod.cells) {
-      std::shared_ptr<par::cell::Cell> newCell =
-          std::make_shared<par::cell::Cell>(Point(), cell.type);
+      par::cell::Cell newCell(Point(), cell.type);
       cellList.push_back(newCell);
 
-      std::cout << &cell << " | " << newCell->type() << " | "
-                << newCell->type()->name << std::endl;
+      std::cout << &cell << " | " << newCell.type() << " | "
+                << newCell.type()->name << std::endl;
 
       // attribute this par::cell::Cell to the pCell
-      cell.parCell = newCell;
+      cell.parCell = std::make_shared<par::cell::Cell>(newCell);
     }
 
     // create placedPorts
@@ -82,7 +80,7 @@ computeConnections(std::vector<pModule> &moduleList) {
 }
 
 std::pair<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
-          std::list<std::shared_ptr<par::cell::Cell>>>
+          std::list<par::cell::Cell>>
 parse_v(int argc, char *argv[]) {
   // initialize yosys environment
   // system("source ../../oss-cad-suite/environment");
@@ -101,7 +99,7 @@ parse_v(int argc, char *argv[]) {
   std::vector<pModule> moduleList = parse_data_json();
 
   // Generate par::cell:Cell list
-  std::list<std::shared_ptr<par::cell::Cell>> cellList = getCells(moduleList);
+  std::list<par::cell::Cell> cellList = getCells(moduleList);
 
   // Generate ret_t
   /* NOTE : The Yosys synthesis script ideally only generates one module,
@@ -111,8 +109,8 @@ parse_v(int argc, char *argv[]) {
 
   // Print cellList
   std::cout << "\n --- CELL LIST" << std::endl;
-  for (std::shared_ptr<par::cell::Cell> cell : cellList) {
-    std::cout << cell << " : " << cell->type()->name << std::endl;
+  for (par::cell::Cell &cell : cellList) {
+    std::cout << &(cell) << " : " << cell.type()->name << std::endl;
   }
 
   // Print ret_t
@@ -123,32 +121,31 @@ parse_v(int argc, char *argv[]) {
 
   // Print all initial positions
   std::cout << "\n --- INITIAL POSITIONS" << std::endl;
-  for (std::shared_ptr<par::cell::Cell> cell : cellList) {
-    rlst::Point bruh = (cell)->position();
-    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z()
-              << std::endl;
+  for (par::cell::Cell &cell : cellList) {
+    rlst::Point bruh = (cell).position();
+    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z() << std::endl;
   }
 
   for (const auto &[p1, p2] : net_t) {
     rlst::Point bruh = (&(p1.parent))->get()->position();
     rlst::Point bruh2 = (&(p2.parent))->get()->position();
-    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z()
-              << std::endl;
-    std::cout << bruh2.x() << " | " << bruh2.y() << " | " << bruh2.z()
-              << std::endl;
+    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z() << std::endl;
+    std::cout << bruh2.x() << " | " << bruh2.y() << " | " << bruh2.z() << std::endl;
   }
 
   // Print all Cells' CellTypes addresses
   std::cout << "\n --- CELL CELLTYPES ADDRESSES" << std::endl;
-  for (std::shared_ptr<par::cell::Cell> &cell : cellList) {
-    std::cout << (cell->type()) << std::endl;
+  for (par::cell::Cell &cell : cellList) {
+    std::cout << (cell.type()) << std::endl;
   }
 
   // Print initial addresses of CellTypes
   std::cout << "\n --- CELLTYPES ADDRESSES" << std::endl;
-  for (const auto &pair : sharedCellTypes) {
+  for (const auto &pair : sharedCellTypes ) {
     std::cout << pair.second << std::endl;
   }
+
+
 
   return std::make_pair(std::move(net_t), std::move(cellList));
 }
