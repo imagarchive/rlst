@@ -155,9 +155,9 @@ int main(int __argc, char *__argv[])
     )
   };
 
-  std::cout << "ROUTING" << std::endl;
-  par::place(cells.begin(), cells.end(), nets.begin(), nets.end(), 16_ul);
   std::cout << "PLACEMENT" << std::endl;
+  par::place(cells.begin(), cells.end(), nets.begin(), nets.end(), 16_ul);
+  std::cout << "ROUTING" << std::endl;
   auto route =
     par::route(
       nets,
@@ -184,29 +184,28 @@ int main(int __argc, char *__argv[])
     }
   }
   // BLOCK PLACEMENT
-  std::cout << "MINECRAFT" << std::endl;
+  //std::cout << "MINECRAFT" << std::endl;
 
-  // TODO don't hardcode
-  std::string file_name = "r.0.0.mca";
+  //std::string file_name = "r.0.0.mca";
 
-  mca_parser::MCA mca_file = mca_parser::readMcaFile(file_name);
+  //mca_parser::MCA mca_file = mca_parser::readMcaFile(file_name);
 
-  // routing blocks
-  std::vector<mca_parser::Block> route_blocks =
-    par::generate_routing_blocks(route, nets);
-  for (mca_parser::Block block : route_blocks) {
-    block.position().z() += 5;
-    mca_parser::placeBlock(mca_file, block);
-  }
+  //// routing blocks
+  //std::vector<mca_parser::Block> route_blocks =
+  //  par::generate_routing_blocks(route, nets);
+  //for (mca_parser::Block block : route_blocks) {
+  //  block.position().z() += 5;
+  //  mca_parser::placeBlock(mca_file, block);
+  //}
 
-  // gate blocks
-  for (par::cell::Cell cell : cells) {
-    std::vector<mca_parser::Block> gate_blocks = cell.generate_blocks();
-    for (mca_parser::Block block : gate_blocks) {
-      block.position().z() += 5;
-      mca_parser::placeBlock(mca_file, block);
-    }
-  }
+  //// gate blocks
+  //for (par::cell::Cell cell : cells) {
+  //  std::vector<mca_parser::Block> gate_blocks = cell.generate_blocks();
+  //  for (mca_parser::Block block : gate_blocks) {
+  //    block.position().z() += 5;
+  //    mca_parser::placeBlock(mca_file, block);
+  //  }
+  //}
 
-  writeData(mca_file);
+  //writeData(mca_file);
 }
