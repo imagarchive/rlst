@@ -9,6 +9,6 @@
 namespace par = rlst::par;
 
 // int parse_v(int argc, char *argv[]);
-std::pair<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
-          std::list<par::cell::Cell>>
+std::tuple<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
+          std::list<par::cell::Cell>, std::unordered_map<std::string, std::shared_ptr<par::cell::Port>>>
 parse_v(int argc, char *argv[]);

@@ -38,8 +38,6 @@ pModule::pModule(std::string module_name, pt::ptree module_tree) {
 
   // initialize cells
   for (const auto &cell : cells_subtree) {
-    std::cout << "HERE BRO HEEEERE" << std::endl;
-    std::cout << cell.first << std::endl;
     this->cells.push_back(pCell(cell.first, cell.second));
   }
 }

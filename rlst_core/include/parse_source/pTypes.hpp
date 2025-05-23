@@ -65,16 +65,16 @@ public:
 class pPort {
 public:
   std::string name;
-  pCell *parent;
+  std::string parent;
 
   pPortDirection direction;
   int bitVector;
   std::list<std::shared_ptr<pPort>> connections;
 
   // extract the Port from the gate_data.json
-  pPort(std::string name, pt::ptree port_tree, pCell &parent);
+  pPort(std::string name, pt::ptree port_tree, std::string parent);
   pPort(std::string name, pt::ptree port_tree);
-  pPort(std::string name, pPortDirection direction, pCell &parent);
+  pPort(std::string name, pPortDirection direction, std::string parent);
   pPort(const pPort &other) = default;
   pPort &operator=(const pPort &other) = default;
 

@@ -41,7 +41,7 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
       portDirection = inout;
     }
     std::shared_ptr<pPort> newPort =
-        std::make_shared<pPort>(direction.first, portDirection, *this);
+        std::make_shared<pPort>(direction.first, portDirection, this->name);
     ports_list.push_back(newPort);
 
     if (directionName == "input") {
@@ -83,8 +83,6 @@ pCell::pCell(std::string cell_name, pt::ptree cell_tree) {
 }
 
 std::list<std::pair<pPort, pPort>> pCell::computePConnections(pCell &otherCell) {
-  std::cout << "COMPUTING CELL PCONNECTIONS" << std::endl;
-
   std::list<std::pair<pPort, pPort>> pConnections;
 
   // output -> input/inoutput

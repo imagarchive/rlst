@@ -1,9 +1,9 @@
 #include "parse_source/pTypes.hpp"
 #include <memory>
 
-pPort::pPort(std::string name, pt::ptree port_tree, pCell &parent) {
+pPort::pPort(std::string name, pt::ptree port_tree, std::string parent) {
   this->name = name;
-  this->parent = &parent;
+  this->parent = parent;
 
   // create ports
   std::string direction = port_tree.get<std::string>("direction");
@@ -21,15 +21,15 @@ pPort::pPort(std::string name, pt::ptree port_tree, pCell &parent) {
   this->bitVector = bitVector;
 }
 
-pPort::pPort(std::string name, pPortDirection direction, pCell &parent) {
-  this->parent = &parent;
+pPort::pPort(std::string name, pPortDirection direction, std::string parent) {
+  this->parent = parent;
   this->name = name;
   this->direction = direction;
 }
 
 pPort::pPort(std::string name, pt::ptree port_tree) {
   this->name = name;
-  this->parent = nullptr;
+  this->parent = "external";
 
   // create ports
   std::string direction = port_tree.get<std::string>("direction");

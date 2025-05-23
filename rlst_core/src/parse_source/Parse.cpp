@@ -61,8 +61,6 @@ std::shared_ptr<par::cell::CellType> findCellType(std::string rawTypeString) {
   std::string rawTypeStringUpper =
       to_uppercase(rawTypeString.substr(2, rawTypeString.size() - 3));
 
-  // std::cout << "rawTypeStringUpper is : " << rawTypeStringUpper << std::endl;
-
   return mapCellTypes[rawTypeStringUpper];
 }
 
@@ -83,21 +81,28 @@ std::list<par::cell::Cell> getCells(std::vector<pModule> &moduleList) {
 
   std::list<par::cell::Cell> cellList = {};
   for (pCell &cell : pCellList) {
-    par::cell::Cell newCell = par::cell::Cell(Point(), findCellType(cell.pType));
+    par::cell::Cell newCell =
+        par::cell::Cell(Point(), findCellType(cell.pType));
     cellList.push_back(newCell);
 
-    // Correspondance between pPorts and Ports (key will be name of the cell + name of the parent)
-    // get an iterator for each of the pCell's three pPort lists
-    std::vector<std::shared_ptr<pPort>>::iterator inputIt = cell.inputPorts.begin();
-    std::vector<std::shared_ptr<pPort>>::iterator outputIt = cell.outputPorts.begin();
-    // std::vector<std::shared_ptr<pPort>>::iterator inoutIt = cell.inoutPorts.begin();
+    // Correspondance between pPorts and Ports (key will be name of the cell +
+    // name of the parent) get an iterator for each of the pCell's three pPort
+    // lists
+    std::vector<std::shared_ptr<pPort>>::iterator inputIt =
+        cell.inputPorts.begin();
+    std::vector<std::shared_ptr<pPort>>::iterator outputIt =
+        cell.outputPorts.begin();
+    // std::vector<std::shared_ptr<pPort>>::iterator inoutIt =
+    // cell.inoutPorts.begin();
 
     for (auto &port : newCell.type()->ports) {
       if (port.type == par::cell::PortType(input)) {
-        portMap[(*inputIt)->parent->name + (*inputIt)->name] = std::make_shared<par::cell::Port>(port);
+        std::string key = (*inputIt)->parent + (*inputIt)->name;
+        portMap[key] = std::make_shared<par::cell::Port>(port);
         inputIt++;
       } else if (port.type == par::cell::PortType(output)) {
-        portMap[(*outputIt)->parent->name + (*inputIt)->name] = std::make_shared<par::cell::Port>(port);
+        std::string key = (*outputIt)->parent + (*outputIt)->name;
+        portMap[key] = std::make_shared<par::cell::Port>(port);
         outputIt++;
       }
     }
@@ -122,9 +127,8 @@ computePConnections(std::vector<pModule> &moduleList) {
 std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
 computeConnections(std::list<std::pair<pPort, pPort>> &pConnections,
                    std::list<par::cell::Cell> &cellList) {
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-      net_t;
-  
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t;
+
   // Reminder: placedPort contains:
   // - std::reference_wrapper<const Cell> parent;
   // - std::reference_wrapper<const Port> port;
@@ -134,11 +138,21 @@ computeConnections(std::list<std::pair<pPort, pPort>> &pConnections,
     pPort rhsPort = pConnection.second;
 
     // Get lhs Cell, make PlacedPort
-    par::cell::Cell lhsCell = *cellMap[lhsPort.parent->name];
-    par::cell::Cell rhsCell = *cellMap[rhsPort.parent->name];
+    par::cell::Cell lhsCell = *cellMap[lhsPort.parent];
+    par::cell::Cell rhsCell = *cellMap[rhsPort.parent];
 
-    par::cell::PlacedPort lhsPlacedPort = {std::ref(lhsCell), std::ref(*portMap[lhsPort.parent->name + lhsPort.name])};
-    par::cell::PlacedPort rhsPlacedPort = {std::ref(rhsCell), std::ref(*portMap[rhsPort.parent->name + rhsPort.name])};
+    par::cell::PlacedPort lhsPlacedPort = {
+        std::ref(lhsCell), std::ref(*portMap[lhsPort.parent + lhsPort.name])};
+    par::cell::PlacedPort rhsPlacedPort = {
+        std::ref(rhsCell), std::ref(*portMap[rhsPort.parent + rhsPort.name])};
+
+    rlst::Point bruh = (rhsPlacedPort.parent).get().position();
+    rlst::Point bruh2 = (lhsPlacedPort.parent).get().position();
+
+    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z()
+              << std::endl;
+    std::cout << bruh2.x() << " | " << bruh2.y() << " | " << bruh2.z()
+              << std::endl;
 
     net_t.push_back(std::make_pair(lhsPlacedPort, rhsPlacedPort));
   }
@@ -146,8 +160,8 @@ computeConnections(std::list<std::pair<pPort, pPort>> &pConnections,
   return net_t;
 }
 
-std::pair<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
-          std::list<par::cell::Cell>>
+std::tuple<std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>,
+          std::list<par::cell::Cell>, std::unordered_map<std::string, std::shared_ptr<par::cell::Port>>>
 parse_v(int argc, char *argv[]) {
   // initialize yosys environment
   // system("source ../../oss-cad-suite/environment");
@@ -165,15 +179,8 @@ parse_v(int argc, char *argv[]) {
   // Parse gate_data.json, generation the list of modules
   std::vector<pModule> moduleList = parse_data_json();
 
-  // // Generate par::cell:Cell list
-  // std::list<par::cell::Cell> cellList = getCells(moduleList);
-  //
-  // // Generate ret_t
-  // std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t =
-  //     computeConnections(moduleList);
-
   // ---------------------------------------------------------------------
-  // TODO : New workflow:
+  // New workflow:
   // - compute pConnections for pModule, pCell and pPort classes
   // - create std::list<Cell>, and a correspondance between pCells and Cells (a
   //   Cell needs shared_ptr<CellType>, which NEEDS to be unique, we have a map
@@ -188,9 +195,9 @@ parse_v(int argc, char *argv[]) {
   // Compute cellList and get correspondance between pCells and Cells
   std::list<par::cell::Cell> cellList = getCells(moduleList);
 
-  // Compute final connectionx
-  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>>
-      net_t = computeConnections(pConnections, cellList);
+  // Compute final connections
+  std::list<std::pair<par::cell::PlacedPort, par::cell::PlacedPort>> net_t =
+      computeConnections(pConnections, cellList);
 
   // Print cellList
   std::cout << "\n --- CELL LIST" << std::endl;
@@ -204,6 +211,36 @@ parse_v(int argc, char *argv[]) {
     std::cout << "(" << &(p1.port) << ", " << &(p2.port) << ")" << std::endl;
   }
 
-  return std::make_pair(std::move(net_t), std::move(cellList));
+  // Print all initial positions
+  std::cout << "\n --- INITIAL POSITIONS" << std::endl;
+  for (par::cell::Cell cell : cellList) {
+    rlst::Point bruh = cell.position();
+    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z()
+              << std::endl;
+  }
+
+  for (const auto &[p1, p2] : net_t) {
+    rlst::Point bruh = (p1.parent).get().position();
+    rlst::Point bruh2 = (p2.parent).get().position();
+    std::cout << bruh.x() << " | " << bruh.y() << " | " << bruh.z()
+              << std::endl;
+    std::cout << bruh2.x() << " | " << bruh2.y() << " | " << bruh2.z()
+              << std::endl;
+  }
+
+  // Print all Cells' CellTypes addresses
+  std::cout << "\n --- CELL CELLTYPES ADDRESSES" << std::endl;
+  for (par::cell::Cell &cell : cellList) {
+    std::cout << (cell.type()) << std::endl;
+  }
+
+  // Print initial addresses of CellTypes
+  std::cout << "\n --- CELLTYPES ADDRESSES" << std::endl;
+  for (const auto &pair : mapCellTypes) {
+    std::cout << pair.second << std::endl;
+  }
+
+  // return std::make_tuple(net_t, cellList, cellMap);
+  return std::make_tuple(std::move(net_t), std::move(cellList), std::move(portMap));
   // ---------------------------------------------------------------------
 }
